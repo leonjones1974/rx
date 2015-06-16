@@ -1,15 +1,85 @@
 
-compileJava {
-    sourceCompatibility = 1.8
-    targetCompatibility = 1.8
-    options.debug = 'source,lines,vars'
-    options.warnings = true
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'com.andrewkroh.gradle:gradle-protobuf-plugin:0.4.0'
+        classpath 'me.tatarka:gradle-retrolambda:3.0.1'
+    }
 }
 
-dependencies {
-    compile 'io.reactivex:rxjava:1.0.8'
-    compile 'org.slf4j:slf4j-api:1.7.7'
-    compile 'com.google.guava:guava:18.0'
+task wrapper(type: Wrapper) {
+    gradleVersion = '2.2'
+    distributionUrl = 'http://services.gradle.org/distributions/gradle-2.2-bin.zip'
 }
 
+
+
+
+    group = 'com.cam.rx-test'
+    version = '1.0-SNAPSHOT'
+
+    apply plugin: 'idea'
+    apply plugin: 'java'
+
+    repositories {
+        mavenCentral()
+    }
+
+    idea {
+        module {
+            inheritOutputDirs = false
+            outputDir = file('.idea-classes')
+            testOutputDir = file('.idea-test-classes')
+            downloadJavadoc = true
+            downloadSources = true
+            jdkName = '1.8'
+
+        }
+    }
+
+    dependencies {
+        compile 'io.reactivex:rxjava:1.0.8'
+        compile 'org.slf4j:slf4j-api:1.7.7'
+        compile 'com.google.guava:guava:18.0'
+        compile 'com.google.protobuf:protobuf-java:2.6.1'
+        testCompile 'org.assertj:assertj-core:3.0.0'
+        testCompile 'org.mockito:mockito-all:1.9.5'
+        testCompile 'de.bechte.junit:junit-hierarchicalcontextrunner:4.11.1'
+        testCompile 'junit:junit:4.11'
+    }
+
+    apply plugin: 'maven-publish'
+
+    task sourceJar(type: Jar) {
+        from sourceSets.main.allJava
+    }
+
+    publishing {
+        publications {
+            mavenJava(MavenPublication) {
+                from components.java
+
+                artifact sourceJar {
+                    classifier "sources"
+                }
+            }
+        }
+
+        repositories {
+            maven {
+                url "http://leonandjosh.ddns.net:8081/nexus/content/repositories/${project.version.endsWith('-SNAPSHOT') ? 'snapshots' : 'releases'}"
+                credentials {
+                    username 'admin'
+                    password 'yamaha'
+                }
+            }
+        }
+    }
+    test {
+        testLogging {
+            events 'started', 'passed'
+        }
+    }
 
