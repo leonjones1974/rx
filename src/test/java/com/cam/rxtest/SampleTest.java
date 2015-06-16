@@ -1,5 +1,6 @@
 package com.cam.rxtest;
 
+import org.assertj.core.api.Assertions;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -10,7 +11,7 @@ public class SampleTest {
 
     @Before
     public void before() {
-        subject = new EventSource<String>();
+        subject = new EventSource<>();
     }
 
     @Test
@@ -20,15 +21,16 @@ public class SampleTest {
                 .emit("1")
                 .go();
 
-
         context.subscriber("subscriber1")
                 .eventCount()
                 .isEqualTo(1);
 
-        context.subscriber("subscriber1")
-                .event(1)
-                .equals("subscriber1");
+        Assertions.assertThat(context.subscriber("subscriber1")
+                .event(1)).isEqualTo("subscriber1");
 
+        context.subscriber("subscriber1")
+                .eventValue(1, Object::toString)
+                .isEqualTo("subscriber1");
     }
 
 }
