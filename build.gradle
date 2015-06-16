@@ -1,0 +1,15 @@
+
+compileJava {
+    sourceCompatibility = 1.8
+    targetCompatibility = 1.8
+    options.debug = 'source,lines,vars'
+    options.warnings = true
+}
+
+dependencies {
+    compile 'io.reactivex:rxjava:1.0.8'
+    compile 'org.slf4j:slf4j-api:1.7.7'
+    compile 'com.google.guava:guava:18.0'
+}
+
+

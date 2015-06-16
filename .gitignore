@@ -1,0 +1,25 @@
+# Android
+local.properties
+
+Maven
+.m2
+# GradleWrapper
+gradlew.bat
+.gradle/
+
+# Build artifacts
+build/
+log
+*.log
+**/src/generated
+generated/
+
+# Idea artifacts
+out/
+.idea
+*.iml
+*.ipr
+*.iws
+
+.idea-classes/
+.idea-test-classes
