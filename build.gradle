@@ -43,10 +43,10 @@ dependencies {
     compile 'org.slf4j:slf4j-api:1.7.7'
     compile 'com.google.guava:guava:18.0'
     compile 'com.google.protobuf:protobuf-java:2.6.1'
-    testCompile 'org.assertj:assertj-core:3.0.0'
-    testCompile 'org.mockito:mockito-all:1.9.5'
-    testCompile 'de.bechte.junit:junit-hierarchicalcontextrunner:4.11.1'
-    testCompile 'junit:junit:4.11'
+    compile 'org.assertj:assertj-core:3.0.0'
+    compile 'org.mockito:mockito-all:1.9.5'
+    compile 'de.bechte.junit:junit-hierarchicalcontextrunner:4.11.1'
+    compile 'junit:junit:4.11'
 }
 
 apply plugin: 'maven-publish'
