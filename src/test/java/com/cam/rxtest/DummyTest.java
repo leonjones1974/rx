@@ -7,6 +7,6 @@ public class DummyTest {
 
     @Test
     public void itShould_Dummy() {
-        Assertions.assertThat(true).isFalse();
+        Assertions.assertThat(true).isTrue();
     }
 }
