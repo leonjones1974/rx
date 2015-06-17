@@ -167,7 +167,7 @@ public class SampleTest {
 
     @Test
     public void merge() {
-        TestScenario2<String, String> testScenario = new TestScenario2<>();
+        TestScenario<String, String> testScenario = new TestScenario<>();
 
         testScenario
                 .given()
