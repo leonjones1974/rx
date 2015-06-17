@@ -1,41 +1,73 @@
 package com.cam.rxtest;
 
-import org.assertj.core.api.AbstractAssert;
-import org.assertj.core.api.AbstractIntegerAssert;
-import org.assertj.core.api.AbstractObjectAssert;
-import org.assertj.core.api.Assertions;
+import org.assertj.core.api.*;
+import rx.Observable;
 import rx.Observer;
+import rx.subscriptions.SerialSubscription;
 
-import java.sql.Timestamp;
-import java.util.function.Function;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class TestSubscriber<T> implements Observer<T> {
 
+    private final rx.observers.TestSubscriber<T> inner;
+    private SerialSubscription subscription = new SerialSubscription();
+
+    public TestSubscriber(String id) {
+        this.inner = new rx.observers.TestSubscriber<T>();
+    }
+
     @Override
     public void onCompleted() {
-
+        inner.onCompleted();
     }
 
     @Override
     public void onError(Throwable e) {
-
+        inner.onError(e);
     }
 
     @Override
     public void onNext(T t) {
-
+        inner.onNext(t);
     }
 
     public AbstractIntegerAssert<?> eventCount() {
-        return Assertions.assertThat(1);
+        return assertThat(inner.getOnNextEvents().size());
     }
 
-    public T event(int index) {
-        return (T) "subscriber1";
+    public void subscribeTo(Observable<T> subject) {
+        subscription.set(subject.subscribe(this));
     }
 
-    public AbstractObjectAssert<?, Object> eventValue(int index, Function<T, Object> f) {
-        Object value = f.apply(event(index));
-        return Assertions.assertThat(value);
+    public AbstractObjectAssert<?, T> event(int index) {
+        return assertThat(getEvent(index));
+    }
+
+    private T getEvent(int index) {
+        return inner.getOnNextEvents().get(index);
+    }
+
+    public AbstractIntegerAssert<?> completedCount() {
+        return assertThat(inner.getOnCompletedEvents().size());
+    }
+
+    public AbstractIntegerAssert<?> errorCount() {
+        return assertThat(inner.getOnErrorEvents().size());
+    }
+
+    public AbstractClassAssert<?> errorClass(int index) {
+        return assertThat(inner.getOnErrorEvents().get(index).getClass());
+    }
+
+    public AbstractCharSequenceAssert<?, String> errorMessage(int index) {
+        return assertThat(inner.getOnErrorEvents().get(index).getMessage());
+    }
+
+    public AbstractThrowableAssert<?, ? extends Throwable> error(int index) {
+        return assertThat(inner.getOnErrorEvents().get(index));
+    }
+
+    public void unsubscribe() {
+        subscription.unsubscribe();
     }
 }
