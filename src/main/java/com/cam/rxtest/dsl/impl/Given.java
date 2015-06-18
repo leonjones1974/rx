@@ -1,11 +1,11 @@
-package com.cam.rxtest;
+package com.cam.rxtest.dsl.impl;
 
+import com.cam.rxtest.dsl.one.Given1;
+import com.cam.rxtest.dsl.two.Given2;
 import rx.Observable;
 import rx.Scheduler;
 import rx.functions.Func1;
 import rx.functions.Func2;
-
-import java.util.Map;
 
 public class Given<T1, T2, U>
         implements Given1<T1, U>,

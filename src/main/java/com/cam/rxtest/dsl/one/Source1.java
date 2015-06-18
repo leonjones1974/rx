@@ -1,4 +1,4 @@
-package com.cam.rxtest;
+package com.cam.rxtest.dsl.one;
 
 public interface Source1<T, T1, U> {
 

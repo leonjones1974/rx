@@ -1,5 +1,7 @@
 package com.cam.rxtest;
 
+import com.cam.rxtest.dsl.one.Scenario1;
+import com.cam.rxtest.dsl.two.Scenario2;
 import org.junit.Test;
 import rx.Observable;
 

@@ -1,5 +1,7 @@
-package com.cam.rxtest;
+package com.cam.rxtest.dsl.impl;
 
+import com.cam.rxtest.dsl.one.Subscriber1;
+import com.cam.rxtest.dsl.two.Subscriber2;
 import org.assertj.core.api.AbstractThrowableAssert;
 import rx.subscriptions.SerialSubscription;
 

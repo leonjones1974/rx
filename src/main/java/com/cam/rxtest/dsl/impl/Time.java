@@ -1,4 +1,7 @@
-package com.cam.rxtest;
+package com.cam.rxtest.dsl.impl;
+
+import com.cam.rxtest.dsl.one.Time1;
+import com.cam.rxtest.dsl.two.Time2;
 
 import java.time.Duration;
 import java.util.concurrent.TimeUnit;

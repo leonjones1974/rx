@@ -1,4 +1,6 @@
-package com.cam.rxtest;
+package com.cam.rxtest.dsl.two;
+
+import com.cam.rxtest.dsl.impl.Then;
 
 public interface When2<T1, T2, U> {
 

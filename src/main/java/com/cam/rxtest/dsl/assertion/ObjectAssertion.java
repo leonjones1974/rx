@@ -1,12 +1,13 @@
-package com.cam.rxtest;
+package com.cam.rxtest.dsl.assertion;
 
-import org.assertj.core.api.AbstractClassAssert;
+import com.cam.rxtest.dsl.impl.Then;
+import org.assertj.core.api.AbstractObjectAssert;
 
-public class ClassAssertion<U> extends AbstractClassAssert<ClassAssertion<U>> implements ISubscriberAssertions<U> {
+public class ObjectAssertion<U> extends AbstractObjectAssert<ObjectAssertion<U>, U> implements ISubscriberAssertions<U> {
     private final ISubscriberAssertions<U> subscriberAssertions;
 
-    public ClassAssertion(Class<?> actual, ISubscriberAssertions<U> subscriberAssertions) {
-        super(actual, ClassAssertion.class);
+    public ObjectAssertion(U actual, ISubscriberAssertions<U> subscriberAssertions) {
+        super(actual, ObjectAssertion.class);
         this.subscriberAssertions = subscriberAssertions;
     }
 

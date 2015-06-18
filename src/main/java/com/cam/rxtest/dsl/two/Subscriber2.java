@@ -1,4 +1,4 @@
-package com.cam.rxtest;
+package com.cam.rxtest.dsl.two;
 
 public interface Subscriber2<T1, T2, U> {
 

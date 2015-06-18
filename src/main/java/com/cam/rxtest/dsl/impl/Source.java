@@ -1,5 +1,7 @@
-package com.cam.rxtest;
+package com.cam.rxtest.dsl.impl;
 
+import com.cam.rxtest.dsl.one.Source1;
+import com.cam.rxtest.dsl.two.Source2;
 import rx.Observable;
 import rx.subjects.PublishSubject;
 

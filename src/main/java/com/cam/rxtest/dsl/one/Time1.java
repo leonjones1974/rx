@@ -1,4 +1,4 @@
-package com.cam.rxtest;
+package com.cam.rxtest.dsl.one;
 
 import java.time.Duration;
 

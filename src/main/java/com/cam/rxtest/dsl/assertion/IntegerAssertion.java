@@ -1,12 +1,14 @@
-package com.cam.rxtest;
+package com.cam.rxtest.dsl.assertion;
 
-import org.assertj.core.api.AbstractObjectAssert;
+import com.cam.rxtest.dsl.impl.Then;
+import org.assertj.core.api.AbstractIntegerAssert;
 
-public class ObjectAssertion<U> extends AbstractObjectAssert<ObjectAssertion<U>, U> implements ISubscriberAssertions<U> {
+public class IntegerAssertion<U> extends AbstractIntegerAssert<IntegerAssertion<U>> implements ISubscriberAssertions<U> {
+
     private final ISubscriberAssertions<U> subscriberAssertions;
 
-    public ObjectAssertion(U actual, ISubscriberAssertions<U> subscriberAssertions) {
-        super(actual, ObjectAssertion.class);
+    public IntegerAssertion(int value, ISubscriberAssertions<U> subscriberAssertions) {
+        super(value, IntegerAssertion.class);
         this.subscriberAssertions = subscriberAssertions;
     }
 
@@ -18,6 +20,11 @@ public class ObjectAssertion<U> extends AbstractObjectAssert<ObjectAssertion<U>,
     @Override
     public IntegerAssertion<U> eventCount() {
         return subscriberAssertions.eventCount();
+    }
+
+    @Override
+    public Then<U> and() {
+        return subscriberAssertions.and();
     }
 
     @Override
@@ -33,10 +40,5 @@ public class ObjectAssertion<U> extends AbstractObjectAssert<ObjectAssertion<U>,
     @Override
     public StringAssertion<U> errorMessage() {
         return subscriberAssertions.errorMessage();
-    }
-
-    @Override
-    public Then<U> and() {
-        return subscriberAssertions.and();
     }
 }

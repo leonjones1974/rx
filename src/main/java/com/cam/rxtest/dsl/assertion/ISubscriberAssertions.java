@@ -1,4 +1,6 @@
-package com.cam.rxtest;
+package com.cam.rxtest.dsl.assertion;
+
+import com.cam.rxtest.dsl.impl.Then;
 
 public interface ISubscriberAssertions<U> {
 

@@ -1,4 +1,4 @@
-package com.cam.rxtest;
+package com.cam.rxtest.dsl.two;
 
 public interface Source2<T, T1, T2, U> {
 

@@ -1,11 +1,13 @@
-package com.cam.rxtest;
+package com.cam.rxtest.dsl.impl;
+
+import com.cam.rxtest.dsl.assertion.*;
 
 public class SubscriberAssertions<U> implements ISubscriberAssertions<U> {
 
     private final ExecutionContext<?, ?, U> context;
-    private final Subscriber1<?, U> testSubscriber;
+    private final Subscriber<?, ?, U> testSubscriber;
 
-    public SubscriberAssertions(ExecutionContext<?, ?, U> context, Subscriber1<?, U> testSubscriber) {
+    public SubscriberAssertions(ExecutionContext<?, ?, U> context, Subscriber<?, ?, U> testSubscriber) {
         this.context = context;
         this.testSubscriber = testSubscriber;
     }

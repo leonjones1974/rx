@@ -1,5 +1,10 @@
 package com.cam.rxtest;
 
+import com.cam.rxtest.dsl.impl.ExecutionContext;
+import com.cam.rxtest.dsl.impl.Given;
+import com.cam.rxtest.dsl.one.Scenario1;
+import com.cam.rxtest.dsl.two.Scenario2;
+
 public class TestScenario<T1, T2, U>
         implements Scenario1<T1, U>,
         Scenario2<T1, T2, U> {

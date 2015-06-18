@@ -1,5 +1,8 @@
-package com.cam.rxtest;
+package com.cam.rxtest.dsl.impl;
 
+
+import com.cam.rxtest.dsl.one.When1;
+import com.cam.rxtest.dsl.two.When2;
 
 public class When<T1, T2, U>
     implements When1<T1, U>,

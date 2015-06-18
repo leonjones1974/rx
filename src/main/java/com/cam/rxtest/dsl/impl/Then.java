@@ -1,4 +1,4 @@
-package com.cam.rxtest;
+package com.cam.rxtest.dsl.impl;
 
 public class Then<U> {
 

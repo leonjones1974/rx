@@ -1,13 +1,14 @@
-package com.cam.rxtest;
+package com.cam.rxtest.dsl.assertion;
 
-import org.assertj.core.api.AbstractIntegerAssert;
+import com.cam.rxtest.dsl.impl.Then;
+import org.assertj.core.api.AbstractCharSequenceAssert;
 
-public class IntegerAssertion<U> extends AbstractIntegerAssert<IntegerAssertion<U>> implements ISubscriberAssertions<U> {
+public class StringAssertion<U> extends AbstractCharSequenceAssert<StringAssertion<U>, CharSequence> implements ISubscriberAssertions<U> {
 
     private final ISubscriberAssertions<U> subscriberAssertions;
 
-    public IntegerAssertion(int value, ISubscriberAssertions<U> subscriberAssertions) {
-        super(value, IntegerAssertion.class);
+    public StringAssertion(String value, ISubscriberAssertions<U> subscriberAssertions) {
+        super(value, StringAssertion.class);
         this.subscriberAssertions = subscriberAssertions;
     }
 
@@ -19,11 +20,6 @@ public class IntegerAssertion<U> extends AbstractIntegerAssert<IntegerAssertion<
     @Override
     public IntegerAssertion<U> eventCount() {
         return subscriberAssertions.eventCount();
-    }
-
-    @Override
-    public Then<U> and() {
-        return subscriberAssertions.and();
     }
 
     @Override
@@ -39,5 +35,10 @@ public class IntegerAssertion<U> extends AbstractIntegerAssert<IntegerAssertion<
     @Override
     public StringAssertion<U> errorMessage() {
         return subscriberAssertions.errorMessage();
+    }
+
+    @Override
+    public Then<U> and() {
+        return subscriberAssertions.and();
     }
 }

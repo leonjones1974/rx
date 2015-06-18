@@ -1,4 +1,6 @@
-package com.cam.rxtest;
+package com.cam.rxtest.dsl.one;
+
+import com.cam.rxtest.dsl.impl.Then;
 
 public interface When1<T1, U> {
 

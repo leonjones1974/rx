@@ -1,4 +1,4 @@
-package com.cam.rxtest;
+package com.cam.rxtest.dsl.impl;
 
 import rx.Observable;
 import rx.schedulers.TestScheduler;

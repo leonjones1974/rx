@@ -1,4 +1,4 @@
-package com.cam.rxtest;
+package com.cam.rxtest.dsl.two;
 
 import rx.Observable;
 import rx.functions.Func2;
