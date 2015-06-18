@@ -7,38 +7,40 @@ import rx.functions.Func2;
 
 import java.util.Map;
 
-public class Given<T, U> {
+public class Given<T1, T2, U>
+        implements Given1<T1, U>,
+        Given2<T1, T2, U> {
 
-    private final ExecutionContext<T, U> context;
+    private final ExecutionContext<T1, T2, U> context;
 
-    public Given(ExecutionContext<T, U> context) {
+    public Given(ExecutionContext<T1, T2, U> context) {
         this.context = context;
     }
 
-    public Given<T, U> theStreamUnderTest(Func1<Observable<T>, Observable<U>> f) {
-        Observable<U> sut = f.call(context.sourceAsObservable());
+    public Given1<T1, U> createSubject(Func1<Observable<T1>, Observable<U>> f) {
+        Observable<U> sut = f.call(context.getSource1().asObservable());
         context.setStreamUnderTest(sut);
         return this;
     }
 
-    public Given<T, U> theStreamUnderTest2(Func1<Map<String, ? extends Observable<T>>, Observable<U>> f) {
-        Observable<U> sut = f.call(context.allSourcesAsObservables());
+    public Given1<T1, U> createSubjectWithScheduler(Func2<Observable<T1>, Scheduler, Observable<U>> f) {
+        Observable<T1> source = context.getSource1().asObservable();
+        Observable<U> sut = f.call(source, context.getScheduler());
         context.setStreamUnderTest(sut);
         return this;
     }
 
-    public Given<T, U> theStreamUnderTest(Func2<Observable<T>, Scheduler, Observable<U>> f) {
-        Observable<U> sut = f.call(context.sourceAsObservable(), context.getScheduler());
+    @Override
+    public Given2<T1, T2, U> createSubject(Func2<Observable<T1>, Observable<T2>, Observable<U>> f) {
+        Observable<T1> source1 = context.getSource1().asObservable();
+        Observable<T2> source2 = context.getSource2().asObservable();
+        Observable<U> sut = f.call(source1, source2);
         context.setStreamUnderTest(sut);
         return this;
     }
 
-    public When<T, U> when() {
+    public When<T1, T2, U> when() {
         return new When<>(context);
     }
 
-    public Given<T, U> aSourceStream(String id) {
-        context.source(id);
-        return new Given<>(context);
-    }
 }

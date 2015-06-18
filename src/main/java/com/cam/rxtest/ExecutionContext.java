@@ -1,6 +1,5 @@
 package com.cam.rxtest;
 
-import com.google.common.collect.Maps;
 import rx.Observable;
 import rx.schedulers.TestScheduler;
 
@@ -10,24 +9,24 @@ import java.util.Queue;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.function.Consumer;
 
-public class ExecutionContext<T, U> {
-    public static final String DEFAULT_SOURCE = "_default";
-    private final Queue<Consumer<ExecutionContext<T, U>>> commands = new ArrayBlockingQueue<>(1000);
-    private final Map<String, Subscriber<T, U>> subscribers = new HashMap<>();
+public class ExecutionContext<T1, T2, U> {
+
+    private final Queue<Consumer<ExecutionContext<T1, T2, U>>> commands = new ArrayBlockingQueue<>(1000);
+    private final Map<String, Subscriber<T1, T2, U>> subscribers = new HashMap<>();
     private final TestScheduler scheduler = new TestScheduler();
-    private final Map<String, Source<T, U>> sources = new HashMap<>();
 
     private Observable<U> streamUnderTest;
 
-    public Source<T, U> source() {
-        return source(DEFAULT_SOURCE);
+    private Source<T1, T1, T2, U> source1 = new Source<>(this);
+    private Source<T2, T1, T2, U> source2 = new Source<>(this);
+
+
+    public Source<T1, T1, T2, U> getSource1() {
+        return source1;
     }
 
-    public Source<T, U> source(String id) {
-        if (!sources.containsKey(id)) {
-            sources.put(id, new Source<>(this));
-        }
-        return sources.get(id);
+    public Source<T2, T1, T2, U> getSource2() {
+        return source2;
     }
 
     public void setStreamUnderTest(Observable<U> streamUnderTest) {
@@ -38,11 +37,11 @@ public class ExecutionContext<T, U> {
         return streamUnderTest;
     }
 
-    public void addCommand(Consumer<ExecutionContext<T, U>> command) {
+    public void addCommand(Consumer<ExecutionContext<T1, T2, U>> command) {
         commands.offer(command);
     }
 
-    public Subscriber<T, U> subscriber(String id) {
+    public Subscriber<T1, T2, U> subscriber(String id) {
         if (!subscribers.containsKey(id)) subscribers.put(id, new Subscriber<>(id, this));
         return subscribers.get(id);
     }
@@ -57,11 +56,4 @@ public class ExecutionContext<T, U> {
         return scheduler;
     }
 
-    public Map<String, ? extends Observable<T>> allSourcesAsObservables() {
-        return Maps.transformValues(sources, Source::asObservable);
-    }
-
-    public Observable<T> sourceAsObservable() {
-        return source().asObservable();
-    }
 }

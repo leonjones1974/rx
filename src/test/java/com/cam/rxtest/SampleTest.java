@@ -1,6 +1,7 @@
 package com.cam.rxtest;
 
 import org.junit.Test;
+import rx.Observable;
 
 import java.time.Duration;
 import java.util.List;
@@ -12,11 +13,11 @@ public class SampleTest {
 
     @Test
     public void simple() {
-        TestScenario<String, Integer> testScenario = new TestScenario<>();
+        Scenario1<String, Integer> testScenario = TestScenario.singleSource();
 
         testScenario
                 .given()
-                    .theStreamUnderTest(source -> source.map(s -> Integer.parseInt(s) + 1))
+                  .createSubject(source -> source.map(s -> Integer.parseInt(s) + 1))
                 .when()
                     .subscriber("s1").subscribes()
                     .theSource().emits("1")
@@ -31,11 +32,11 @@ public class SampleTest {
 
     @Test
     public void multipleSubscribers() {
-        TestScenario<String, Integer> testScenario = new TestScenario<>();
+        Scenario1<String, Integer> testScenario = TestScenario.singleSource();
 
         testScenario
                 .given()
-                    .theStreamUnderTest(source -> source.map(s -> Integer.parseInt(s) + 1))
+                    .createSubject(source -> source.map(s -> Integer.parseInt(s) + 1))
                 .when()
                     .subscriber("s1").subscribes()
                     .theSource().emits("1")
@@ -54,11 +55,11 @@ public class SampleTest {
 
     @Test
     public void unsubscribe() {
-        TestScenario<String, Integer> testScenario = new TestScenario<>();
+        Scenario1<String, Integer> testScenario = TestScenario.singleSource();
 
         testScenario
                 .given()
-                    .theStreamUnderTest(source -> source.map(s -> Integer.parseInt(s) + 1))
+                    .createSubject(source -> source.map(s -> Integer.parseInt(s) + 1))
                 .when()
                     .subscriber("s1").subscribes()
                     .theSource().emits("1")
@@ -70,52 +71,13 @@ public class SampleTest {
     }
 
 
-//    @Test
-//    public void zip() {
-//        Observable<String> s1;
-//        Observable<String> s2;
-//
-//        testScenario.newSource("stream1", String.class);
-//        testScenario.newSource("stream2", Integer.class);
-//
-//        testScenario
-//                .given(aStream("stream1", String.class))
-//                .and(aStream("stream2", Integer.class))
-//                .and(theStreamUnderTest((Observable<?>[] sources) -> {
-//                    Observable.zip(sources[0], sources[1], new Func2<String, Integer, String>() {
-//                        @Override
-//                        public String call(String o, Integer o2) {
-//                            return null;
-//                        }
-//                    });
-//                })
-//                        .when(subscriber("s1").subscribes())
-//                        .and(stream("stream1").emitsEvent("a"))
-//                        .and(stream("stream2").emitsEvent(1))
-//                        .then()
-//                        .subscriber("s1").eventCount().isEqualTo(1)
-//                        .subscriber("s2").event(0).isEqualTo("a1");
-//
-//        Context<Integer> context = testScenario
-//                .newSource("source2")
-//                .newSubscriber("s1")
-//                .newEvent("1")
-//                .source("source2").newEvent("2")
-//                .newEvent("3")
-//                .source("source2").newEvent("4")
-//                .executeTest(this::subject);
-//
-//        context.subscriber("s1").eventCount().isEqualTo(2);
-//        context.subscriber("s2").eventCount().isEqualTo(1);
-//    }
-
     @Test
     public void completion() {
-        TestScenario<String, Integer> testScenario = new TestScenario<>();
+        Scenario1<String, Integer> testScenario = TestScenario.singleSource();
 
         testScenario
                 .given()
-                .theStreamUnderTest(source -> source.map(s -> Integer.parseInt(s) + 1))
+                .createSubject(source -> source.map(s -> Integer.parseInt(s) + 1))
                 .when()
                 .subscriber("s1").subscribes()
                 .theSource().emits("1")
@@ -127,11 +89,11 @@ public class SampleTest {
 
     @Test
     public void error() {
-        TestScenario<String, Integer> testScenario = new TestScenario<>();
+        Scenario1<String, Integer> testScenario = TestScenario.singleSource();
 
         testScenario
                 .given()
-                    .theStreamUnderTest(source -> source.map(s -> Integer.parseInt(s) + 1))
+                    .createSubject(source -> source.map(s -> Integer.parseInt(s) + 1))
                 .when()
                     .subscriber("s1").subscribes()
                     .theSource().emits("1")
@@ -144,11 +106,11 @@ public class SampleTest {
 
     @Test
     public void temporal() {
-        TestScenario<String, List<String>> testScenario = new TestScenario<>();
+        Scenario1<String, List<String>> testScenario = TestScenario.singleSource();
 
         testScenario
                 .given()
-                    .theStreamUnderTest((source, scheduler) -> source.buffer(10, TimeUnit.SECONDS, scheduler))
+                    .createSubjectWithScheduler((source, scheduler) -> source.buffer(10, TimeUnit.SECONDS, scheduler))
                 .when()
                     .subscriber("s1").subscribes()
                     .theSource().emits("1a")
@@ -167,21 +129,19 @@ public class SampleTest {
 
     @Test
     public void merge() {
-        TestScenario<String, String> testScenario = new TestScenario<>();
+        Scenario2<String, String, String> testScenario = TestScenario.twoSources();
 
         testScenario
                 .given()
-                    .aSourceStream("s1")
-                    .aSourceStream("s2")
-                    .theStreamUnderTest2(sources -> sources.get("s1").mergeWith(sources.get("s2")))
+                    .createSubject(Observable::mergeWith)
                 .when()
                     .subscriber("s1").subscribes()
-                    .theSource("s1").emits("1")
-                    .theSource("s2").emits("a")
-                    .theSource("s1").emits("2")
-                    .theSource("s2").emits("b")
-                    .theSource("s1").completes()
-                    .theSource("s2").completes()
+                    .source1().emits("1")
+                    .source2().emits("a")
+                    .source1().emits("2")
+                    .source2().emits("b")
+                    .source1().completes()
+                    .source2().completes()
                 .then()
                     .subscriber("s1")
                         .eventCount().isEqualTo(4)
@@ -189,5 +149,27 @@ public class SampleTest {
                         .event(1).isEqualTo("a")
                         .event(2).isEqualTo("2")
                         .event(3).isEqualTo("b");
+    }
+
+    @Test
+    public void zip() {
+        Scenario2<String, Integer, String> testScenario = TestScenario.twoSources();
+
+        testScenario
+                .given()
+                    .createSubject((s1, s2) -> s1.zipWith(s2, (z, n) -> z + n))
+                .when()
+                    .subscriber("s1").subscribes()
+                    .source1().emits("a")
+                    .source2().emits(1)
+                    .source1().emits("b")
+                    .source2().emits(2)
+                    .source1().completes()
+                    .source2().completes()
+                .then()
+                    .subscriber("s1")
+                        .eventCount().isEqualTo(2)
+                        .event(0).isEqualTo("a1")
+                        .event(1).isEqualTo("b2");
     }
 }
