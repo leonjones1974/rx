@@ -20,7 +20,6 @@ public class ExecutionContext<T1, T2, U> {
     private Source<T1, T1, T2, U> source1 = new Source<>(this);
     private Source<T2, T1, T2, U> source2 = new Source<>(this);
 
-
     public Source<T1, T1, T2, U> getSource1() {
         return source1;
     }
