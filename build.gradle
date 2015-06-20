@@ -22,7 +22,7 @@ subprojects { p ->
         mavenLocal()
         mavenCentral()
         maven {
-            url "http://leonandjosh.ddns.net:8081/nexus/content/repositories/snapshots'"
+            url "http://leonandjosh.ddns.net:8081/nexus/content/repositories/snapshots"
         }
         maven {
             url "http://leonandjosh.ddns.net:8081/nexus/content/repositories/releases"
