@@ -3,7 +3,7 @@ dependencies {
     compile 'io.reactivex:rxjava:1.0.8'
     compile 'com.google.guava:guava:18.0'
     compile 'org.assertj:assertj-core:3.0.0'
-    compile 'com.cam.rx:capture:1.0-SNAPSHOT';
+    testCompile 'com.cam.rx:capture:1.0-SNAPSHOT';
 }
 
 
