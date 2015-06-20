@@ -25,7 +25,7 @@ subprojects { p ->
             url "http://leonandjosh.ddns.net:8081/nexus/content/repositories/snapshots'"
         }
         maven {
-            url "http://leonandjosh.ddns.net:8081/nexus/content/repositories/release'"
+            url "http://leonandjosh.ddns.net:8081/nexus/content/repositories/releases"
         }
     }
 
