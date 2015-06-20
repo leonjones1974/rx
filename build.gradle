@@ -30,6 +30,7 @@ subprojects { p ->
     }
 
     idea {
+
         module {
             inheritOutputDirs = false
             outputDir = file('.idea-classes')

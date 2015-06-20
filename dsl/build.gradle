@@ -6,4 +6,9 @@ dependencies {
     testCompile 'com.cam.rx:capture:1.0-SNAPSHOT';
 }
 
-
+test {
+    def agentPath = project.configurations.testCompile.find { it.name.startsWith("capture")}
+    if (agentPath == null) throw new RuntimeException("Unable to locate java agent")
+    println("Using agent path: $agentPath")
+    jvmArgs "-javaagent:$agentPath"
+}

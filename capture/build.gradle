@@ -4,4 +4,11 @@ dependencies {
     compile 'com.google.guava:guava:18.0'
 }
 
+jar {
+    manifest {
+        attributes(
+                "Premain-Class": 'com.cam.rx.capture.instr.CaptureAgent'
+        )
+    }
+}
 
