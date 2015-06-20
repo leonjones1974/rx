@@ -1,5 +1,6 @@
 buildscript {
     repositories {
+        mavenLocal()
         mavenCentral()
     }    
 }
@@ -8,7 +9,6 @@ task wrapper(type: Wrapper) {
     gradleVersion = '2.2'
     distributionUrl = 'http://services.gradle.org/distributions/gradle-2.2-bin.zip'
 }
-
 
 subprojects { p ->
 
@@ -19,6 +19,7 @@ subprojects { p ->
     apply plugin: 'java'
 
     repositories {
+        mavenLocal()
         mavenCentral()
     }
 
@@ -30,12 +31,11 @@ subprojects { p ->
             downloadJavadoc = true
             downloadSources = true
             jdkName = '1.8'
-
         }
     }
 
     dependencies {
-	testCompile 'org.mockito:mockito-all:1.9.5'
+	    testCompile 'org.mockito:mockito-all:1.9.5'
         testCompile 'de.bechte.junit:junit-hierarchicalcontextrunner:4.11.1'
         testCompile 'junit:junit:4.11'
         testCompile 'org.assertj:assertj-core:3.0.0'
@@ -45,6 +45,12 @@ subprojects { p ->
 
     task sourceJar(type: Jar) {
         from sourceSets.main.allJava
+    }
+
+    configurations.all {
+        resolutionStrategy {
+            cacheChangingModulesFor 0, 'seconds'
+        }
     }
 
     publishing {
