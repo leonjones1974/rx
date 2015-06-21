@@ -4,6 +4,7 @@ dependencies {
     compile 'com.google.guava:guava:18.0'
     compile 'org.assertj:assertj-core:3.0.0'
     testCompile 'com.cam.rx:capture:1.0-SNAPSHOT';
+    testCompile files("${System.properties['java.home']}/../lib/tools.jar")
     testRuntime 'javassist:javassist:3.12.1.GA'
 }
 

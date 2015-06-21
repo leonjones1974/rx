@@ -1,5 +1,6 @@
 package com.cam.rx.capture.instr;
 
+import com.sun.tools.attach.VirtualMachine;
 import javassist.ClassPool;
 import javassist.CtClass;
 import javassist.CtMethod;
@@ -14,6 +15,7 @@ import java.io.ByteArrayInputStream;
 import java.lang.instrument.ClassFileTransformer;
 import java.lang.instrument.IllegalClassFormatException;
 import java.lang.instrument.Instrumentation;
+import java.lang.management.ManagementFactory;
 import java.security.ProtectionDomain;
 
 public class CaptureAgent {
@@ -24,6 +26,29 @@ public class CaptureAgent {
         System.out.println("EXECUTING PRE-MAIN");
         instr.addTransformer(new DurationTransformer());
         initialized = true;
+    }
+
+    public static void agentmain(String args, Instrumentation instr) {
+        System.out.println("EXECUTING AGENT MAIN");
+        instr.addTransformer(new DurationTransformer());
+        initialized = true;
+    }
+
+    /**
+     * Programmatic hook to dynamically load javaagent at runtime.
+     */
+    public static void initialize() {
+        String nameOfRunningVM = ManagementFactory.getRuntimeMXBean().getName();
+        int p = nameOfRunningVM.indexOf('@');
+        String pid = nameOfRunningVM.substring(0, p);
+
+        try {
+            VirtualMachine vm = VirtualMachine.attach(pid);
+            vm.loadAgent("/home/leonjones/workspace/cam/rx/capture/build/libs/capture-1.0-SNAPSHOT.jar", "");
+            vm.detach();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     //this class will be registered with instrumentation agent
