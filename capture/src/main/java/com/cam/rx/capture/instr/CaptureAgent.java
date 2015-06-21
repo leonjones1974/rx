@@ -3,6 +3,7 @@ package com.cam.rx.capture.instr;
 import javassist.ClassPool;
 import javassist.CtClass;
 import javassist.CtMethod;
+import javassist.Modifier;
 import javassist.bytecode.AttributeInfo;
 import javassist.bytecode.Descriptor;
 import javassist.bytecode.LocalVariableAttribute;
@@ -41,25 +42,28 @@ public class CaptureAgent {
                     for (CtMethod method : methods) {
 
                         if ("rx.Observable".equals(method.getReturnType().getName())) {
+                            boolean isStatic = Modifier.isStatic(method.getModifiers());
 
-                            String inst = "System.out.println(\"" + method.getName() + "\");";
-                            method.insertBefore(inst);
-                            System.out.println("Method: " + method.getName());
-                            MethodInfo methodInfo = method.getMethodInfo();
-                            LocalVariableAttribute table = (LocalVariableAttribute) methodInfo.getCodeAttribute().getAttribute(LocalVariableAttribute.tag);
-                            int index = 1;
-                            for (CtClass paramClass : method.getParameterTypes()) {
-                                System.out.println("\tparam = " + paramClass.getName());
-                                if (paramClass.getName().equals("rx.functions.Func1") && "map".equals(method.getName())) {
-                                    System.out.println("I got a func1@" + index);
-                                    if (table != null) {
+                            if (!isStatic) {
+                                String inst = "System.out.println(\"" + method.getName() + "\");";
+                                method.insertBefore(inst);
+                                System.out.println("Method: " + method.getLongName());
+                                MethodInfo methodInfo = method.getMethodInfo();
+                                LocalVariableAttribute table = (LocalVariableAttribute) methodInfo.getCodeAttribute().getAttribute(LocalVariableAttribute.tag);
+                                int index = 1;
+                                for (CtClass paramClass : method.getParameterTypes()) {
+
+                                    System.out.println("\tparam = " + paramClass.getName());
+                                    if (paramClass.getName().equals("rx.functions.Func1")) {
+                                        if (table != null) {
                                             int varIndex = table.nameIndex(index);
                                             String variableName = methodInfo.getConstPool().getUtf8Info(varIndex);
-                                            System.out.println("\t\t\tname = " + variableName);
-                                            method.insertBefore("func = new com.cam.rx.capture.instr.Func1Wrapper(func);");
+                                            System.out.println("\t\t\tFunc1 name = " + variableName);
+                                            method.insertBefore(variableName + " = new com.cam.rx.capture.instr.Func1Wrapper(" + variableName + ");");
+                                        }
                                     }
+                                    index++;
                                 }
-                                index++;
                             }
 
 
