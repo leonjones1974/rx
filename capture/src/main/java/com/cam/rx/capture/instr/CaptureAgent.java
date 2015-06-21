@@ -3,7 +3,10 @@ package com.cam.rx.capture.instr;
 import javassist.ClassPool;
 import javassist.CtClass;
 import javassist.CtMethod;
+import javassist.bytecode.AttributeInfo;
 import javassist.bytecode.Descriptor;
+import javassist.bytecode.LocalVariableAttribute;
+import javassist.bytecode.MethodInfo;
 import rx.functions.Func1;
 
 import java.io.ByteArrayInputStream;
@@ -35,24 +38,38 @@ public class CaptureAgent {
                     ClassPool classPool = ClassPool.getDefault();
                     CtClass ctClass = classPool.makeClass(new ByteArrayInputStream(classfileBuffer));
                     CtMethod[] methods = ctClass.getDeclaredMethods();
-                    System.out.println("methods = " + methods.length);
+                    for (CtMethod method : methods) {
 
-                    CtClass func1 = classPool.getCtClass("rx/functions/Func1");
-                    CtClass observable = classPool.getCtClass("rx/Observable");
+                        if ("rx.Observable".equals(method.getReturnType().getName())) {
 
-                    CtMethod method = ctClass.getMethod("map", Descriptor.ofMethod(observable, new CtClass[]{func1}));
-                    System.out.println("method = " + method);
-                    method.insertAfter("System.out.println(\"--MAP--\");");
-//                    for (CtMethod method : methods) {
-//                        System.out.println("method: " + method.getName());
-//                        method.addLocalVariable("startTime", CtClass.longType);
-//                        method.insertBefore("startTime = System.nanoTime();");
-//                        method.insertAfter("System.out.println(\"Execution Duration (nano sec): \"+ (System.nanoTime() - startTime) );");
-//                        System.out.println("Instrumented = " + method.getName());
-//                    }
+                            String inst = "System.out.println(\"" + method.getName() + "\");";
+                            method.insertBefore(inst);
+                            System.out.println("Method: " + method.getName());
+                            MethodInfo methodInfo = method.getMethodInfo();
+                            LocalVariableAttribute table = (LocalVariableAttribute) methodInfo.getCodeAttribute().getAttribute(LocalVariableAttribute.tag);
+                            int index = 1;
+                            for (CtClass paramClass : method.getParameterTypes()) {
+                                System.out.println("\tparam = " + paramClass.getName());
+                                if (paramClass.getName().equals("rx.functions.Func1") && "map".equals(method.getName())) {
+                                    System.out.println("I got a func1@" + index);
+                                    if (table != null) {
+                                            int varIndex = table.nameIndex(index);
+                                            String variableName = methodInfo.getConstPool().getUtf8Info(varIndex);
+                                            System.out.println("\t\t\tname = " + variableName);
+                                            method.insertBefore("func = new com.cam.rx.capture.instr.Func1Wrapper(func);");
+                                    }
+                                }
+                                index++;
+                            }
+
+
+                        }
+                    }
                     byteCode = ctClass.toBytecode();
                     ctClass.detach();
                     System.out.println("Instrumentation complete.");
+                    System.out.println();
+                    System.out.println();
                 } catch (Throwable ex) {
                     System.out.println("Exception: " + ex);
                     ex.printStackTrace();
@@ -61,4 +78,11 @@ public class CaptureAgent {
             return byteCode;
         }
     }
+
+    private Func1 func1 = new Func1() {
+        @Override
+        public Object call(Object o) {
+            return "s";
+        }
+    };
 }

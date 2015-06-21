@@ -2,7 +2,7 @@
 dependencies {
     compile 'io.reactivex:rxjava:1.0.8'
     compile 'com.google.guava:guava:18.0'
-    compile 'javassist:javassist:3.12.1.GA'
+    compile 'org.javassist:javassist:3.19.0-GA'
 }
 
 jar {
