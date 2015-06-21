@@ -5,8 +5,6 @@ import javassist.ClassPool;
 import javassist.CtClass;
 import javassist.CtMethod;
 import javassist.Modifier;
-import javassist.bytecode.AttributeInfo;
-import javassist.bytecode.Descriptor;
 import javassist.bytecode.LocalVariableAttribute;
 import javassist.bytecode.MethodInfo;
 import rx.functions.Func1;
@@ -69,9 +67,8 @@ public class CaptureAgent {
                         if ("rx.Observable".equals(method.getReturnType().getName())) {
                             boolean isStatic = Modifier.isStatic(method.getModifiers());
 
-                            if (!isStatic) {
-                                String inst = "System.out.println(\"" + method.getName() + "\");";
-                                method.insertBefore(inst);
+                            if (!isStatic && method.getName().equals("map")) {
+
                                 System.out.println("Method: " + method.getLongName());
                                 MethodInfo methodInfo = method.getMethodInfo();
                                 LocalVariableAttribute table = (LocalVariableAttribute) methodInfo.getCodeAttribute().getAttribute(LocalVariableAttribute.tag);
@@ -84,14 +81,14 @@ public class CaptureAgent {
                                             int varIndex = table.nameIndex(index);
                                             String variableName = methodInfo.getConstPool().getUtf8Info(varIndex);
                                             System.out.println("\t\t\tFunc1 name = " + variableName);
-                                            method.insertBefore(variableName + " = new com.cam.rx.capture.instr.Func1Wrapper(" + variableName + ");");
+                                            method.addLocalVariable("_stream", classPool.getCtClass("com.cam.rx.capture.model.Stream"));
+                                            String inst = "_stream = com.cam.rx.capture.model.CaptureModel.instance().newStream(\"" + method.getName() + "\");";
+                                            method.insertBefore(inst + "; " + variableName + " = new com.cam.rx.capture.instr.Func1Wrapper(" + variableName + ", _stream);");
                                         }
                                     }
                                     index++;
                                 }
                             }
-
-
                         }
                     }
                     byteCode = ctClass.toBytecode();
