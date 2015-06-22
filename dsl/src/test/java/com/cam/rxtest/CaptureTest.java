@@ -1,9 +1,11 @@
 package com.cam.rxtest;
 
 import com.cam.rx.capture.instr.CaptureAgent;
+import com.cam.rx.capture.model.CaptureModel;
 import com.cam.rxtest.dsl.one.Scenario1;
 import org.junit.Before;
 import org.junit.Test;
+import rx.Observable;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -28,7 +30,7 @@ public class CaptureTest {
 
         scenario
                 .given()
-                    .createSubject(source -> source.map(s -> "hello" + s).map(s -> s.toUpperCase()))
+                    .createSubject(source -> source.map(s -> "hello" + s).map(String::toUpperCase))
                 .when()
                     .subscriber("s1").subscribes()
                     .theSource().emits(1)
@@ -36,12 +38,10 @@ public class CaptureTest {
                     .theSource().emits(3)
                 .then()
                     .subscriber("s1")
-                        .eventCount().isEqualTo(3)
-                        .event(0).isEqualTo("HELLO1")
-                        .event(1).isEqualTo("HELLO2")
-                        .event(2).isEqualTo("HELLO3");
+                        .eventCount().isEqualTo(3);
 
 
+        CaptureModel.instance().dump();
     }
 
 }

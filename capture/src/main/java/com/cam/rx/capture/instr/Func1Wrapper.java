@@ -1,5 +1,7 @@
 package com.cam.rx.capture.instr;
 
+import com.cam.rx.capture.model.CaptureModel;
+import com.cam.rx.capture.model.Event;
 import com.cam.rx.capture.model.Stream;
 import rx.functions.Func1;
 
@@ -15,7 +17,7 @@ public class Func1Wrapper<T, R> implements Func1<T, R> {
     @Override
     public R call(T t) {
         R r = inner.call(t);
-        stream.newEvent(t, r);
+        stream.newEvent(new Event(t, CaptureModel.instance().nextEventCount()));
         return r;
     }
 }

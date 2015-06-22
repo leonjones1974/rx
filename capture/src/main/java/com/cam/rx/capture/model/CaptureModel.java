@@ -3,18 +3,21 @@ package com.cam.rx.capture.model;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
+import rx.Observable;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 public class CaptureModel {
 
     private static Object lock = new Object();
     private static CaptureModel instance;
-    private List<Stream> streams = new ArrayList<>();
-    private LoadingCache<String, AtomicInteger> operations;
+    private final List<Stream> streams = new ArrayList<>();
+    private final LoadingCache<String, AtomicInteger> operations;
+    private final AtomicInteger eventCount = new AtomicInteger(0);
 
     public static CaptureModel instance() {
         synchronized (lock) {
@@ -25,6 +28,10 @@ public class CaptureModel {
         }
     }
 
+    public int nextEventCount() {
+        return eventCount.incrementAndGet();
+    }
+
     public CaptureModel() {
         operations = CacheBuilder.<String, AtomicInteger>newBuilder()
                 .build(new CacheLoader<String, AtomicInteger>() {
@@ -33,6 +40,7 @@ public class CaptureModel {
                         return new AtomicInteger(0);
                     }
                 });
+        eventCount.set(0);
     }
 
     public void destroy() {
@@ -52,4 +60,16 @@ public class CaptureModel {
             throw new RuntimeException(e);
         }
     }
+
+    public Observable<Stream> capturedStreams() {
+        return Observable.from(streams);
+    }
+
+    public void dump() {
+        for (Stream stream : streams) {
+            System.out.println(stream);
+            System.out.println();
+        }
+    }
+
 }

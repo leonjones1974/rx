@@ -15,10 +15,12 @@ import java.lang.instrument.IllegalClassFormatException;
 import java.lang.instrument.Instrumentation;
 import java.lang.management.ManagementFactory;
 import java.security.ProtectionDomain;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class CaptureAgent {
 
     public static boolean initialized = false;
+
 
     public static void premain(String agentArgs, Instrumentation instr) {
         System.out.println("EXECUTING PRE-MAIN");
@@ -67,7 +69,7 @@ public class CaptureAgent {
                         if ("rx.Observable".equals(method.getReturnType().getName())) {
                             boolean isStatic = Modifier.isStatic(method.getModifiers());
 
-                            if (!isStatic && method.getName().equals("map")) {
+                            if (!isStatic) {
 
                                 System.out.println("Method: " + method.getLongName());
                                 MethodInfo methodInfo = method.getMethodInfo();
