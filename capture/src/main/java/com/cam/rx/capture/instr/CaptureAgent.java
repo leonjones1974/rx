@@ -1,21 +1,22 @@
 package com.cam.rx.capture.instr;
 
 import com.sun.tools.attach.VirtualMachine;
-import javassist.ClassPool;
-import javassist.CtClass;
-import javassist.CtMethod;
-import javassist.Modifier;
+import javassist.*;
 import javassist.bytecode.LocalVariableAttribute;
 import javassist.bytecode.MethodInfo;
+import rx.Observable;
 import rx.functions.Func1;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.lang.instrument.ClassFileTransformer;
 import java.lang.instrument.IllegalClassFormatException;
 import java.lang.instrument.Instrumentation;
 import java.lang.management.ManagementFactory;
 import java.security.ProtectionDomain;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class CaptureAgent {
 
@@ -24,13 +25,13 @@ public class CaptureAgent {
 
     public static void premain(String agentArgs, Instrumentation instr) {
         System.out.println("EXECUTING PRE-MAIN");
-        instr.addTransformer(new DurationTransformer());
+        instr.addTransformer(new OperatorInterceptor());
         initialized = true;
     }
 
     public static void agentmain(String args, Instrumentation instr) {
         System.out.println("EXECUTING AGENT MAIN");
-        instr.addTransformer(new DurationTransformer());
+        instr.addTransformer(new OperatorInterceptor());
         initialized = true;
     }
 
@@ -48,6 +49,45 @@ public class CaptureAgent {
             vm.detach();
         } catch (Exception e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    public static class OperatorInterceptor implements ClassFileTransformer {
+
+        @Override
+        public byte[] transform(ClassLoader cl, String className, Class<?> clazz, ProtectionDomain pd, byte[] classfileBuffer) throws IllegalClassFormatException {
+
+            byte[] byteCode = classfileBuffer;
+
+            if (className.contains("rx/internal/operators")) {
+                System.out.println("Instrumenting......" + className);
+                try {
+                    ClassPool classPool = ClassPool.getDefault();
+                    CtClass ctClass = classPool.makeClass(new ByteArrayInputStream(classfileBuffer));
+
+                    List<String> interfaces = Arrays.asList(ctClass.getInterfaces()).stream().map(CtClass::getName).collect(Collectors.toList());
+                    System.out.println("ctClass = " + interfaces);
+                    if (interfaces.contains("rx.Observable$Operator")) {
+                        System.out.println("Found operator");
+                        CtMethod call = ctClass.getDeclaredMethod("call");
+                        System.out.println("call = " + call);
+//                        call.insertAfter( "System.out.println( \"Hello\" + $_ );");
+                        call.insertAfter("return new com.cam.rx.capture.instr.SubscriberWrapper((rx.Observer)$_);");
+                    }
+
+                    byteCode = ctClass.toBytecode();
+                    ctClass.detach();
+                    System.out.println("Instrumentation complete.");
+                    System.out.println();
+                    System.out.println();
+                } catch (Throwable ex) {
+                    System.out.println("Exception: " + ex);
+                    ex.printStackTrace();
+                }
+            }
+            return byteCode;
+
+
         }
     }
 
