@@ -4,10 +4,11 @@ import rx.Observer;
 import rx.Subscriber;
 
 public class SubscriberWrapper extends Subscriber {
+    private final String name;
     private final Observer observer;
 
-    public SubscriberWrapper(Observer<?> observer) {
-
+    public SubscriberWrapper(String name, Observer<?> observer) {
+        this.name = name;
         this.observer = observer;
     }
 
@@ -23,7 +24,7 @@ public class SubscriberWrapper extends Subscriber {
 
     @Override
     public void onNext(Object o) {
-        System.out.println("WOOT WOOT OnNext: " + o);
+        System.out.println("[" + name + "]" + " OnNext: " + o);
         observer.onNext(o);
     }
 }

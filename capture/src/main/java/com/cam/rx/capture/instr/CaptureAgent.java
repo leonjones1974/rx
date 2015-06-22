@@ -71,8 +71,8 @@ public class CaptureAgent {
                         System.out.println("Found operator");
                         CtMethod call = ctClass.getDeclaredMethod("call");
                         System.out.println("call = " + call);
-//                        call.insertAfter( "System.out.println( \"Hello\" + $_ );");
-                        call.insertAfter("return new com.cam.rx.capture.instr.SubscriberWrapper((rx.Observer)$_);");
+                        String name = ctClass.getName().replace("Operator", "");
+                        call.insertAfter("return new com.cam.rx.capture.instr.SubscriberWrapper(\"" + name + "\", (rx.Observer)$_);");
                     }
 
                     byteCode = ctClass.toBytecode();
@@ -85,54 +85,19 @@ public class CaptureAgent {
                     ex.printStackTrace();
                 }
             }
-            return byteCode;
-
-
-        }
-    }
-
-    //this class will be registered with instrumentation agent
-    public static class DurationTransformer implements ClassFileTransformer {
-        public byte[] transform(ClassLoader loader, String className,
-                                Class classBeingRedefined, ProtectionDomain protectionDomain,
-                                byte[] classfileBuffer) throws IllegalClassFormatException {
-            byte[] byteCode = classfileBuffer;
 
             if (className.equals("rx/Observable")) {
                 System.out.println("Instrumenting......" + className);
                 try {
+                    System.out.println("Found Observable");
                     ClassPool classPool = ClassPool.getDefault();
                     CtClass ctClass = classPool.makeClass(new ByteArrayInputStream(classfileBuffer));
-                    CtMethod[] methods = ctClass.getDeclaredMethods();
-                    for (CtMethod method : methods) {
+                    CtClass subscriberClass = classPool.get("rx/Subscriber");
 
-                        if ("rx.Observable".equals(method.getReturnType().getName())) {
-                            boolean isStatic = Modifier.isStatic(method.getModifiers());
+                    CtMethod subscribe = ctClass.getDeclaredMethod("subscribe", new CtClass[]{subscriberClass});
+                    System.out.println("subscribe = " + subscribe);
+                    subscribe.insertBefore("subscriber = new com.cam.rx.capture.instr.SubscriberWrapper(\"subscriber\", subscriber);");
 
-                            if (!isStatic) {
-
-                                System.out.println("Method: " + method.getLongName());
-                                MethodInfo methodInfo = method.getMethodInfo();
-                                LocalVariableAttribute table = (LocalVariableAttribute) methodInfo.getCodeAttribute().getAttribute(LocalVariableAttribute.tag);
-                                int index = 1;
-                                for (CtClass paramClass : method.getParameterTypes()) {
-
-                                    System.out.println("\tparam = " + paramClass.getName());
-                                    if (paramClass.getName().equals("rx.functions.Func1")) {
-                                        if (table != null) {
-                                            int varIndex = table.nameIndex(index);
-                                            String variableName = methodInfo.getConstPool().getUtf8Info(varIndex);
-                                            System.out.println("\t\t\tFunc1 name = " + variableName);
-                                            method.addLocalVariable("_stream", classPool.getCtClass("com.cam.rx.capture.model.Stream"));
-                                            String inst = "_stream = com.cam.rx.capture.model.CaptureModel.instance().newStream(\"" + method.getName() + "\");";
-                                            method.insertBefore(inst + "; " + variableName + " = new com.cam.rx.capture.instr.Func1Wrapper(" + variableName + ", _stream);");
-                                        }
-                                    }
-                                    index++;
-                                }
-                            }
-                        }
-                    }
                     byteCode = ctClass.toBytecode();
                     ctClass.detach();
                     System.out.println("Instrumentation complete.");
@@ -144,13 +109,9 @@ public class CaptureAgent {
                 }
             }
             return byteCode;
+
+
         }
     }
 
-    private Func1 func1 = new Func1() {
-        @Override
-        public Object call(Object o) {
-            return "s";
-        }
-    };
 }

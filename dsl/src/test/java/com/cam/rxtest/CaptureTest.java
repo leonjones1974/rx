@@ -26,11 +26,11 @@ public class CaptureTest {
 
     @Test
     public void itShould_CaptureAMappedStream() {
-        Scenario1<Integer, String> scenario = TestScenario.singleSource();
+        Scenario1<Integer, Integer> scenario = TestScenario.singleSource();
 
         scenario
                 .given()
-                    .createSubject(source -> source.map(s -> "hello" + s).map(String::toUpperCase))
+                    .createSubject(source -> source.map(s -> "hello" + s).map(String::toUpperCase).flatMap(s -> Observable.just(1, 2, 3, 4).filter(n -> n%2 == 0)))
                 .when()
                     .subscriber("s1").subscribes()
                     .theSource().emits(1)
@@ -38,7 +38,7 @@ public class CaptureTest {
                     .theSource().emits(3)
                 .then()
                     .subscriber("s1")
-                        .eventCount().isEqualTo(3);
+                        .eventCount().isEqualTo(6);
 
 
         CaptureModel.instance().dump();
