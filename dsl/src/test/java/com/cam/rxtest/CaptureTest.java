@@ -2,10 +2,13 @@ package com.cam.rxtest;
 
 import com.cam.rx.capture.instr.CaptureAgent;
 import com.cam.rx.capture.model.CaptureModel;
+import com.cam.rx.capture.model.Stream;
 import com.cam.rxtest.dsl.one.Scenario1;
 import org.junit.Before;
 import org.junit.Test;
 import rx.Observable;
+
+import java.util.ArrayList;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -27,14 +30,16 @@ public class CaptureTest {
     public void map() {
         Scenario1<Integer, String> scenario = TestScenario.singleSource();
 
+        ArrayList<Stream> streams = new ArrayList<>();
         CaptureModel.instance().capturedStreams()
-                .subscribe(s -> System.out.println("Got: " + s.getName()));
+                .subscribe(streams::add);
 
         scenario
                 .given()
                     .createSubject(source -> source.map(s -> "hello" + s))
                 .when()
                     .subscriber("s1").subscribes()
+                    .subscriber("s2").subscribes()
                     .theSource().emits(1)
                     .theSource().emits(2)
                     .theSource().emits(3)
@@ -42,6 +47,10 @@ public class CaptureTest {
                     .subscriber("s1")
                         .eventCount().isEqualTo(3)
                         .event(0).isEqualTo("hello1");
+
+        for (Stream stream : streams) {
+            System.out.println(stream.getName() + " -------");
+        }
 
     }
 

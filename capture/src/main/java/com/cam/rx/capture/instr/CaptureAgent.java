@@ -99,6 +99,7 @@ public class CaptureAgent {
                     CtMethod subscribe = ctClass.getDeclaredMethod("subscribe", new CtClass[]{subscriberClass});
 //                    System.out.println("subscribe = " + subscribe);
                     subscribe.insertBefore("subscriber = new com.cam.rx.capture.instr.SubscriberWrapper(\"subscriber\", subscriber);");
+                    subscribe.insertBefore("com.cam.rx.capture.model.CaptureModel.instance().newStream(\"subscriber\");");
 
                     byteCode = ctClass.toBytecode();
                     ctClass.detach();

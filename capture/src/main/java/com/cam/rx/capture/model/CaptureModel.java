@@ -70,5 +70,4 @@ public class CaptureModel {
         return streams;
     }
 
-
 }
