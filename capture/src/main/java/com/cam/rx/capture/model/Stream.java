@@ -15,8 +15,11 @@ public class Stream {
         this.name = name;
     }
 
+    public String getName() {
+        return name;
+    }
+
     public void newEvent(Event event) {
-        System.out.println("[" + name +"]: " + event);
         this.events.add(event);
     }
 

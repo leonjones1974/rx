@@ -16,7 +16,6 @@ public class CaptureTest {
 
     @Before
     public void before() {
-
     }
 
     @Test
@@ -25,12 +24,15 @@ public class CaptureTest {
     }
 
     @Test
-    public void itShould_CaptureAMappedStream() {
-        Scenario1<Integer, Integer> scenario = TestScenario.singleSource();
+    public void map() {
+        Scenario1<Integer, String> scenario = TestScenario.singleSource();
+
+        CaptureModel.instance().capturedStreams()
+                .subscribe(s -> System.out.println("Got: " + s.getName()));
 
         scenario
                 .given()
-                    .createSubject(source -> source.map(s -> "hello" + s).map(String::toUpperCase).flatMap(s -> Observable.just(1, 2, 3, 4).filter(n -> n%2 == 0)))
+                    .createSubject(source -> source.map(s -> "hello" + s))
                 .when()
                     .subscriber("s1").subscribes()
                     .theSource().emits(1)
@@ -38,10 +40,49 @@ public class CaptureTest {
                     .theSource().emits(3)
                 .then()
                     .subscriber("s1")
-                        .eventCount().isEqualTo(6);
+                        .eventCount().isEqualTo(3)
+                        .event(0).isEqualTo("hello1");
 
+    }
 
-        CaptureModel.instance().dump();
+    @Test
+    public void flatMap() {
+        Scenario1<Integer, Integer> scenario = TestScenario.singleSource();
+
+        CaptureModel.instance().capturedStreams()
+                .subscribe(s -> System.out.println("Got: " + s.getName()));
+
+        scenario
+                .given()
+                    .createSubject(source -> source.map(n -> n).flatMap(s -> Observable.just(1, 2, 3, 4)))
+                .when()
+                    .subscriber("s1").subscribes()
+                    .theSource().emits(1)
+                    .theSource().emits(2)
+                .then()
+                    .subscriber("s1")
+                        .eventCount().isEqualTo(8);
+    }
+
+    @Test
+    public void filter() {
+        Scenario1<Integer, Integer> scenario = TestScenario.singleSource();
+
+        CaptureModel.instance().capturedStreams()
+                .subscribe(s -> System.out.println("Got: " + s.getName()));
+
+        scenario
+                .given()
+                    .createSubject(source -> source.map(n -> n).filter(n -> n % 2 ==0))
+                .when()
+                    .subscriber("s1").subscribes()
+                    .theSource().emits(1)
+                    .theSource().emits(2)
+                    .theSource().emits(3)
+                    .theSource().emits(4)
+                .then()
+                    .subscriber("s1")
+                        .eventCount().isEqualTo(2);
     }
 
 }

@@ -26,12 +26,14 @@ public class CaptureAgent {
     public static void premain(String agentArgs, Instrumentation instr) {
         System.out.println("EXECUTING PRE-MAIN");
         instr.addTransformer(new OperatorInterceptor());
+        instr.addTransformer(new StaticStreamCreationInterceptor());
         initialized = true;
     }
 
     public static void agentmain(String args, Instrumentation instr) {
         System.out.println("EXECUTING AGENT MAIN");
         instr.addTransformer(new OperatorInterceptor());
+        instr.addTransformer(new StaticStreamCreationInterceptor());
         initialized = true;
     }
 
@@ -60,26 +62,26 @@ public class CaptureAgent {
             byte[] byteCode = classfileBuffer;
 
             if (className.contains("rx/internal/operators")) {
-                System.out.println("Instrumenting......" + className);
+//                System.out.println("Instrumenting......" + className);
                 try {
                     ClassPool classPool = ClassPool.getDefault();
                     CtClass ctClass = classPool.makeClass(new ByteArrayInputStream(classfileBuffer));
 
                     List<String> interfaces = Arrays.asList(ctClass.getInterfaces()).stream().map(CtClass::getName).collect(Collectors.toList());
-                    System.out.println("ctClass = " + interfaces);
+//                    System.out.println("ctClass = " + interfaces);
                     if (interfaces.contains("rx.Observable$Operator")) {
-                        System.out.println("Found operator");
+//                        System.out.println("Found operator");
                         CtMethod call = ctClass.getDeclaredMethod("call");
-                        System.out.println("call = " + call);
+//                        System.out.println("call = " + call);
                         String name = ctClass.getName().replace("Operator", "");
                         call.insertAfter("return new com.cam.rx.capture.instr.SubscriberWrapper(\"" + name + "\", (rx.Observer)$_);");
                     }
 
                     byteCode = ctClass.toBytecode();
                     ctClass.detach();
-                    System.out.println("Instrumentation complete.");
-                    System.out.println();
-                    System.out.println();
+//                    System.out.println("Instrumentation complete.");
+//                    System.out.println();
+//                    System.out.println();
                 } catch (Throwable ex) {
                     System.out.println("Exception: " + ex);
                     ex.printStackTrace();
@@ -87,7 +89,7 @@ public class CaptureAgent {
             }
 
             if (className.equals("rx/Observable")) {
-                System.out.println("Instrumenting......" + className);
+//                System.out.println("Instrumenting......" + className);
                 try {
                     System.out.println("Found Observable");
                     ClassPool classPool = ClassPool.getDefault();
@@ -95,14 +97,14 @@ public class CaptureAgent {
                     CtClass subscriberClass = classPool.get("rx/Subscriber");
 
                     CtMethod subscribe = ctClass.getDeclaredMethod("subscribe", new CtClass[]{subscriberClass});
-                    System.out.println("subscribe = " + subscribe);
+//                    System.out.println("subscribe = " + subscribe);
                     subscribe.insertBefore("subscriber = new com.cam.rx.capture.instr.SubscriberWrapper(\"subscriber\", subscriber);");
 
                     byteCode = ctClass.toBytecode();
                     ctClass.detach();
-                    System.out.println("Instrumentation complete.");
-                    System.out.println();
-                    System.out.println();
+//                    System.out.println("Instrumentation complete.");
+//                    System.out.println();
+//                    System.out.println();
                 } catch (Throwable ex) {
                     System.out.println("Exception: " + ex);
                     ex.printStackTrace();
@@ -111,6 +113,66 @@ public class CaptureAgent {
             return byteCode;
 
 
+        }
+    }
+
+    public static class StaticStreamCreationInterceptor implements ClassFileTransformer {
+        public byte[] transform(ClassLoader loader, String className,
+                                Class classBeingRedefined, ProtectionDomain protectionDomain,
+                                byte[] classfileBuffer) throws IllegalClassFormatException {
+            byte[] byteCode = classfileBuffer;
+
+            if (className.equals("rx/Observable")) {
+//                System.out.println("Instrumenting......" + className);
+                try {
+                    ClassPool classPool = ClassPool.getDefault();
+                    CtClass ctClass = classPool.makeClass(new ByteArrayInputStream(classfileBuffer));
+                    CtMethod[] methods = ctClass.getDeclaredMethods();
+                    for (CtMethod method : methods) {
+
+                        if ("rx.Observable".equals(method.getReturnType().getName())) {
+                            boolean isStatic = Modifier.isStatic(method.getModifiers());
+
+                            if (!isStatic) {
+
+//                                System.out.println("Method: " + method.getLongName());
+                                String inst = "com.cam.rx.capture.model.CaptureModel.instance().newStream(\"" + method.getName() + "\");";
+                                method.insertBefore(inst);
+
+
+
+//                                MethodInfo methodInfo = method.getMethodInfo();
+//                                LocalVariableAttribute table = (LocalVariableAttribute) methodInfo.getCodeAttribute().getAttribute(LocalVariableAttribute.tag);
+//                                int index = 1;
+//                                for (CtClass paramClass : method.getParameterTypes()) {
+//
+//                                    System.out.println("\tparam = " + paramClass.getName());
+//                                    if (paramClass.getName().equals("rx.functions.Func1")) {
+//                                        if (table != null) {
+//                                            int varIndex = table.nameIndex(index);
+//                                            String variableName = methodInfo.getConstPool().getUtf8Info(varIndex);
+//                                            System.out.println("\t\t\tFunc1 name = " + variableName);
+//                                            method.addLocalVariable("_stream", classPool.getCtClass("com.cam.rx.capture.model.Stream"));
+//                                            String inst = "_stream = com.cam.rx.capture.model.CaptureModel.instance().newStream(\"" + method.getName() + "\");";
+//                                            method.insertBefore(inst + "; " + variableName + " = new com.cam.rx.capture.instr.Func1Wrapper(" + variableName + ", _stream);");
+//                                        }
+//                                    }
+//                                    index++;
+//                                }
+                            }
+                        }
+                    }
+                    byteCode = ctClass.toBytecode();
+                    ctClass.detach();
+//                    System.out.println("Instrumentation complete.");
+//                    System.out.println();
+//                    System.out.println();
+                } catch (Throwable ex) {
+                    System.out.println("Exception: " + ex);
+                    ex.printStackTrace();
+                }
+            }
+            return byteCode;
         }
     }
 
