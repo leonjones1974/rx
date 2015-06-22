@@ -6,9 +6,8 @@ import com.google.common.cache.LoadingCache;
 import rx.Observable;
 import rx.subjects.PublishSubject;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class CaptureModel {
@@ -19,6 +18,7 @@ public class CaptureModel {
     private final LoadingCache<String, AtomicInteger> operations;
     private final AtomicInteger eventCount = new AtomicInteger(0);
     private final PublishSubject<Stream> streams = PublishSubject.create();
+    private final AtomicBoolean firstStream = new AtomicBoolean(true);
 
     public static CaptureModel instance() {
         synchronized (lock) {
@@ -30,6 +30,7 @@ public class CaptureModel {
     }
 
     public int nextEventCount() {
+        eventCount.incrementAndGet();
         return eventCount.incrementAndGet();
     }
 
@@ -50,7 +51,10 @@ public class CaptureModel {
         }
     }
 
-    public Stream newStream(String name) {
+
+    public Stream newStream(Observable<?> source, String name) {
+
+
         try {
             StackTraceElement[] stackTrace = new RuntimeException().getStackTrace();
             for (int i = 2; i < stackTrace.length; i++) {
@@ -58,7 +62,8 @@ public class CaptureModel {
             }
 
             String qualifiedName = name + "-" + (operations.get(name).incrementAndGet());
-            Stream stream = new Stream(qualifiedName);
+
+            Stream stream = new Stream(source, qualifiedName, firstStream.getAndSet(false));
             streams.onNext(stream);
             return stream;
         } catch (ExecutionException e) {
@@ -70,4 +75,7 @@ public class CaptureModel {
         return streams;
     }
 
+    public int eventCount() {
+        return eventCount.get();
+    }
 }

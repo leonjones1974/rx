@@ -98,8 +98,8 @@ public class CaptureAgent {
 
                     CtMethod subscribe = ctClass.getDeclaredMethod("subscribe", new CtClass[]{subscriberClass});
 //                    System.out.println("subscribe = " + subscribe);
-                    subscribe.insertBefore("subscriber = new com.cam.rx.capture.instr.SubscriberWrapper(\"subscriber\", subscriber);");
-                    subscribe.insertBefore("com.cam.rx.capture.model.CaptureModel.instance().newStream(\"subscriber\");");
+//                    subscribe.insertBefore("subscriber = new com.cam.rx.capture.instr.SubscriberWrapper(\"\", subscriber);");
+                    subscribe.insertBefore("com.cam.rx.capture.model.CaptureModel.instance().newStream(this, \"subscriber\");");
 
                     byteCode = ctClass.toBytecode();
                     ctClass.detach();
@@ -137,9 +137,8 @@ public class CaptureAgent {
                             if (!isStatic) {
 
 //                                System.out.println("Method: " + method.getLongName());
-                                String inst = "com.cam.rx.capture.model.CaptureModel.instance().newStream(\"" + method.getName() + "\");";
-                                method.insertBefore(inst);
-
+                                String inst = "com.cam.rx.capture.model.CaptureModel.instance().newStream($_, \"" + method.getName() + "\");";
+                                method.insertAfter(inst);
 
 
 //                                MethodInfo methodInfo = method.getMethodInfo();

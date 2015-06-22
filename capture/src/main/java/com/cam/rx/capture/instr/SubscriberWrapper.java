@@ -24,7 +24,6 @@ public class SubscriberWrapper extends Subscriber {
 
     @Override
     public void onNext(Object o) {
-//        System.out.println("[" + name + "]" + " OnNext: " + o);
         observer.onNext(o);
     }
 }
