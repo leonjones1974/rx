@@ -2,13 +2,17 @@
 dependencies {
     compile 'io.reactivex:rxjava:1.0.8'
     compile 'com.google.guava:guava:18.0'
-    compile 'javassist:javassist:3.12.1.GA'
+    compile 'org.javassist:javassist:3.19.0-GA'
+    compile files("${System.properties['java.home']}/../lib/tools.jar")
 }
 
 jar {
     manifest {
         attributes(
-                "Premain-Class": 'com.cam.rx.capture.instr.CaptureAgent'
+                "Premain-Class": 'com.cam.rx.capture.instr.CaptureAgent',
+                "Agent-Class": 'com.cam.rx.capture.instr.CaptureAgent',
+                "Can-Redefine-Classes": 'true',
+                "Can-Retransform-Classes": 'true'
         )
     }
 }

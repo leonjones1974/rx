@@ -10,6 +10,8 @@ task wrapper(type: Wrapper) {
     distributionUrl = 'http://services.gradle.org/distributions/gradle-2.2-bin.zip'
 }
 
+
+
 subprojects { p ->
 
     group = 'com.cam.rx'
@@ -18,6 +20,16 @@ subprojects { p ->
     apply plugin: 'idea'
     apply plugin: 'java'
 
+    idea {
+        module {
+            inheritOutputDirs = false
+            outputDir = file('.idea-classes')
+            testOutputDir = file('.idea-test-classes')
+            downloadJavadoc = true
+            downloadSources = true
+            jdkName = '1.8'
+        }
+    }
     repositories {
         mavenLocal()
         mavenCentral()
@@ -29,17 +41,6 @@ subprojects { p ->
         }
     }
 
-    idea {
-
-        module {
-            inheritOutputDirs = false
-            outputDir = file('.idea-classes')
-            testOutputDir = file('.idea-test-classes')
-            downloadJavadoc = true
-            downloadSources = true
-            jdkName = '1.8'
-        }
-    }
 
     dependencies {
 	    testCompile 'org.mockito:mockito-all:1.9.5'

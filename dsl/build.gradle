@@ -3,13 +3,4 @@ dependencies {
     compile 'io.reactivex:rxjava:1.0.8'
     compile 'com.google.guava:guava:18.0'
     compile 'org.assertj:assertj-core:3.0.0'
-    testCompile 'com.cam.rx:capture:1.0-SNAPSHOT';
-    testRuntime 'javassist:javassist:3.12.1.GA'
-}
-
-test {
-    def agentPath = project.configurations.testCompile.find { it.name.startsWith("capture")}
-    if (agentPath == null) throw new RuntimeException("Unable to locate java agent")
-    println("Using agent path: $agentPath")
-    jvmArgs "-javaagent:$agentPath"
 }
