@@ -153,36 +153,38 @@ subprojects { p ->
                     }
 
                 }
-                gpgJars(MavenPublication) {
-                    getSignatureFiles().each {signature ->
-                        artifact (signature.archive) {
-                            classifier = signature.classifier
-                            extension  = signature.extension
-                        }
-                    }
-                }
-                if (project.ext.pomFile.exists()) {
-                    gpgPom(MavenPublication) {
-                        artifact (getPomSignature()) {
-                            classifier = null
-                            extension  = 'pom.asc'
-                        }
-                    }
-                }
-                signatures (MavenPublication) {
-                    getSignatureFiles().each {signature ->
-                        artifact (signature.archive) {
-                            classifier = signature.classifier
-                            extension  = signature.extension
-                        }
-                    }
-                }
+
 
                 artifact sourceJar {
                     classifier "sources"
                 }
                 artifact javadocJar {
                     classifier "javadoc"
+                }
+            }
+
+            gpgJars(MavenPublication) {
+                getSignatureFiles().each {signature ->
+                    artifact (signature.archive) {
+                        classifier = signature.classifier
+                        extension  = signature.extension
+                    }
+                }
+            }
+            if (project.ext.pomFile.exists()) {
+                gpgPom(MavenPublication) {
+                    artifact (getPomSignature()) {
+                        classifier = null
+                        extension  = 'pom.asc'
+                    }
+                }
+            }
+            signatures (MavenPublication) {
+                getSignatureFiles().each {signature ->
+                    artifact (signature.archive) {
+                        classifier = signature.classifier
+                        extension  = signature.extension
+                    }
                 }
             }
         }
