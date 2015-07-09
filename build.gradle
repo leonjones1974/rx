@@ -201,8 +201,8 @@ subprojects { p ->
             maven {
                 url "http://leonandjosh.ddns.net:8081/nexus/content/repositories/${project.version.endsWith('-SNAPSHOT') ? 'snapshots' : 'releases'}"
                 credentials {
-                    username camsw.nexus.user
-                    password camsw.nexus.password
+                    username nexusUser
+                    password nexusPassword
                 }
             }
         }
