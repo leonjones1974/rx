@@ -24,7 +24,7 @@ subprojects { p ->
     }
 
     group = 'uk.camsw.rx'
-    version = '1.0.0'
+    version = '1.0.2'
 
     apply plugin: 'idea'
     apply plugin: 'java'
@@ -90,12 +90,10 @@ subprojects { p ->
         sign configurations.archives
     }
 
-
-
-
     task signPom(type: Sign) {
         sign configurations.pom
     }
+
     def getPomSignature = {
         return project.tasks.signPom.signatureFiles.collect{it}[0]
     }
@@ -121,34 +119,12 @@ subprojects { p ->
 
     publishing {
         publications {
-            gpgJars(MavenPublication) {
-                getSignatureFiles().each {signature ->
-                    artifact (signature.archive) {
-                        classifier = signature.classifier
-                        extension  = signature.extension
-                    }
-                }
-            }
-            if (project.ext.pomFile.exists()) {
-                gpgPom(MavenPublication) {
-                    artifact (getPomSignature()) {
-                        classifier = null
-                        extension  = 'pom.asc'
-                    }
-                }
-            }
-            signatures (MavenPublication) {
-                getSignatureFiles().each {signature ->
-                    artifact (signature.archive) {
-                        classifier = signature.classifier
-                        extension  = signature.extension
-                    }
-                }
-            }
+
             mavenJava(MavenPublication) {
                 from components.java
                 pom.withXml {
                     if (!project.ext.pomFile.exists()) {
+                        println("Writing POM")
                         writeTo (project.ext.pomFile)
                     }
                     asNode().children().last() + {
@@ -177,13 +153,27 @@ subprojects { p ->
                     }
 
                 }
-
-
+                gpgJars(MavenPublication) {
+                    getSignatureFiles().each {signature ->
+                        artifact (signature.archive) {
+                            classifier = signature.classifier
+                            extension  = signature.extension
+                        }
+                    }
+                }
                 if (project.ext.pomFile.exists()) {
                     gpgPom(MavenPublication) {
                         artifact (getPomSignature()) {
                             classifier = null
                             extension  = 'pom.asc'
+                        }
+                    }
+                }
+                signatures (MavenPublication) {
+                    getSignatureFiles().each {signature ->
+                        artifact (signature.archive) {
+                            classifier = signature.classifier
+                            extension  = signature.extension
                         }
                     }
                 }
