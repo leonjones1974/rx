@@ -12,7 +12,7 @@ test {
 ```
 
 ```
-    testCompile 'com.cam.rx:capture:1.0-SNAPSHOT';
+    testCompile 'uk.camsw.rx:capture:1.0-SNAPSHOT';
     testCompile files("${System.properties['java.home']}/../lib/tools.jar")
     testRuntime 'javassist:javassist:3.12.1.GA'
 

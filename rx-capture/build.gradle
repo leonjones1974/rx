@@ -9,8 +9,8 @@ dependencies {
 jar {
     manifest {
         attributes(
-                "Premain-Class": 'com.cam.rx.capture.instr.CaptureAgent',
-                "Agent-Class": 'com.cam.rx.capture.instr.CaptureAgent',
+                "Premain-Class": 'uk.camsw.rx.capture.instr.CaptureAgent',
+                "Agent-Class": 'uk.camsw.rx.capture.instr.CaptureAgent',
                 "Can-Redefine-Classes": 'true',
                 "Can-Retransform-Classes": 'true'
         )

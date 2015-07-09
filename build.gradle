@@ -23,7 +23,7 @@ subprojects { p ->
         pom
     }
 
-    group = 'com.cam.rx'
+    group = 'uk.camsw.rx'
     version = '1.0-SNAPSHOT'
 
     apply plugin: 'idea'
