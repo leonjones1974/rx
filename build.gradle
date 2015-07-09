@@ -14,11 +14,21 @@ task wrapper(type: Wrapper) {
 
 subprojects { p ->
 
+    ext {
+        pomFilePath = "${project.projectDir}/tmp/pom.xml"
+        pomFile = file(pomFilePath)
+    }
+
+    configurations {
+        pom
+    }
+
     group = 'com.cam.rx'
     version = '1.0-SNAPSHOT'
 
     apply plugin: 'idea'
     apply plugin: 'java'
+    apply plugin: 'signing'
 
     idea {
         module {
@@ -51,7 +61,7 @@ subprojects { p ->
 
     apply plugin: 'maven-publish'
 
-    task sourcesJar(type: Jar, dependsOn: classes) {
+    task sourceJar(type: Jar, dependsOn: classes) {
         classifier = 'sources'
         from sourceSets.main.allSource
     }
@@ -62,8 +72,12 @@ subprojects { p ->
     }
 
     artifacts {
-        archives sourcesJar
+        archives jar
+        archives sourceJar
         archives javadocJar
+        if (pomFile.exists()) {
+            pom pomFile
+        }
     }
 
     configurations.all {
@@ -72,12 +86,109 @@ subprojects { p ->
         }
     }
 
+    task signJars (type : Sign, dependsOn: [jar, javadocJar, sourceJar]) {
+        sign configurations.archives
+    }
+
+
+
+
+    task signPom(type: Sign) {
+        sign configurations.pom
+    }
+    def getPomSignature = {
+        return project.tasks.signPom.signatureFiles.collect{it}[0]
+    }
+    if (project.ext.pomFile.exists()) {
+        task preparePublication (dependsOn : [signJars, signPom])
+    } else {
+        task preparePublication (dependsOn : signJars)
+    }
+
+
+    task preparePublish(dependsOn: signJars)
+    def getSignatureFiles = {
+        def allFiles = project.tasks.signJars.signatureFiles.collect { it }
+        def signedSources = allFiles.find { it.name.contains('-sources') }
+        def signedJavadoc = allFiles.find { it.name.contains('-javadoc') }
+        def signedJar = (allFiles - [signedSources, signedJavadoc])[0]
+        return [
+                [archive: signedSources, classifier: 'sources', extension: 'jar.asc'],
+                [archive: signedJavadoc, classifier: 'javadoc', extension: 'jar.asc'],
+                [archive: signedJar,     classifier: null,      extension: 'jar.asc']
+        ]
+    }
+
     publishing {
         publications {
+            gpgJars(MavenPublication) {
+                getSignatureFiles().each {signature ->
+                    artifact (signature.archive) {
+                        classifier = signature.classifier
+                        extension  = signature.extension
+                    }
+                }
+            }
+            if (project.ext.pomFile.exists()) {
+                gpgPom(MavenPublication) {
+                    artifact (getPomSignature()) {
+                        classifier = null
+                        extension  = 'pom.asc'
+                    }
+                }
+            }
+            signatures (MavenPublication) {
+                getSignatureFiles().each {signature ->
+                    artifact (signature.archive) {
+                        classifier = signature.classifier
+                        extension  = signature.extension
+                    }
+                }
+            }
             mavenJava(MavenPublication) {
                 from components.java
+                pom.withXml {
 
-                artifact sourcesJar {
+                    asNode().children().last() + {
+                        resolveStrategy = Closure.DELEGATE_FIRST
+                        name 'Reactive Extensions Utils'
+                        description 'Utils for working with RxJava'
+                        url 'https://github.com/leonjones1974/rx'
+                        scm {
+                            url 'git@github.com:leonjones1974/rx.git'
+                            connection 'scm:git:git@github.com:leonjones1974/rx.git'
+                            developerConnection 'scm:git:git@github.com:leonjones1974/rx.git'
+                        }
+                        licenses {
+                            license {
+                                name 'MIT License'
+                                url 'http://www.opensource.org/licenses/mit-license.php'
+                            }
+                        }
+                        developers {
+                            developer {
+                                id 'leonjones1974'
+                                name 'Leon Jones'
+                                email 'leonj_24@yahoo.com'
+                            }
+                        }
+                    }
+                    if (!project.ext.pomFile.exists()) {
+                        writeTo (project.ext.pomFile)
+                    }
+                }
+
+
+                if (project.ext.pomFile.exists()) {
+                    gpgPom(MavenPublication) {
+                        artifact (getPomSignature()) {
+                            classifier = null
+                            extension  = 'pom.asc'
+                        }
+                    }
+                }
+
+                artifact sourceJar {
                     classifier "sources"
                 }
                 artifact javadocJar {
