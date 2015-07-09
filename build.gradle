@@ -148,7 +148,9 @@ subprojects { p ->
             mavenJava(MavenPublication) {
                 from components.java
                 pom.withXml {
-
+                    if (!project.ext.pomFile.exists()) {
+                        writeTo (project.ext.pomFile)
+                    }
                     asNode().children().last() + {
                         resolveStrategy = Closure.DELEGATE_FIRST
                         name 'Reactive Extensions Utils'
@@ -173,9 +175,7 @@ subprojects { p ->
                             }
                         }
                     }
-                    if (!project.ext.pomFile.exists()) {
-                        writeTo (project.ext.pomFile)
-                    }
+
                 }
 
 
