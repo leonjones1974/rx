@@ -1,3 +1,3 @@
 rootProject.name = 'com.cam.rx'
-include ':dsl'
-include ':capture'
+include ':rx-test-dsl'
+include ':rx-capture'
