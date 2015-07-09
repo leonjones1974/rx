@@ -9,6 +9,8 @@ import com.google.common.base.Strings;
 import org.junit.Before;
 import org.junit.Test;
 import rx.Observable;
+import rx.Subscription;
+import rx.schedulers.Schedulers;
 
 import java.util.ArrayList;
 
@@ -19,10 +21,6 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 public class CaptureTest {
 
-    @Before
-    public void before() {
-    }
-
     @Test
     public void instrumentationShouldBeEnabled() {
         assertThat(CaptureAgent.initialized).isTrue();
@@ -32,72 +30,54 @@ public class CaptureTest {
     public void map() {
         Scenario1<Integer, String> scenario = TestScenario.singleSource();
 
-        ArrayList<Stream> streams = new ArrayList<>();
-        CaptureModel.instance().capturedStreams()
-                .subscribe(streams::add);
-
+        Subscription captureSubscription = CaptureModel.instance().beginCapture();
         scenario
                 .given()
-                    .createSubject(source -> source.map(s -> "hello" + s))
+                    .createSubject(source -> source
+                           .map(n -> n * 2)
+                           .scan((n1, n2) -> n1 + n2)
+                            .map(z -> "z: " + z.toString())
+                            .flatMap(z -> Observable.just("a", "b", "c")).filter(z -> !z.equals("b"))
+        )
                 .when()
                     .subscriber("s1").subscribes()
-                    .subscriber("s2").subscribes()
                     .theSource().emits(1)
                     .theSource().emits(2)
                     .theSource().emits(3)
                 .then()
                     .subscriber("s1")
-                        .eventCount().isEqualTo(3)
-                        .event(0).isEqualTo("hello1");
+                .eventCount().isEqualTo(6);
 
-        dump(streams);
+        captureSubscription.unsubscribe();
 
-    }
+        CaptureModel.instance()
+                .streams()
+                .doOnNext(s -> System.out.println(s.getName()))
+                .flatMap(Stream::events)
+                .subscribe(s -> System.out.println("\t" + s.getValue()));
 
-    private void dump(ArrayList<Stream> streams) {
-        for (Stream stream : streams) {
-            StringBuffer sb = new StringBuffer();
-            sb.append(stream.getName() + Strings.repeat(" ", 30 - stream.getName().length()));
-            int lastOffset = 0;
-            for (Event event : stream.getEvents()) {
-                sb.append(Strings.repeat("-", event.getOffset() - lastOffset)).append("O");
-                lastOffset = event.getOffset()-1;
-            }
-
-            System.out.println(sb.toString());
-        }
     }
 
     @Test
     public void flatMap() {
         Scenario1<Integer, Integer> scenario = TestScenario.singleSource();
 
-        ArrayList<Stream> streams = new ArrayList<>();
-        CaptureModel.instance().capturedStreams()
-                .subscribe(streams::add);
-
         scenario
                 .given()
-                .createSubject(source -> source.map(n -> n).flatMap(s -> Observable.just(1, 2, 3, 4)))
+                .createSubject(source -> source.map(n -> n).flatMap(s -> Observable.just(1, 2, 3, 4)).filter(n -> n % 2 == 0))
                 .when()
                 .subscriber("s1").subscribes()
                 .theSource().emits(1)
                 .theSource().emits(2)
                 .then()
                 .subscriber("s1")
-                .eventCount().isEqualTo(8);
-
-        dump(streams);
+                .eventCount().isEqualTo(4);
 
     }
 
     @Test
     public void filter() {
         Scenario1<Integer, Integer> scenario = TestScenario.singleSource();
-
-        ArrayList<Stream> streams = new ArrayList<>();
-        CaptureModel.instance().capturedStreams()
-                .subscribe(streams::add);
 
         scenario
                 .given()
@@ -111,7 +91,6 @@ public class CaptureTest {
                 .then()
                 .subscriber("s1")
                 .eventCount().isEqualTo(2);
-        dump(streams);
     }
 
 }

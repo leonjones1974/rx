@@ -1,7 +1,5 @@
 package com.cam.rx.capture.model;
 
-import com.google.common.base.MoreObjects;
-
 public class Event {
     private final Object value;
     private final int offset;
@@ -19,11 +17,7 @@ public class Event {
         return offset;
     }
 
-    @Override
     public String toString() {
-        return MoreObjects.toStringHelper(this)
-                .add("value", value)
-                .add("offset", offset)
-                .toString();
+        return value.toString();
     }
 }

@@ -1,16 +1,12 @@
 package com.cam.rx.capture.model;
 
-import com.google.common.base.Strings;
 import rx.Observable;
-
-import java.util.ArrayList;
-import java.util.List;
+import rx.subjects.ReplaySubject;
 
 public class Stream {
 
     private final String name;
-    private final List<Event> events = new ArrayList<>();
-
+    private ReplaySubject<Event> events = ReplaySubject.create();
 
     public Stream(Observable<?> source, String name, boolean isFirst) {
         this.name = name;
@@ -28,25 +24,16 @@ public class Stream {
         return name;
     }
 
-    public void newEvent(Event event) {
-        System.out.println("event.getOffset() = " + event.getOffset());
-        this.events.add(event);
+    public Observable<Event> events() {
+        return events;
     }
 
-    public List<Event> getEvents() {
-        return events;
+    public void newEvent(Event event) {
+       events.onNext(event);
     }
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder(name + Strings.repeat(" ", 20 - name.length()));
-        int eventCount = 0;
-        for (Event event : events) {
-            int offset = event.getOffset();
-            sb.append(Strings.repeat("-", (offset - eventCount)));
-            sb.append("O");
-            eventCount = offset;
-        }
-        return sb.toString();
+        return name;
     }
 }
