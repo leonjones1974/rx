@@ -43,12 +43,6 @@ subprojects { p ->
     repositories {
         mavenLocal()
         mavenCentral()
-        maven {
-            url "http://leonandjosh.ddns.net:8081/nexus/content/repositories/snapshots"
-        }
-        maven {
-            url "http://leonandjosh.ddns.net:8081/nexus/content/repositories/releases"
-        }
     }
 
 
@@ -191,7 +185,7 @@ subprojects { p ->
 
         repositories {
             maven {
-                url project.version.endsWith('-SNAPSHOT') ?  "https://oss.sonatype.org/content/repositories" : "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
+                url project.version.endsWith('-SNAPSHOT') ?  "https://oss.sonatype.org/content/repositories/snapshots" : "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
                 credentials {
                     username nexusUser
                     password nexusPassword
