@@ -2,7 +2,7 @@ buildscript {
     repositories {
         mavenLocal()
         mavenCentral()
-    }    
+    }
 }
 
 task wrapper(type: Wrapper) {
@@ -18,6 +18,8 @@ subprojects { p ->
         pomFilePath = "${project.projectDir}/build/pom.xml"
         pomFile = file(pomFilePath)
     }
+
+    println("POM path: " + pomFilePath)
 
     configurations {
         pom
@@ -155,6 +157,7 @@ subprojects { p ->
                 artifact javadocJar {
                     classifier "javadoc"
                 }
+
             }
 
             gpgJars(MavenPublication) {
@@ -173,22 +176,18 @@ subprojects { p ->
                     }
                 }
             }
-            signatures (MavenPublication) {
-                getSignatureFiles().each {signature ->
-                    artifact (signature.archive) {
-                        classifier = signature.classifier
-                        extension  = signature.extension
-                    }
-                }
-            }
         }
 
         repositories {
             maven {
-                url project.version.endsWith('-SNAPSHOT') ?  "https://oss.sonatype.org/content/repositories/snapshots" : "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
-                credentials {
-                    username nexusUser
-                    password nexusPassword
+                if (project.ext.pomFile.exists()) {
+                    url project.version.endsWith('-SNAPSHOT') ? "https://oss.sonatype.org/content/repositories/snapshots" : "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
+                    credentials {
+                        username nexusUser
+                        password nexusPassword
+                    }
+                } else {
+                    url '/tmp'
                 }
             }
         }
