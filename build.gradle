@@ -19,6 +19,8 @@ subprojects { p ->
         pomFile = file(pomFilePath)
     }
 
+    println("POM path: " + pomFilePath)
+
     configurations {
         pom
     }
