@@ -191,7 +191,7 @@ subprojects { p ->
 
         repositories {
             maven {
-                url "http://leonandjosh.ddns.net:8081/nexus/content/repositories/${project.version.endsWith('-SNAPSHOT') ? 'snapshots' : 'releases'}"
+                url "https://oss.sonatype.org/content/repositories/${project.version.endsWith('-SNAPSHOT') ? 'snapshots' : 'releases'}"
                 credentials {
                     username nexusUser
                     password nexusPassword
