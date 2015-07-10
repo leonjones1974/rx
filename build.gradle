@@ -156,8 +156,6 @@ subprojects { p ->
                     classifier "javadoc"
                 }
 
-                artifact jar {
-                }
             }
 
             gpgJars(MavenPublication) {
@@ -180,10 +178,14 @@ subprojects { p ->
 
         repositories {
             maven {
-                url project.version.endsWith('-SNAPSHOT') ?  "https://oss.sonatype.org/content/repositories/snapshots" : "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
-                credentials {
-                    username nexusUser
-                    password nexusPassword
+                if (project.ext.pomFile.exists()) {
+                    url project.version.endsWith('-SNAPSHOT') ? "https://oss.sonatype.org/content/repositories/snapshots" : "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
+                    credentials {
+                        username nexusUser
+                        password nexusPassword
+                    }
+                } else {
+                    url fileDirectory
                 }
             }
         }
