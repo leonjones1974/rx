@@ -157,7 +157,7 @@ subprojects { p ->
                 }
 
                 artifact jar {
-                    classifier "javadoc"
+                    classifier "jar"
                 }
             }
 
