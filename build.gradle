@@ -184,8 +184,6 @@ subprojects { p ->
                         username nexusUser
                         password nexusPassword
                     }
-                } else {
-                    url fileDirectory
                 }
             }
         }
