@@ -24,7 +24,7 @@ subprojects { p ->
     }
 
     group = 'uk.camsw.rx'
-//    version = projectVersion
+    version = currentVersion
 
     apply plugin: 'idea'
     apply plugin: 'java'
