@@ -2,7 +2,7 @@ buildscript {
     repositories {
         mavenLocal()
         mavenCentral()
-    }    
+    }
 }
 
 task wrapper(type: Wrapper) {
@@ -178,13 +178,11 @@ subprojects { p ->
 
         repositories {
             maven {
-                if (project.ext.pomFile.exists()) {
                     url project.version.endsWith('-SNAPSHOT') ? "https://oss.sonatype.org/content/repositories/snapshots" : "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
                     credentials {
                         username nexusUser
                         password nexusPassword
                     }
-                }
             }
         }
     }
