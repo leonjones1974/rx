@@ -110,15 +110,6 @@ subprojects { p ->
             sign configurations.archives
         }
 
-        //task androidJavadocs(type: Javadoc) {
-        //source = android.sourceSets.main.allJava
-        //}
-
-        //task androidJavadocsJar(type: Jar, dependsOn: androidJavadocs) {
-        //classifier = 'javadoc'
-        //from androidJavadocs.destinationDir
-        //}
-
         task sourceJar(type: Jar, dependsOn: classes) {
             classifier = 'sources'
             from sourceSets.main.allSource
