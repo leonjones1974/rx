@@ -11,6 +11,27 @@ task wrapper(type: Wrapper) {
 }
 
 
+def isReleaseBuild() {
+    return currentVersion.contains("SNAPSHOT") == false
+}
+
+def getReleaseRepositoryUrl() {
+    return hasProperty('RELEASE_REPOSITORY_URL') ? RELEASE_REPOSITORY_URL
+            : "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
+}
+
+def getSnapshotRepositoryUrl() {
+    return hasProperty('SNAPSHOT_REPOSITORY_URL') ? SNAPSHOT_REPOSITORY_URL
+            : "https://oss.sonatype.org/content/repositories/snapshots/"
+}
+
+def getRepositoryUsername() {
+    return nexusUser
+}
+
+def getRepositoryPassword() {
+    return nexusPassword
+}
 
 subprojects { p ->
 
@@ -30,7 +51,91 @@ subprojects { p ->
 
     apply plugin: 'idea'
     apply plugin: 'java'
+
+
+    apply plugin: 'maven'
     apply plugin: 'signing'
+
+
+    afterEvaluate { project ->
+        uploadArchives {
+            repositories {
+                mavenDeployer {
+                    beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+
+                    pom.groupId = GROUP
+                    pom.artifactId = POM_ARTIFACT_ID
+                    pom.version = currentVersion
+
+                    repository(url: getReleaseRepositoryUrl()) {
+                        authentication(userName: getRepositoryUsername(), password: getRepositoryPassword())
+                    }
+                    snapshotRepository(url: getSnapshotRepositoryUrl()) {
+                        authentication(userName: getRepositoryUsername(), password: getRepositoryPassword())
+                    }
+
+                    pom.project {
+                        name POM_NAME
+                        packaging POM_PACKAGING
+                        description POM_DESCRIPTION
+                        url POM_URL
+
+                        scm {
+                            url POM_SCM_URL
+                            connection POM_SCM_CONNECTION
+                            developerConnection POM_SCM_DEV_CONNECTION
+                        }
+
+                        licenses {
+                            license {
+                                name POM_LICENCE_NAME
+                                url POM_LICENCE_URL
+                                distribution POM_LICENCE_DIST
+                            }
+                        }
+
+                        developers {
+                            developer {
+                                id POM_DEVELOPER_ID
+                                name POM_DEVELOPER_NAME
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        signing {
+            required { isReleaseBuild() && gradle.taskGraph.hasTask("uploadArchives") }
+            sign configurations.archives
+        }
+
+        //task androidJavadocs(type: Javadoc) {
+        //source = android.sourceSets.main.allJava
+        //}
+
+        //task androidJavadocsJar(type: Jar, dependsOn: androidJavadocs) {
+        //classifier = 'javadoc'
+        //from androidJavadocs.destinationDir
+        //}
+
+        task sourceJar(type: Jar, dependsOn: classes) {
+            classifier = 'sources'
+            from sourceSets.main.allSource
+        }
+
+        task javadocJar(type: Jar, dependsOn: javadoc) {
+            classifier = 'javadoc'
+            from javadoc.destinationDir
+        }
+
+        artifacts {
+            archives jar
+            archives sourceJar
+            archives javadocJar
+        }
+    }
+
 
     idea {
         module {
@@ -49,31 +154,10 @@ subprojects { p ->
 
 
     dependencies {
-	    testCompile 'org.mockito:mockito-all:1.9.5'
+        testCompile 'org.mockito:mockito-all:1.9.5'
         testCompile 'de.bechte.junit:junit-hierarchicalcontextrunner:4.11.1'
         testCompile 'junit:junit:4.11'
         testCompile 'org.assertj:assertj-core:3.0.0'
-    }
-
-    apply plugin: 'maven-publish'
-
-    task sourceJar(type: Jar, dependsOn: classes) {
-        classifier = 'sources'
-        from sourceSets.main.allSource
-    }
-
-    task javadocJar(type: Jar, dependsOn: javadoc) {
-        classifier = 'javadoc'
-        from javadoc.destinationDir
-    }
-
-    artifacts {
-        archives jar
-        archives sourceJar
-        archives javadocJar
-        if (pomFile.exists()) {
-            pom pomFile
-        }
     }
 
     configurations.all {
@@ -82,116 +166,6 @@ subprojects { p ->
         }
     }
 
-    task signJars (type : Sign, dependsOn: [jar, javadocJar, sourceJar]) {
-        sign configurations.archives
-    }
-
-    task signPom(type: Sign) {
-        sign configurations.pom
-    }
-
-    def getPomSignature = {
-        return project.tasks.signPom.signatureFiles.collect{it}[0]
-    }
-    if (project.ext.pomFile.exists()) {
-        task preparePublication (dependsOn : [signJars, signPom])
-    } else {
-        task preparePublication (dependsOn : signJars)
-    }
-
-
-    task preparePublish(dependsOn: signJars)
-    def getSignatureFiles = {
-        def allFiles = project.tasks.signJars.signatureFiles.collect { it }
-        def signedSources = allFiles.find { it.name.contains('-sources') }
-        def signedJavadoc = allFiles.find { it.name.contains('-javadoc') }
-        def signedJar = (allFiles - [signedSources, signedJavadoc])[0]
-        return [
-                [archive: signedSources, classifier: 'sources', extension: 'jar.asc'],
-                [archive: signedJavadoc, classifier: 'javadoc', extension: 'jar.asc'],
-                [archive: signedJar,     classifier: null,      extension: 'jar.asc']
-        ]
-    }
-
-    publishing {
-        publications {
-
-            mavenJava(MavenPublication) {
-                from components.java
-                pom.withXml {
-                    if (!project.ext.pomFile.exists()) {
-                        println("Writing POM")
-                        writeTo (project.ext.pomFile)
-                    }
-                    asNode().children().last() + {
-                        resolveStrategy = Closure.DELEGATE_FIRST
-                        name 'Reactive Extensions Utils'
-                        description 'Utils for working with RxJava'
-                        url 'https://github.com/leonjones1974/rx'
-                        scm {
-                            url 'git@github.com:leonjones1974/rx.git'
-                            connection 'scm:git:git@github.com:leonjones1974/rx.git'
-                            developerConnection 'scm:git:git@github.com:leonjones1974/rx.git'
-                        }
-                        licenses {
-                            license {
-                                name 'MIT License'
-                                url 'http://www.opensource.org/licenses/mit-license.php'
-                            }
-                        }
-                        developers {
-                            developer {
-                                id 'leonjones1974'
-                                name 'Leon Jones'
-                                email 'leonj_24@yahoo.com'
-                            }
-                        }
-                    }
-
-                }
-
-
-                artifact sourceJar {
-                    classifier "sources"
-                }
-                artifact javadocJar {
-                    classifier "javadoc"
-                }
-
-            }
-
-            gpgJars(MavenPublication) {
-                getSignatureFiles().each {signature ->
-                    artifact (signature.archive) {
-                        classifier = signature.classifier
-                        extension  = signature.extension
-                    }
-                }
-            }
-            if (project.ext.pomFile.exists()) {
-                gpgPom(MavenPublication) {
-                    artifact (getPomSignature()) {
-                        classifier = null
-                        extension  = 'pom.asc'
-                    }
-                }
-            }
-        }
-
-        repositories {
-            maven {
-                if (project.ext.pomFile.exists()) {
-                    url project.version.endsWith('-SNAPSHOT') ? "https://oss.sonatype.org/content/repositories/snapshots" : "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
-                    credentials {
-                        username nexusUser
-                        password nexusPassword
-                    }
-                } else {
-                    url '/tmp'
-                }
-            }
-        }
-    }
     test {
         testLogging {
             events 'started', 'passed'

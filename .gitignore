@@ -13,6 +13,9 @@ log
 *.log
 **/src/generated
 generated/
+**/*.asc
+**/**pom.xml
+**/tmp
 
 # Idea artifacts
 out/
