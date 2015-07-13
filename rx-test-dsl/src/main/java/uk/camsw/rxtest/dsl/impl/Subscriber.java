@@ -1,15 +1,17 @@
 package uk.camsw.rxtest.dsl.impl;
 
+import org.assertj.core.api.AbstractThrowableAssert;
+import rx.exceptions.OnErrorNotImplementedException;
+import rx.subscriptions.SerialSubscription;
 import uk.camsw.rxtest.dsl.one.Subscriber1;
 import uk.camsw.rxtest.dsl.two.Subscriber2;
-import org.assertj.core.api.AbstractThrowableAssert;
-import rx.subscriptions.SerialSubscription;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class Subscriber<T1, T2, U>
         implements Subscriber1<T1,U>,
-        Subscriber2<T1, T2, U>
+        Subscriber2<T1, T2, U>,
+        rx.Observer<U>
 {
 
     private final rx.observers.TestSubscriber<U> inner;
@@ -30,7 +32,7 @@ public class Subscriber<T1, T2, U>
 
     @Override
     public When<T1, T2, U> subscribes() {
-        context.addCommand(c -> subscription.set(c.getStreamUnderTest().subscribe(inner)));
+        context.addCommand(c -> subscription.set(c.getStreamUnderTest().subscribe(this)));
         return new When<>(context);
     }
 
@@ -43,6 +45,10 @@ public class Subscriber<T1, T2, U>
     @Override
     public int eventCount() {
         return inner.getOnNextEvents().size();
+    }
+
+    public boolean isErrored() {
+        return inner.getOnErrorEvents().size() > 0;
     }
 
     @Override
@@ -75,4 +81,23 @@ public class Subscriber<T1, T2, U>
         return assertThat(inner.getOnErrorEvents().get(index));
     }
 
+
+    @Override
+    public void onCompleted() {
+        inner.onCompleted();
+    }
+
+    @Override
+    public void onError(Throwable e) {
+        if (context.handleErrors()) {
+            inner.onError(e);
+        } else {
+            throw new OnErrorNotImplementedException("Unhandled Error", e);
+        }
+    }
+
+    @Override
+    public void onNext(U next) {
+        inner.onNext(next);
+    }
 }

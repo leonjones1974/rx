@@ -6,6 +6,9 @@ public class Then<U> {
 
     public Then(ExecutionContext<?, ?,  U> context) {
         this.context = context;
+    }
+
+    public void executeCommands()  {
         this.context.executeCommands();
     }
 

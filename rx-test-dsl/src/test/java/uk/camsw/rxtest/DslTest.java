@@ -1,5 +1,6 @@
 package uk.camsw.rxtest;
 
+import rx.exceptions.OnErrorNotImplementedException;
 import uk.camsw.rxtest.dsl.one.Scenario1;
 import uk.camsw.rxtest.dsl.two.Scenario2;
 import org.junit.Test;
@@ -86,11 +87,31 @@ public class DslTest {
                 .theSource().completes()
                 .then()
                 .subscriber("s1")
+                .isErrored().isFalse()
                 .completedCount().isEqualTo(1);
     }
 
     @Test
-    public void error() {
+    public void handledError() {
+        Scenario1<String, Integer> testScenario = TestScenario.singleSource();
+
+        testScenario
+                .given()
+                    .createSubject(source -> source.map(s -> Integer.parseInt(s) + 1))
+                    .errorsAreHandled()
+                .when()
+                    .subscriber("s1").subscribes()
+                    .theSource().emits("1")
+                    .theSource().errors(new IllegalArgumentException("oh no"))
+                .then()
+                    .subscriber("s1")
+                        .isErrored().isTrue()
+                        .errorClass().isEqualTo(IllegalArgumentException.class)
+                        .errorMessage().isEqualTo("oh no");
+    }
+
+    @Test(expected = OnErrorNotImplementedException.class)
+    public void unhandledError() {
         Scenario1<String, Integer> testScenario = TestScenario.singleSource();
 
         testScenario
@@ -100,10 +121,7 @@ public class DslTest {
                     .subscriber("s1").subscribes()
                     .theSource().emits("1")
                     .theSource().errors(new IllegalArgumentException("oh no"))
-                .then()
-                    .subscriber("s1")
-                        .errorClass().isEqualTo(IllegalArgumentException.class)
-                        .errorMessage().isEqualTo("oh no");
+                .go();
     }
 
     @Test

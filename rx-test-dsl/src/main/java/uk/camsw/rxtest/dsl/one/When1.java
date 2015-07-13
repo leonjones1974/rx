@@ -10,5 +10,7 @@ public interface When1<T1, U> {
 
     Then<U> then();
 
+    void go();
+
     Time1<T1, U> time();
 }
