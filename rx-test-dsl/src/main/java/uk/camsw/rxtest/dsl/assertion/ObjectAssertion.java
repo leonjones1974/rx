@@ -37,6 +37,11 @@ public class ObjectAssertion<U> extends AbstractObjectAssert<ObjectAssertion<U>,
     }
 
     @Override
+    public BooleanAssertion<U> isErrored() {
+        return subscriberAssertions.isErrored();
+    }
+
+    @Override
     public Then<U> and() {
         return subscriberAssertions.and();
     }

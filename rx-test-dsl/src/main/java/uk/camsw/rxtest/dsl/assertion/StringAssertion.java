@@ -41,4 +41,9 @@ public class StringAssertion<U> extends AbstractCharSequenceAssert<StringAsserti
     public Then<U> and() {
         return subscriberAssertions.and();
     }
+
+    @Override
+    public BooleanAssertion<U> isErrored() {
+        return subscriberAssertions.isErrored();
+    }
 }

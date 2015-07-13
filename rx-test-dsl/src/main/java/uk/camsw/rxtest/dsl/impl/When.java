@@ -16,7 +16,14 @@ public class When<T1, T2, U>
     }
 
     public Then<U> then() {
-        return new Then<>(context);
+        Then<U> then = new Then<>(context);
+        then.executeCommands();
+        return then;
+    }
+
+    @Override
+    public void go() {
+        then();
     }
 
     public Time<T1, T2, U> time() {

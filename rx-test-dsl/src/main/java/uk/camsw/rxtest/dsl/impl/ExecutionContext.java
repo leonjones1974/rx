@@ -19,6 +19,7 @@ public class ExecutionContext<T1, T2, U> {
 
     private Source<T1, T1, T2, U> source1 = new Source<>(this);
     private Source<T2, T1, T2, U> source2 = new Source<>(this);
+    private boolean handleErrors = false;
 
     public Source<T1, T1, T2, U> getSource1() {
         return source1;
@@ -40,6 +41,14 @@ public class ExecutionContext<T1, T2, U> {
         commands.offer(command);
     }
 
+    public boolean handleErrors() {
+        return handleErrors;
+    }
+
+    public void setHandleErrors(boolean handleErrors) {
+        this.handleErrors = handleErrors;
+    }
+
     public Subscriber<T1, T2, U> subscriber(String id) {
         if (!subscribers.containsKey(id)) subscribers.put(id, new Subscriber<>(id, this));
         return subscribers.get(id);
@@ -54,5 +63,6 @@ public class ExecutionContext<T1, T2, U> {
     public TestScheduler getScheduler() {
         return scheduler;
     }
+
 
 }

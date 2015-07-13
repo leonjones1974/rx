@@ -43,4 +43,10 @@ public class Given<T1, T2, U>
         return new When<>(context);
     }
 
+    @Override
+    public Given1<T1, U> errorsAreHandled() {
+        context.setHandleErrors(true);
+        return this;
+    }
+
 }

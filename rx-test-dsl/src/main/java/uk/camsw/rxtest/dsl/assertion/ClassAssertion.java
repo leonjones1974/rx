@@ -40,4 +40,9 @@ public class ClassAssertion<U> extends AbstractClassAssert<ClassAssertion<U>> im
     public Then<U> and() {
         return subscriberAssertions.and();
     }
+
+    @Override
+    public BooleanAssertion<U> isErrored() {
+        return subscriberAssertions.isErrored();
+    }
 }

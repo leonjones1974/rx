@@ -12,4 +12,6 @@ public interface Given1<T1, U> {
     Given1<T1, U> createSubjectWithScheduler(Func2<Observable<T1>, Scheduler, Observable<U>> f);
 
     When1<T1, U> when();
+
+    Given1<T1, U> errorsAreHandled();
 }

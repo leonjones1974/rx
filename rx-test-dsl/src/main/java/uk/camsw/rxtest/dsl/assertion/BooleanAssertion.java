@@ -1,14 +1,14 @@
 package uk.camsw.rxtest.dsl.assertion;
 
+import org.assertj.core.api.AbstractBooleanAssert;
 import uk.camsw.rxtest.dsl.impl.Then;
-import org.assertj.core.api.AbstractIntegerAssert;
 
-public class IntegerAssertion<U> extends AbstractIntegerAssert<IntegerAssertion<U>> implements ISubscriberAssertions<U> {
+public class BooleanAssertion<U> extends AbstractBooleanAssert<BooleanAssertion<U>> implements ISubscriberAssertions<U> {
 
     private final ISubscriberAssertions<U> subscriberAssertions;
 
-    public IntegerAssertion(int value, ISubscriberAssertions<U> subscriberAssertions) {
-        super(value, IntegerAssertion.class);
+    public BooleanAssertion(Boolean actual, ISubscriberAssertions<U> subscriberAssertions) {
+        super(actual, BooleanAssertion.class);
         this.subscriberAssertions = subscriberAssertions;
     }
 
@@ -20,11 +20,6 @@ public class IntegerAssertion<U> extends AbstractIntegerAssert<IntegerAssertion<
     @Override
     public IntegerAssertion<U> eventCount() {
         return subscriberAssertions.eventCount();
-    }
-
-    @Override
-    public Then<U> and() {
-        return subscriberAssertions.and();
     }
 
     @Override
@@ -40,6 +35,11 @@ public class IntegerAssertion<U> extends AbstractIntegerAssert<IntegerAssertion<
     @Override
     public StringAssertion<U> errorMessage() {
         return subscriberAssertions.errorMessage();
+    }
+
+    @Override
+    public Then<U> and() {
+        return subscriberAssertions.and();
     }
 
     @Override

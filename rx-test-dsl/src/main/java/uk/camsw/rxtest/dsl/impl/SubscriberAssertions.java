@@ -42,4 +42,8 @@ public class SubscriberAssertions<U> implements ISubscriberAssertions<U> {
         return new Then<>(context);
     }
 
+    @Override
+    public BooleanAssertion<U> isErrored() {
+        return new BooleanAssertion<>(testSubscriber.isErrored(), this);
+    }
 }

@@ -14,5 +14,7 @@ public interface ISubscriberAssertions<U> {
 
     StringAssertion<U> errorMessage();
 
+    BooleanAssertion<U> isErrored();
+
     Then<U> and();
 }
