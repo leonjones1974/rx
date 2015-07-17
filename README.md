@@ -118,3 +118,21 @@ rx-test aims to provide a simple DSL and associated capture libraries to make cr
 
 
 ```
+
+### Providing your own publisher 
+```
+        PublishSubject<String> customSource = PublishSubject.create();
+        TestScenario.singleSource(customSource)
+                .given()
+                    .createSubject(_source -> customSource.map(String::toUpperCase))
+                .when()
+                    .subscriber("s1").subscribes()
+                    .theSource().emits("a")
+                    .theSource().emits("b")
+                .then()
+                    .subscriber("s1")
+                    .eventCount().isEqualTo(2)
+                    .event(0).isEqualTo("A")
+                    .event(1).isEqualTo("B");
+
+```
