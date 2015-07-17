@@ -76,3 +76,45 @@ rx-test aims to provide a simple DSL and associated capture libraries to make cr
                         .event(0).isEqualTo("a1")
                         .event(1).isEqualTo("b2");
 ```
+
+### Asserting on errors
+```
+   
+      Scenario1<String, Integer> testScenario = TestScenario.singleSource();
+
+        testScenario
+                .given()
+                    .createSubject(source -> source.map(s -> Integer.parseInt(s) + 1))
+                    .errorsAreHandled()
+                .when()
+                    .subscriber("s1").subscribes()
+                    .theSource().emits("1")
+                    .theSource().errors(new IllegalArgumentException("oh no"))
+                .then()
+                    .subscriber("s1")
+                        .isErrored().isTrue()
+                        .errorClass().isEqualTo(IllegalArgumentException.class)
+                        .errorMessage().isEqualTo("oh no");
+    }
+
+```
+
+### Asserting using a rendering
+```
+        testScenario
+                .given()
+                    .createSubject(source -> source.map(n -> n == 0 ? "a" : "B"))
+                    .renderer(event -> "'" + event + "'")
+                .when()
+                    .subscriber("s1").subscribes()
+                    .theSource().emits(0)
+                    .theSource().emits(1)
+                    .theSource().completes()
+                .then()
+                    .subscriber("s1")
+                        .renderedStream().isEqualTo("['a']-['B']-|")
+                        .completedCount().isEqualTo(1)
+                        .eventCount().isEqualTo(2);
+
+
+```
