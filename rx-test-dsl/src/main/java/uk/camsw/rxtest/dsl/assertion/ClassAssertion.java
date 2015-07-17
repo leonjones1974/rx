@@ -42,6 +42,11 @@ public class ClassAssertion<U> extends AbstractClassAssert<ClassAssertion<U>> im
     }
 
     @Override
+    public StringAssertion<U> renderedStream() {
+        return subscriberAssertions.renderedStream();
+    }
+
+    @Override
     public BooleanAssertion<U> isErrored() {
         return subscriberAssertions.isErrored();
     }

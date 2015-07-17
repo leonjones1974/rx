@@ -1,7 +1,7 @@
 package uk.camsw.rxtest.dsl.assertion;
 
-import uk.camsw.rxtest.dsl.impl.Then;
 import org.assertj.core.api.AbstractCharSequenceAssert;
+import uk.camsw.rxtest.dsl.impl.Then;
 
 public class StringAssertion<U> extends AbstractCharSequenceAssert<StringAssertion<U>, CharSequence> implements ISubscriberAssertions<U> {
 
@@ -45,5 +45,10 @@ public class StringAssertion<U> extends AbstractCharSequenceAssert<StringAsserti
     @Override
     public BooleanAssertion<U> isErrored() {
         return subscriberAssertions.isErrored();
+    }
+
+    @Override
+    public StringAssertion<U> renderedStream() {
+        return subscriberAssertions.renderedStream();
     }
 }

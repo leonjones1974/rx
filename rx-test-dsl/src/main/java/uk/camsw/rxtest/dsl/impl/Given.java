@@ -49,4 +49,10 @@ public class Given<T1, T2, U>
         return this;
     }
 
+    @Override
+    public Given1<T1, U> renderer(Func1<U, String> renderer) {
+        context.setRenderer(renderer);
+        return this;
+    }
+
 }

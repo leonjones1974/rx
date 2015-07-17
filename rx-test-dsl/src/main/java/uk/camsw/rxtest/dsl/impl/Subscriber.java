@@ -6,6 +6,8 @@ import rx.subscriptions.SerialSubscription;
 import uk.camsw.rxtest.dsl.one.Subscriber1;
 import uk.camsw.rxtest.dsl.two.Subscriber2;
 
+import java.util.List;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class Subscriber<T1, T2, U>
@@ -54,6 +56,10 @@ public class Subscriber<T1, T2, U>
     @Override
     public U event(int index) {
         return getEvent(index);
+    }
+
+    public List<U> events() {
+        return inner.getOnNextEvents();
     }
 
     private U getEvent(int index) {

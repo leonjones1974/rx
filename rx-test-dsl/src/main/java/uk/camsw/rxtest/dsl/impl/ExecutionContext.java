@@ -1,6 +1,7 @@
 package uk.camsw.rxtest.dsl.impl;
 
 import rx.Observable;
+import rx.functions.Func1;
 import rx.schedulers.TestScheduler;
 import rx.subjects.PublishSubject;
 
@@ -21,6 +22,7 @@ public class ExecutionContext<T1, T2, U> {
     private final Source<T1, T1, T2, U> source1;
     private final Source<T2, T1, T2, U> source2;
     private boolean handleErrors = false;
+    private Func1<U, String> renderer = Object::toString;
 
     public ExecutionContext() {
         source1 = new Source<>(this);
@@ -30,6 +32,10 @@ public class ExecutionContext<T1, T2, U> {
     public ExecutionContext(PublishSubject<T1> customSource) {
         source1 = new Source<>(customSource, this);
         source2 = new Source<>(this);
+    }
+
+    public void setRenderer(Func1<U, String> renderer) {
+        this.renderer = renderer;
     }
 
     public Source<T1, T1, T2, U> getSource1() {
@@ -76,4 +82,7 @@ public class ExecutionContext<T1, T2, U> {
     }
 
 
+    public Func1<U, String> getRenderer() {
+        return renderer;
+    }
 }

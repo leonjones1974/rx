@@ -211,4 +211,47 @@ public class DslTest {
                     .event(1).isEqualTo("B");
 
     }
+
+    @Test
+    public void streamRendering() {
+        Scenario1<Integer, String> testScenario = TestScenario.singleSource();
+
+        testScenario
+                .given()
+                    .createSubject(source -> source.map(n -> n == 0 ? "a" : "B"))
+                    .renderer(event -> "'" + event + "'")
+                .when()
+                    .subscriber("s1").subscribes()
+                    .theSource().emits(0)
+                    .theSource().emits(1)
+                    .theSource().completes()
+                .then()
+                    .subscriber("s1")
+                        .renderedStream().isEqualTo("['a']-['B']-|")
+                        .completedCount().isEqualTo(1)
+                        .eventCount().isEqualTo(2);
+
+    }
+
+    @Test
+    public void streamRenderingWithError() {
+        Scenario1<Integer, String> testScenario = TestScenario.singleSource();
+
+        testScenario
+                .given()
+                    .createSubject(source -> source.map(n -> n == 0 ? "a" : "B"))
+                    .errorsAreHandled()
+                    .renderer(event -> "'" + event + "'")
+                .when()
+                    .subscriber("s1").subscribes()
+                    .theSource().emits(0)
+                    .theSource().emits(1)
+                    .theSource().errors(new RuntimeException("I'm broken"))
+                .then()
+                    .subscriber("s1")
+                        .renderedStream().isEqualTo("['a']-['B']-X[RuntimeException: I'm broken]")
+                        .isErrored().isTrue()
+                        .eventCount().isEqualTo(2);
+
+    }
 }
