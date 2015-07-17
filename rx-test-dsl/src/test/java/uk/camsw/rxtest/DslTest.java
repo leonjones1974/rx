@@ -1,6 +1,7 @@
 package uk.camsw.rxtest;
 
 import rx.exceptions.OnErrorNotImplementedException;
+import rx.subjects.PublishSubject;
 import uk.camsw.rxtest.dsl.one.Scenario1;
 import uk.camsw.rxtest.dsl.two.Scenario2;
 import org.junit.Test;
@@ -191,5 +192,23 @@ public class DslTest {
                         .eventCount().isEqualTo(2)
                         .event(0).isEqualTo("a1")
                         .event(1).isEqualTo("b2");
+    }
+
+    @Test
+    public void manualSingleSource() {
+        PublishSubject<String> customSource = PublishSubject.create();
+        TestScenario.singleSource(customSource)
+                .given()
+                    .createSubject(source -> source.map(String::toUpperCase))
+                .when()
+                    .subscriber("s1").subscribes()
+                    .theSource().emits("a")
+                    .theSource().emits("b")
+                .then()
+                    .subscriber("s1")
+                    .eventCount().isEqualTo(2)
+                    .event(0).isEqualTo("A")
+                    .event(1).isEqualTo("B");
+
     }
 }

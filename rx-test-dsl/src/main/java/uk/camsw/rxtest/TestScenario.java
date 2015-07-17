@@ -1,5 +1,6 @@
 package uk.camsw.rxtest;
 
+import rx.subjects.PublishSubject;
 import uk.camsw.rxtest.dsl.impl.ExecutionContext;
 import uk.camsw.rxtest.dsl.impl.Given;
 import uk.camsw.rxtest.dsl.one.Scenario1;
@@ -24,8 +25,15 @@ public class TestScenario<T1, T2, U>
         return new TestScenario<>(context);
     }
 
+    public static <T1, U> Scenario1<T1, U> singleSource(PublishSubject<T1> customSource) {
+        ExecutionContext<T1, Object, U> context = new ExecutionContext<>(customSource);
+        return new TestScenario<>(context);
+    }
+
     public static <T1, T2, U> Scenario2<T1, T2, U> twoSources() {
         ExecutionContext<T1, T2, U> context = new ExecutionContext<>();
         return new TestScenario<>(context);
     }
+
+
 }
