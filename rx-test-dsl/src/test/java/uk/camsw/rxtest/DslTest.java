@@ -199,7 +199,7 @@ public class DslTest {
         PublishSubject<String> customSource = PublishSubject.create();
         TestScenario.singleSource(customSource)
                 .given()
-                    .createSubject(source -> source.map(String::toUpperCase))
+                    .createSubject(_source -> customSource.map(String::toUpperCase))
                 .when()
                     .subscriber("s1").subscribes()
                     .theSource().emits("a")
