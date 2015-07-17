@@ -14,4 +14,6 @@ public interface Given1<T1, U> {
     When1<T1, U> when();
 
     Given1<T1, U> errorsAreHandled();
+
+    Given1<T1, U> renderer(Func1<U, String> renderer);
 }

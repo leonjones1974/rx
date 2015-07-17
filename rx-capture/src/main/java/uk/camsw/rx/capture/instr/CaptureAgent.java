@@ -40,7 +40,7 @@ public class CaptureAgent {
 
         try {
             VirtualMachine vm = VirtualMachine.attach(pid);
-            vm.loadAgent("/home/leonjones/workspace/cam/rx/capture/build/libs/capture-1.0-SNAPSHOT.jar", "");
+            vm.loadAgent("/home/leonjones/workspace/cam/rx/capture/build/libs/capture-1.2-SNAPSHOT.jar", "");
             vm.detach();
         } catch (Exception e) {
             throw new RuntimeException(e);

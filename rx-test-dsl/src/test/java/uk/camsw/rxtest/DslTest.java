@@ -1,6 +1,7 @@
 package uk.camsw.rxtest;
 
 import rx.exceptions.OnErrorNotImplementedException;
+import rx.subjects.PublishSubject;
 import uk.camsw.rxtest.dsl.one.Scenario1;
 import uk.camsw.rxtest.dsl.two.Scenario2;
 import org.junit.Test;
@@ -191,5 +192,66 @@ public class DslTest {
                         .eventCount().isEqualTo(2)
                         .event(0).isEqualTo("a1")
                         .event(1).isEqualTo("b2");
+    }
+
+    @Test
+    public void manualSingleSource() {
+        PublishSubject<String> customSource = PublishSubject.create();
+        TestScenario.singleSource(customSource)
+                .given()
+                    .createSubject(_source -> customSource.map(String::toUpperCase))
+                .when()
+                    .subscriber("s1").subscribes()
+                    .theSource().emits("a")
+                    .theSource().emits("b")
+                .then()
+                    .subscriber("s1")
+                    .eventCount().isEqualTo(2)
+                    .event(0).isEqualTo("A")
+                    .event(1).isEqualTo("B");
+
+    }
+
+    @Test
+    public void streamRendering() {
+        Scenario1<Integer, String> testScenario = TestScenario.singleSource();
+
+        testScenario
+                .given()
+                    .createSubject(source -> source.map(n -> n == 0 ? "a" : "B"))
+                    .renderer(event -> "'" + event + "'")
+                .when()
+                    .subscriber("s1").subscribes()
+                    .theSource().emits(0)
+                    .theSource().emits(1)
+                    .theSource().completes()
+                .then()
+                    .subscriber("s1")
+                        .renderedStream().isEqualTo("['a']-['B']-|")
+                        .completedCount().isEqualTo(1)
+                        .eventCount().isEqualTo(2);
+
+    }
+
+    @Test
+    public void streamRenderingWithError() {
+        Scenario1<Integer, String> testScenario = TestScenario.singleSource();
+
+        testScenario
+                .given()
+                    .createSubject(source -> source.map(n -> n == 0 ? "a" : "B"))
+                    .errorsAreHandled()
+                    .renderer(event -> "'" + event + "'")
+                .when()
+                    .subscriber("s1").subscribes()
+                    .theSource().emits(0)
+                    .theSource().emits(1)
+                    .theSource().errors(new RuntimeException("I'm broken"))
+                .then()
+                    .subscriber("s1")
+                        .renderedStream().isEqualTo("['a']-['B']-X[RuntimeException: I'm broken]")
+                        .isErrored().isTrue()
+                        .eventCount().isEqualTo(2);
+
     }
 }

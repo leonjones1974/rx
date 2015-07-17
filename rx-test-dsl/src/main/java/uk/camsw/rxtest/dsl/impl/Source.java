@@ -13,8 +13,12 @@ public class Source<T, T1, T2, U>
     private final PublishSubject<T> publisher;
 
     public Source(ExecutionContext<T1, T2, U> context) {
+        this(PublishSubject.create(), context);
+    }
+
+    public Source(PublishSubject<T> publisher, ExecutionContext<T1, T2, U> context) {
         this.context = context;
-        this.publisher = PublishSubject.create();
+        this.publisher = publisher;
     }
 
     public When<T1, T2, U> emits(T event) {

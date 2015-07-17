@@ -45,4 +45,9 @@ public class ObjectAssertion<U> extends AbstractObjectAssert<ObjectAssertion<U>,
     public Then<U> and() {
         return subscriberAssertions.and();
     }
+
+    @Override
+    public StringAssertion<U> renderedStream() {
+        return subscriberAssertions.renderedStream();
+    }
 }

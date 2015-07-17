@@ -17,4 +17,6 @@ public interface ISubscriberAssertions<U> {
     BooleanAssertion<U> isErrored();
 
     Then<U> and();
+
+    StringAssertion<U> renderedStream();
 }

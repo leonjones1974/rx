@@ -28,6 +28,11 @@ public class IntegerAssertion<U> extends AbstractIntegerAssert<IntegerAssertion<
     }
 
     @Override
+    public StringAssertion<U> renderedStream() {
+        return subscriberAssertions.renderedStream();
+    }
+
+    @Override
     public IntegerAssertion<U> completedCount() {
         return subscriberAssertions.completedCount();
     }
