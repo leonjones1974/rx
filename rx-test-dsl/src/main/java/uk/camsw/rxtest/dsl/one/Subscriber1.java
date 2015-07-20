@@ -21,4 +21,6 @@ public interface Subscriber1<T1, U> {
     String errorMessage();
 
     AbstractThrowableAssert<?, ? extends Throwable> error(int index);
+
+    When1<T1, U> waitsforEvents(int eventCount);
 }
