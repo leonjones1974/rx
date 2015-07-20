@@ -7,6 +7,9 @@ import rx.Scheduler;
 import rx.functions.Func1;
 import rx.functions.Func2;
 
+import java.time.Duration;
+import java.time.temporal.TemporalUnit;
+
 public class Given<T1, T2, U>
         implements Given1<T1, U>,
         Given2<T1, T2, U> {
@@ -52,6 +55,17 @@ public class Given<T1, T2, U>
     @Override
     public Given1<T1, U> renderer(Func1<U, String> renderer) {
         context.setRenderer(renderer);
+        return this;
+    }
+
+    @Override
+    public Given1<T1, U> asyncTimeout(long timeout, TemporalUnit unit) {
+       return asyncTimeout(Duration.of(timeout, unit));
+    }
+
+    @Override
+    public Given1<T1, U> asyncTimeout(Duration duration) {
+        context.setAsyncTimeout(duration);
         return this;
     }
 

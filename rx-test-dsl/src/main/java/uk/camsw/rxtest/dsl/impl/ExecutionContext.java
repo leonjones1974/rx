@@ -1,14 +1,18 @@
 package uk.camsw.rxtest.dsl.impl;
 
+import com.jayway.awaitility.Awaitility;
+import com.jayway.awaitility.core.ConditionFactory;
 import rx.Observable;
 import rx.functions.Func1;
 import rx.schedulers.TestScheduler;
 import rx.subjects.PublishSubject;
 
+import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 public class ExecutionContext<T1, T2, U> {
@@ -23,6 +27,7 @@ public class ExecutionContext<T1, T2, U> {
     private final Source<T2, T1, T2, U> source2;
     private boolean handleErrors = false;
     private Func1<U, String> renderer = Object::toString;
+    private Duration asyncTimeoutDuration =  Duration.ofSeconds(5);
 
     public ExecutionContext() {
         source1 = new Source<>(this);
@@ -81,8 +86,21 @@ public class ExecutionContext<T1, T2, U> {
         return scheduler;
     }
 
+    public Duration getAsyncTimeoutDuration() {
+        return asyncTimeoutDuration;
+    }
+
+    public ConditionFactory await() {
+        com.jayway.awaitility.Duration timeToWait = new com.jayway.awaitility.Duration(asyncTimeoutDuration.toMillis(), TimeUnit.MILLISECONDS);
+        return Awaitility.await().pollInterval(Math.min(100, asyncTimeoutDuration.toMillis() -1), TimeUnit.MILLISECONDS).atMost(timeToWait);
+    }
 
     public Func1<U, String> getRenderer() {
         return renderer;
+    }
+
+    public void setAsyncTimeout(Duration duration) {
+        if (duration.toMillis() < 2) this.asyncTimeoutDuration = Duration.ofMillis(2);
+        else this.asyncTimeoutDuration = duration;
     }
 }

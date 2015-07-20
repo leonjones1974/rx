@@ -87,6 +87,11 @@ public class Subscriber<T1, T2, U>
         return assertThat(inner.getOnErrorEvents().get(index));
     }
 
+    @Override
+    public When<T1, T2, U> waitsforEvents(int eventCount) {
+        context.addCommand(context -> context.await().until(() -> inner.getOnNextEvents().size() == eventCount));
+        return new When<>(context);
+    }
 
     @Override
     public void onCompleted() {

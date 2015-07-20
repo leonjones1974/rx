@@ -1,6 +1,8 @@
 package uk.camsw.rxtest;
 
+import com.jayway.awaitility.core.ConditionTimeoutException;
 import rx.exceptions.OnErrorNotImplementedException;
+import rx.schedulers.Schedulers;
 import rx.subjects.PublishSubject;
 import uk.camsw.rxtest.dsl.one.Scenario1;
 import uk.camsw.rxtest.dsl.two.Scenario2;
@@ -11,6 +13,7 @@ import java.time.Duration;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import static com.jayway.awaitility.Duration.TWO_SECONDS;
 import static java.util.Arrays.asList;
 
 public class DslTest {
@@ -227,9 +230,10 @@ public class DslTest {
                     .theSource().completes()
                 .then()
                     .subscriber("s1")
+                        .eventCount().isEqualTo(2)
                         .renderedStream().isEqualTo("['a']-['B']-|")
                         .completedCount().isEqualTo(1)
-                        .eventCount().isEqualTo(2);
+        ;
 
     }
 
@@ -253,5 +257,22 @@ public class DslTest {
                         .isErrored().isTrue()
                         .eventCount().isEqualTo(2);
 
+    }
+
+
+    @Test(expected = ConditionTimeoutException.class)
+    public void asyncWithTimeout() {
+        Scenario1<String, String> testScenario = TestScenario.singleSource();
+
+        testScenario
+                .given()
+                    .createSubject(source -> source.observeOn(Schedulers.computation()).delay(10, TimeUnit.SECONDS))
+                    .asyncTimeout(Duration.ofMillis(500))
+                .when()
+                    .subscriber("s1").subscribes()
+                    .theSource().emits("a")
+                    .theSource().emits("b")
+                    .subscriber("s1").waitsforEvents(2)
+                .go();
     }
 }
