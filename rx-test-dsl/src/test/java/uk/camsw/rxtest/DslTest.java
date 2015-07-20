@@ -259,6 +259,24 @@ public class DslTest {
 
     }
 
+    @Test
+    public void asyncWaitForEvents() {
+        Scenario1<String, String> testScenario = TestScenario.singleSource();
+
+        testScenario
+                .given()
+                    .createSubject(source -> source.observeOn(Schedulers.computation()).delay(1, TimeUnit.SECONDS))
+                    .asyncTimeout(Duration.ofSeconds(2))
+                .when()
+                    .subscriber("s1").subscribes()
+                    .theSource().emits("a")
+                    .theSource().emits("b")
+                    .subscriber("s1").waitsforEvents(2)
+                .then()
+                    .subscriber("s1")
+                        .renderedStream().isEqualTo("[a]-[b]")
+                        .eventCount().isEqualTo(2);
+    }
 
     @Test(expected = ConditionTimeoutException.class)
     public void asyncWithTimeout() {
