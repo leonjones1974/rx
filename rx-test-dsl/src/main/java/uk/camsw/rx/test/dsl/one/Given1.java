@@ -2,6 +2,8 @@ package uk.camsw.rx.test.dsl.one;
 
 import rx.Observable;
 import rx.Scheduler;
+import rx.functions.Action;
+import rx.functions.Func0;
 import rx.functions.Func1;
 import rx.functions.Func2;
 
@@ -23,4 +25,6 @@ public interface Given1<T1, U> {
     Given1<T1, U> asyncTimeout(long timeout, TemporalUnit unit);
 
     Given1<T1, U> asyncTimeout(Duration duration);
+
+    Given1<T1, U> theResource(Func0<? extends AutoCloseable> f);
 }

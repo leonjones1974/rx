@@ -17,6 +17,7 @@ public class When<T1, T2, U>
 
     public Then<U> then() {
         Then<U> then = new Then<>(context);
+        context.addCommand(ExecutionContext::releaseResources);
         then.executeCommands();
         return then;
     }

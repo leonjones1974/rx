@@ -8,9 +8,7 @@ import rx.schedulers.TestScheduler;
 import rx.subjects.PublishSubject;
 
 import java.time.Duration;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Queue;
+import java.util.*;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
@@ -28,6 +26,7 @@ public class ExecutionContext<T1, T2, U> {
     private boolean handleErrors = false;
     private Func1<U, String> renderer = Object::toString;
     private Duration asyncTimeoutDuration =  Duration.ofSeconds(5);
+    private List<AutoCloseable> resources = new ArrayList<>();
 
     public ExecutionContext() {
         source1 = new Source<>(this);
@@ -61,6 +60,20 @@ public class ExecutionContext<T1, T2, U> {
 
     public void addCommand(Consumer<ExecutionContext<T1, T2, U>> command) {
         commands.offer(command);
+    }
+
+    public void addResource(AutoCloseable resource) {
+        resources.add(resource);
+    }
+
+    public void releaseResources() {
+        resources.forEach(r -> {
+            try {
+                r.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
     }
 
     public boolean handleErrors() {
@@ -103,4 +116,5 @@ public class ExecutionContext<T1, T2, U> {
         if (duration.toMillis() < 2) this.asyncTimeoutDuration = Duration.ofMillis(2);
         else this.asyncTimeoutDuration = duration;
     }
+
 }

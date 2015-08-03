@@ -1,6 +1,7 @@
 package uk.camsw.rx.test.dsl.two;
 
 import rx.Observable;
+import rx.functions.Func0;
 import rx.functions.Func2;
 
 public interface Given2<T1, T2, U> {

@@ -1,5 +1,6 @@
 package uk.camsw.rx.test.dsl.impl;
 
+import rx.functions.Func0;
 import uk.camsw.rx.test.dsl.two.Given2;
 import uk.camsw.rx.test.dsl.one.Given1;
 import rx.Observable;
@@ -66,6 +67,12 @@ public class Given<T1, T2, U>
     @Override
     public Given1<T1, U> asyncTimeout(Duration duration) {
         context.setAsyncTimeout(duration);
+        return this;
+    }
+
+    @Override
+    public Given1<T1, U> theResource(Func0<? extends AutoCloseable> f) {
+        context.addCommand(context -> context.addResource(f.call()));
         return this;
     }
 
