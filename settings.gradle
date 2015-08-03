@@ -2,4 +2,6 @@ rootProject.name = 'uk.camsw.rx'
 
 
 include ':rx-test-dsl'
+include ':rx-common'
+include ':rx-kafka'
 //include ':rx-capture'
