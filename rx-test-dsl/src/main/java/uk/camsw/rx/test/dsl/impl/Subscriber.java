@@ -103,6 +103,7 @@ public class Subscriber<T1, T2, U>
         if (context.handleErrors()) {
             inner.onError(e);
         } else {
+            context.cleanUp();
             throw new OnErrorNotImplementedException("Unhandled Error", e);
         }
     }

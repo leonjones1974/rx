@@ -155,3 +155,23 @@ rx-test aims to provide a simple DSL and associated capture libraries to make cr
                         .renderedStream().isEqualTo("[a]-[b]")
                         .eventCount().isEqualTo(2);
 ```
+
+
+### External resources
+```
+        AtomicBoolean closed = new AtomicBoolean(false);
+        AutoCloseable resource = () -> closed.getAndSet(true);
+        Scenario1<String, String> testScenario = TestScenario.singleSource();
+
+        testScenario
+                .given()
+                    .theResource(() -> resource)
+                    .createSubject(source -> Observable.just("a", "b"))
+                .when()
+                    .subscriber("s1").subscribes()
+                .then()
+                   .subscriber("s1").eventCount().isEqualTo(2);
+
+        assertThat(closed.get()).isTrue();
+
+```

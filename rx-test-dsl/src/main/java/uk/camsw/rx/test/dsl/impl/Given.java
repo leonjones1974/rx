@@ -21,13 +21,13 @@ public class Given<T1, T2, U>
         this.context = context;
     }
 
-    public Given1<T1, U> createSubject(Func1<Observable<T1>, Observable<U>> f) {
+    public Given<T1, T2, U> createSubject(Func1<Observable<T1>, Observable<U>> f) {
         Observable<U> sut = f.call(context.getSource1().asObservable());
         context.setStreamUnderTest(sut);
         return this;
     }
 
-    public Given1<T1, U> createSubjectWithScheduler(Func2<Observable<T1>, Scheduler, Observable<U>> f) {
+    public Given<T1, T2, U> createSubjectWithScheduler(Func2<Observable<T1>, Scheduler, Observable<U>> f) {
         Observable<T1> source = context.getSource1().asObservable();
         Observable<U> sut = f.call(source, context.getScheduler());
         context.setStreamUnderTest(sut);
@@ -35,7 +35,7 @@ public class Given<T1, T2, U>
     }
 
     @Override
-    public Given2<T1, T2, U> createSubject(Func2<Observable<T1>, Observable<T2>, Observable<U>> f) {
+    public Given<T1, T2, U> createSubject(Func2<Observable<T1>, Observable<T2>, Observable<U>> f) {
         Observable<T1> source1 = context.getSource1().asObservable();
         Observable<T2> source2 = context.getSource2().asObservable();
         Observable<U> sut = f.call(source1, source2);
@@ -48,30 +48,30 @@ public class Given<T1, T2, U>
     }
 
     @Override
-    public Given1<T1, U> errorsAreHandled() {
+    public Given<T1, T2, U> errorsAreHandled() {
         context.setHandleErrors(true);
         return this;
     }
 
     @Override
-    public Given1<T1, U> renderer(Func1<U, String> renderer) {
+    public Given<T1, T2, U> renderer(Func1<U, String> renderer) {
         context.setRenderer(renderer);
         return this;
     }
 
     @Override
-    public Given1<T1, U> asyncTimeout(long timeout, TemporalUnit unit) {
+    public Given<T1, T2, U> asyncTimeout(long timeout, TemporalUnit unit) {
        return asyncTimeout(Duration.of(timeout, unit));
     }
 
     @Override
-    public Given1<T1, U> asyncTimeout(Duration duration) {
+    public Given<T1, T2, U> asyncTimeout(Duration duration) {
         context.setAsyncTimeout(duration);
         return this;
     }
 
     @Override
-    public Given1<T1, U> theResource(Func0<? extends AutoCloseable> f) {
+    public Given<T1, T2, U> theResource(Func0<? extends AutoCloseable> f) {
         context.addCommand(context -> context.addResource(f.call()));
         return this;
     }

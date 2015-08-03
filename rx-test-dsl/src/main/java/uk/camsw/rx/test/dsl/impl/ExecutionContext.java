@@ -66,7 +66,7 @@ public class ExecutionContext<T1, T2, U> {
         resources.add(resource);
     }
 
-    public void releaseResources() {
+    private void releaseResources() {
         resources.forEach(r -> {
             try {
                 r.close();
@@ -74,7 +74,13 @@ public class ExecutionContext<T1, T2, U> {
                 e.printStackTrace();
             }
         });
+        resources.clear();
     }
+
+    public void cleanUp() {
+        releaseResources();
+    }
+
 
     public boolean handleErrors() {
         return handleErrors;
@@ -116,5 +122,4 @@ public class ExecutionContext<T1, T2, U> {
         if (duration.toMillis() < 2) this.asyncTimeoutDuration = Duration.ofMillis(2);
         else this.asyncTimeoutDuration = duration;
     }
-
 }
