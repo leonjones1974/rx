@@ -1,6 +1,7 @@
 package uk.camsw.rx.test.dsl.two;
 
 import rx.Observable;
+import rx.Scheduler;
 import rx.functions.Func0;
 import rx.functions.Func1;
 import rx.functions.Func2;
@@ -10,7 +11,9 @@ import java.time.temporal.TemporalUnit;
 
 public interface Given2<T1, T2, U> {
 
-    Given2<T1, T2, U> createSubject(Func2<Observable<T1>, Observable<T2>, Observable<U>> f);
+    Given2<T1, T2, U> subjectCreated(Func2<Observable<T1>, Observable<T2>, Observable<U>> f);
+
+    Given2<T1, T2, U> subjectCreatedWithScheduler(Func2<Observable<T1>, Scheduler, Observable<U>> f);
 
     When2<T1, T2, U> when();
 

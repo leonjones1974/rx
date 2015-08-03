@@ -17,7 +17,7 @@ rx-test aims to provide a simple DSL and associated capture libraries to make cr
 
         testScenario
                 .given()
-                  .createSubject(source -> source.map(s -> Integer.parseInt(s) + 1))
+                  .subjectCreated(source -> source.map(s -> Integer.parseInt(s) + 1))
                 .when()
                     .subscriber("s1").subscribes()
                     .theSource().emits("1")
@@ -38,7 +38,7 @@ rx-test aims to provide a simple DSL and associated capture libraries to make cr
 
         testScenario
                 .given()
-                    .createSubjectWithScheduler((source, scheduler) -> source.buffer(10, TimeUnit.SECONDS, scheduler))
+                    .subjectCreatedWithScheduler((source, scheduler) -> source.buffer(10, TimeUnit.SECONDS, scheduler))
                 .when()
                     .subscriber("s1").subscribes()
                     .theSource().emits("1a")
@@ -61,7 +61,7 @@ rx-test aims to provide a simple DSL and associated capture libraries to make cr
 
         testScenario
                 .given()
-                    .createSubject((s1, s2) -> s1.zipWith(s2, (z, n) -> z + n))
+                    .subjectCreated((s1, s2) -> s1.zipWith(s2, (z, n) -> z + n))
                 .when()
                     .subscriber("s1").subscribes()
                     .source1().emits("a")
@@ -84,7 +84,7 @@ rx-test aims to provide a simple DSL and associated capture libraries to make cr
 
         testScenario
                 .given()
-                    .createSubject(source -> source.map(s -> Integer.parseInt(s) + 1))
+                    .subjectCreated(source -> source.map(s -> Integer.parseInt(s) + 1))
                     .errorsAreHandled()
                 .when()
                     .subscriber("s1").subscribes()
@@ -103,7 +103,7 @@ rx-test aims to provide a simple DSL and associated capture libraries to make cr
 ```
         testScenario
                 .given()
-                    .createSubject(source -> source.map(n -> n == 0 ? "a" : "B"))
+                    .subjectCreated(source -> source.map(n -> n == 0 ? "a" : "B"))
                     .renderer(event -> "'" + event + "'")
                 .when()
                     .subscriber("s1").subscribes()
@@ -124,7 +124,7 @@ rx-test aims to provide a simple DSL and associated capture libraries to make cr
         PublishSubject<String> customSource = PublishSubject.create();
         TestScenario.singleSource(customSource)
                 .given()
-                    .createSubject(_source -> customSource.map(String::toUpperCase))
+                    .subjectCreated(_source -> customSource.map(String::toUpperCase))
                 .when()
                     .subscriber("s1").subscribes()
                     .theSource().emits("a")
@@ -143,7 +143,7 @@ rx-test aims to provide a simple DSL and associated capture libraries to make cr
 
         testScenario
                 .given()
-                    .createSubject(source -> source.observeOn(Schedulers.computation()).delay(1, TimeUnit.SECONDS))
+                    .subjectCreated(source -> source.observeOn(Schedulers.computation()).delay(1, TimeUnit.SECONDS))
                     .asyncTimeout(Duration.ofSeconds(2))
                 .when()
                     .subscriber("s1").subscribes()
@@ -166,7 +166,7 @@ rx-test aims to provide a simple DSL and associated capture libraries to make cr
         testScenario
                 .given()
                     .theResource(() -> resource)
-                    .createSubject(source -> Observable.just("a", "b"))
+                    .subjectCreated(source -> Observable.just("a", "b"))
                 .when()
                     .subscriber("s1").subscribes()
                 .then()

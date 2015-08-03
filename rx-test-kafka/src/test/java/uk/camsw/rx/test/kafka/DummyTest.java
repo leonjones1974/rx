@@ -14,7 +14,7 @@ public class DummyTest {
         TestScenario.singleSource()
                 .given()
                 .theResource(() -> TopicBuilder.newBuilder(new EnvProperties()).build())
-                .createSubject(_source -> Observable.just(1, 2, 3, 4))
+                .subjectCreated(_source -> Observable.just(1, 2, 3, 4))
                 .when()
                 .subscriber("s1").subscribes()
                 .then()
