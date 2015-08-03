@@ -13,4 +13,6 @@ public interface When1<T1, U> {
     void go();
 
     Time1<T1, U> time();
+
+    <S extends AutoCloseable> Resource1<T1, U, S> resource(String id);
 }

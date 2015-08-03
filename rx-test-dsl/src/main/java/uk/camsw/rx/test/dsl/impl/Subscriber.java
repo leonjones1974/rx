@@ -89,7 +89,7 @@ public class Subscriber<T1, T2, U>
 
     @Override
     public When<T1, T2, U> waitsforEvents(int eventCount) {
-        context.addCommand(context -> context.await().until(() -> inner.getOnNextEvents().size() == eventCount));
+        context.addCommand(context -> context.await().until(() -> inner.getOnNextEvents().size() >= eventCount));
         return new When<>(context);
     }
 

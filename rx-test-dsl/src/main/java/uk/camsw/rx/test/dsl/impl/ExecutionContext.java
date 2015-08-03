@@ -6,6 +6,7 @@ import rx.Observable;
 import rx.functions.Func1;
 import rx.schedulers.TestScheduler;
 import rx.subjects.PublishSubject;
+import uk.camsw.rx.test.dsl.one.Resource1;
 
 import java.time.Duration;
 import java.util.*;
@@ -26,7 +27,7 @@ public class ExecutionContext<T1, T2, U> {
     private boolean handleErrors = false;
     private Func1<U, String> renderer = Object::toString;
     private Duration asyncTimeoutDuration =  Duration.ofSeconds(5);
-    private List<AutoCloseable> resources = new ArrayList<>();
+    private Map<String, Resource<T1, T2, U, ? extends AutoCloseable>> resources = new HashMap<>();
 
     public ExecutionContext() {
         source1 = new Source<>(this);
@@ -62,12 +63,13 @@ public class ExecutionContext<T1, T2, U> {
         commands.offer(command);
     }
 
-    public void addResource(AutoCloseable resource) {
-        resources.add(resource);
+    public void addResource(String id, AutoCloseable resource) {
+        if (resources.containsKey(id)) throw new IllegalArgumentException("Resource with id: " + id + " already exists");
+        resources.put(id, new Resource<>(resource, this));
     }
 
     private void releaseResources() {
-        resources.forEach(r -> {
+        resources.values().forEach(r -> {
             try {
                 r.close();
             } catch (Exception e) {
@@ -80,7 +82,6 @@ public class ExecutionContext<T1, T2, U> {
     public void cleanUp() {
         releaseResources();
     }
-
 
     public boolean handleErrors() {
         return handleErrors;
@@ -121,5 +122,9 @@ public class ExecutionContext<T1, T2, U> {
     public void setAsyncTimeout(Duration duration) {
         if (duration.toMillis() < 2) this.asyncTimeoutDuration = Duration.ofMillis(2);
         else this.asyncTimeoutDuration = duration;
+    }
+
+    public Resource<T1, T2, U, ? extends AutoCloseable> getResource(String id) {
+        return resources.get(id);
     }
 }

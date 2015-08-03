@@ -32,6 +32,11 @@ public class When<T1, T2, U>
     }
 
     @Override
+    public Resource<T1, T2, U, ? extends AutoCloseable> resource(String id) {
+        return context.getResource(id);
+    }
+
+    @Override
     public Source<T1, T1, T2, U> theSource() {
         return context.getSource1();
     }

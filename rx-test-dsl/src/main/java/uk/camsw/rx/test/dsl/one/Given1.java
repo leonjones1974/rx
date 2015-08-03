@@ -26,5 +26,7 @@ public interface Given1<T1, U> {
 
     Given1<T1, U> asyncTimeout(Duration duration);
 
+    Given1<T1, U> theResource(String id, Func0<? extends AutoCloseable> f);
+
     Given1<T1, U> theResource(Func0<? extends AutoCloseable> f);
 }

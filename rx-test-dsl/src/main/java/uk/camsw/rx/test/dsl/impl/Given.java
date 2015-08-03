@@ -10,6 +10,7 @@ import rx.functions.Func2;
 
 import java.time.Duration;
 import java.time.temporal.TemporalUnit;
+import java.util.UUID;
 
 public class Given<T1, T2, U>
         implements Given1<T1, U>,
@@ -71,9 +72,13 @@ public class Given<T1, T2, U>
     }
 
     @Override
-    public Given<T1, T2, U> theResource(Func0<? extends AutoCloseable> f) {
-        context.addCommand(context -> context.addResource(f.call()));
+    public Given<T1, T2, U> theResource(String id, Func0<? extends AutoCloseable> f) {
+        context.addResource(id, f.call());
         return this;
     }
 
+    @Override
+    public Given<T1, T2, U> theResource(Func0<? extends AutoCloseable> f) {
+        return theResource("resource-" + UUID.randomUUID(), f);
+    }
 }

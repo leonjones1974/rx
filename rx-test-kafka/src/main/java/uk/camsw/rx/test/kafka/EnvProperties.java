@@ -6,6 +6,10 @@ public class EnvProperties {
         return "localhost:2181";
     }
 
+    public String kafkaBrokers() {
+        return "localhost:9092";
+    }
+
     public int sessionTimeoutMs() {
         return 10000;
     }
@@ -13,6 +17,7 @@ public class EnvProperties {
     public int connectionTimeoutMs() {
         return 10000;
     }
+
 
     // todo: toString
     // todo: allow property override
