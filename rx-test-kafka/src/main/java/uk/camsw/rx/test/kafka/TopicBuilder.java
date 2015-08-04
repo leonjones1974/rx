@@ -35,7 +35,7 @@ public class TopicBuilder<K, V> {
         }
     }
 
-    public TopicBuilder forTopic(String topicName) {
+    public TopicBuilder<K, V> forTopic(String topicName) {
         this.topicName = topicName;
         return this;
     }
