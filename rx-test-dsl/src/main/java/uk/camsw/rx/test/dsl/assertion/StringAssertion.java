@@ -1,7 +1,8 @@
 package uk.camsw.rx.test.dsl.assertion;
 
 import org.assertj.core.api.AbstractCharSequenceAssert;
-import uk.camsw.rx.test.dsl.impl.Then;
+import uk.camsw.rx.test.dsl.base.BaseThen;
+import uk.camsw.rx.test.dsl.base.IThen;
 
 public class StringAssertion<U> extends AbstractCharSequenceAssert<StringAssertion<U>, CharSequence> implements ISubscriberAssertions<U> {
 
@@ -38,7 +39,7 @@ public class StringAssertion<U> extends AbstractCharSequenceAssert<StringAsserti
     }
 
     @Override
-    public Then<U> and() {
+    public IThen<U> and() {
         return subscriberAssertions.and();
     }
 

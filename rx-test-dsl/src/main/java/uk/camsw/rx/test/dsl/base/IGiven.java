@@ -7,8 +7,6 @@ import java.time.temporal.TemporalUnit;
 
 public interface IGiven<U, GIVEN extends IGiven, WHEN extends IWhen> {
 
-    WHEN when();
-
     GIVEN errorsAreHandled();
 
     GIVEN renderer(Func1<U, String> renderer);
@@ -17,4 +15,5 @@ public interface IGiven<U, GIVEN extends IGiven, WHEN extends IWhen> {
 
     GIVEN asyncTimeout(Duration duration);
 
+    WHEN when();
 }

@@ -1,7 +1,7 @@
 package uk.camsw.rx.test.dsl.assertion;
 
-import uk.camsw.rx.test.dsl.impl.Then;
 import org.assertj.core.api.AbstractClassAssert;
+import uk.camsw.rx.test.dsl.base.IThen;
 
 public class ClassAssertion<U> extends AbstractClassAssert<ClassAssertion<U>> implements ISubscriberAssertions<U> {
     private final ISubscriberAssertions<U> subscriberAssertions;
@@ -37,7 +37,7 @@ public class ClassAssertion<U> extends AbstractClassAssert<ClassAssertion<U>> im
     }
 
     @Override
-    public Then<U> and() {
+    public IThen<U> and() {
         return subscriberAssertions.and();
     }
 

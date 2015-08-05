@@ -1,7 +1,7 @@
 package uk.camsw.rx.test.dsl.assertion;
 
 import org.assertj.core.api.AbstractBooleanAssert;
-import uk.camsw.rx.test.dsl.impl.Then;
+import uk.camsw.rx.test.dsl.base.IThen;
 
 public class BooleanAssertion<U> extends AbstractBooleanAssert<BooleanAssertion<U>> implements ISubscriberAssertions<U> {
 
@@ -38,7 +38,7 @@ public class BooleanAssertion<U> extends AbstractBooleanAssert<BooleanAssertion<
     }
 
     @Override
-    public Then<U> and() {
+    public IThen<U> and() {
         return subscriberAssertions.and();
     }
 

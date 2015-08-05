@@ -3,7 +3,7 @@ package uk.camsw.rx.test.dsl.base;
 
 import uk.camsw.rx.test.dsl.impl.ExecutionContext;
 
-public class When2<T1, T2, U> extends BaseWhen<T1, U, When2<T1, T2, U>> {
+public class When2<T1, T2, U> extends BaseWhen<U, When2<T1, T2, U>> {
 
     private final ExecutionContext<T1, T2, U, Given2<T1, T2, U>, When2<T1, T2, U>> context;
 

@@ -1,13 +1,12 @@
 package uk.camsw.rx.test.dsl.base;
 
 import uk.camsw.rx.test.dsl.impl.ExecutionContext;
-import uk.camsw.rx.test.dsl.impl.Then;
 
-public class BaseWhen<T1, U, WHEN extends IWhen> implements IWhen<T1, U, BaseTime<WHEN>> {
+public class BaseWhen<U, WHEN extends IWhen> implements IWhen<U, WHEN> {
 
-    private final ExecutionContext<T1, ?, U, ?, WHEN> context;
+    private final ExecutionContext<?, ?, U, ?, WHEN> context;
 
-    public BaseWhen(ExecutionContext<T1, ?, U, ?, WHEN> context) {
+    public BaseWhen(ExecutionContext<?, ?, U, ?, WHEN> context) {
         this.context = context;
     }
 
@@ -16,8 +15,8 @@ public class BaseWhen<T1, U, WHEN extends IWhen> implements IWhen<T1, U, BaseTim
     }
 
     @Override
-    public Then<U> then() {
-        Then<U> then = new Then<>(context);
+    public IThen<U> then() {
+        BaseThen<U> then = new BaseThen<>(context);
         context.addCommand(ExecutionContext::cleanUp);
         then.executeCommands();
         return then;
@@ -32,6 +31,5 @@ public class BaseWhen<T1, U, WHEN extends IWhen> implements IWhen<T1, U, BaseTim
     public BaseTime<WHEN> time() {
         return new BaseTime<>(context);
     }
-
 
 }

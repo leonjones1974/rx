@@ -4,6 +4,7 @@ import com.google.common.base.Joiner;
 import rx.functions.Func1;
 import uk.camsw.rx.test.dsl.assertion.*;
 import uk.camsw.rx.test.dsl.base.BaseSubscriber;
+import uk.camsw.rx.test.dsl.base.BaseThen;
 import uk.camsw.rx.test.dsl.base.IWhen;
 
 import java.util.stream.Collectors;
@@ -44,8 +45,8 @@ public class SubscriberAssertions<U> implements ISubscriberAssertions<U> {
     }
 
     @Override
-    public Then<U> and() {
-        return new Then<>(context);
+    public BaseThen<U> and() {
+        return new BaseThen<>(context);
     }
 
     @Override

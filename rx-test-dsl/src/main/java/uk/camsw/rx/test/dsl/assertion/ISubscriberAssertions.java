@@ -1,6 +1,6 @@
 package uk.camsw.rx.test.dsl.assertion;
 
-import uk.camsw.rx.test.dsl.impl.Then;
+import uk.camsw.rx.test.dsl.base.IThen;
 
 public interface ISubscriberAssertions<U> {
 
@@ -16,7 +16,7 @@ public interface ISubscriberAssertions<U> {
 
     BooleanAssertion<U> isErrored();
 
-    Then<U> and();
+    IThen<U> and();
 
     StringAssertion<U> renderedStream();
 }
