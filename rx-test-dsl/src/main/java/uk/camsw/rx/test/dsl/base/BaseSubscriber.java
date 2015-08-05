@@ -1,47 +1,47 @@
-package uk.camsw.rx.test.dsl.impl;
+package uk.camsw.rx.test.dsl.base;
 
 import org.assertj.core.api.AbstractThrowableAssert;
 import rx.exceptions.OnErrorNotImplementedException;
 import rx.subscriptions.SerialSubscription;
-import uk.camsw.rx.test.dsl.two.Subscriber2;
-import uk.camsw.rx.test.dsl.one.Subscriber1;
+import uk.camsw.rx.test.dsl.impl.ExecutionContext;
 
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class Subscriber<T1, T2, U>
-        implements Subscriber1<T1,U>,
-        Subscriber2<T1, T2, U>,
-        rx.Observer<U>
-{
-
-    private final rx.observers.TestSubscriber<U> inner;
-    private final String id;
-    private final ExecutionContext<T1, T2, U> context;
+public class BaseSubscriber<U, WHEN extends IWhen> implements ISubscriber<U, WHEN>, rx.Observer<U> {
     private final SerialSubscription subscription = new SerialSubscription();
 
-    public Subscriber(String id, ExecutionContext<T1, T2, U> context) {
+    private final String id;
+    private final ExecutionContext<?, ?, U, ?, WHEN> context;
+    private final rx.observers.TestSubscriber<U> inner;
+
+    public BaseSubscriber(String id, ExecutionContext<?, ?, U, ?, WHEN> context) {
         this.id = id;
+        this.context= context;
         this.inner = new rx.observers.TestSubscriber<>();
-        this.context = context;
     }
 
-    @Override
     public String getId() {
         return id;
     }
 
     @Override
-    public When<T1, T2, U> subscribes() {
+    public WHEN subscribes() {
         context.addCommand(c -> subscription.set(c.getStreamUnderTest().subscribe(this)));
-        return new When<>(context);
+        return context.getWhen();
     }
 
     @Override
-    public When<T1, T2, U> unsubscribes() {
+    public WHEN unsubscribes() {
         context.addCommand(c -> subscription.unsubscribe());
-        return new When<>(context);
+        return context.getWhen();
+    }
+
+    @Override
+    public WHEN waitsforEvents(int eventCount) {
+        context.addCommand(context -> context.await().until(() -> inner.getOnNextEvents().size() >= eventCount));
+        return context.getWhen();
     }
 
     @Override
@@ -85,12 +85,6 @@ public class Subscriber<T1, T2, U>
     @Override
     public AbstractThrowableAssert<?, ? extends Throwable> error(int index) {
         return assertThat(inner.getOnErrorEvents().get(index));
-    }
-
-    @Override
-    public When<T1, T2, U> waitsforEvents(int eventCount) {
-        context.addCommand(context -> context.await().until(() -> inner.getOnNextEvents().size() >= eventCount));
-        return new When<>(context);
     }
 
     @Override

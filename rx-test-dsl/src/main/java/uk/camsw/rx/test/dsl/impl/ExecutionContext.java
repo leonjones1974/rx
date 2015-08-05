@@ -6,48 +6,57 @@ import rx.Observable;
 import rx.functions.Func1;
 import rx.schedulers.TestScheduler;
 import rx.subjects.PublishSubject;
-import uk.camsw.rx.test.dsl.one.Resource1;
+import uk.camsw.rx.test.dsl.base.*;
 
 import java.time.Duration;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Queue;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
-public class ExecutionContext<T1, T2, U> {
+public class ExecutionContext<T1, T2, U, GIVEN extends IGiven, WHEN extends IWhen> {
 
-    private final Queue<Consumer<ExecutionContext<T1, T2, U>>> commands = new ArrayBlockingQueue<>(1000);
-    private final Map<String, Subscriber<T1, T2, U>> subscribers = new HashMap<>();
+    private final Queue<Consumer<ExecutionContext<T1, T2, U, GIVEN, WHEN>>> commands = new ArrayBlockingQueue<>(1000);
+    private final Map<String, BaseSubscriber<U, ? extends IWhen>> subscribers = new HashMap<>();
     private final TestScheduler scheduler = new TestScheduler();
+    private GIVEN given;
+    private WHEN when;
 
     private Observable<U> streamUnderTest;
 
-    private final Source<T1, T1, T2, U> source1;
-    private final Source<T2, T1, T2, U> source2;
+    private final BaseSource<T1, GIVEN, WHEN> source1;
+    private final BaseSource<T2, GIVEN, WHEN> source2;
+
     private boolean handleErrors = false;
     private Func1<U, String> renderer = Object::toString;
-    private Duration asyncTimeoutDuration =  Duration.ofSeconds(5);
-    private Map<String, Resource<T1, T2, U, ? extends AutoCloseable>> resources = new HashMap<>();
+    private Duration asyncTimeoutDuration = Duration.ofSeconds(5);
 
     public ExecutionContext() {
-        source1 = new Source<>(this);
-        source2 = new Source<>(this);
+        source1 = new BaseSource<>(this);
+        source2 = new BaseSource<>(this);
+    }
+
+    public void initSteps(GIVEN given, WHEN when) {
+        this.given = given;
+        this.when = when;
     }
 
     public ExecutionContext(PublishSubject<T1> customSource) {
-        source1 = new Source<>(customSource, this);
-        source2 = new Source<>(this);
+        source1 = new BaseSource<>(customSource, this);
+        source2 = new BaseSource<>(this);
     }
 
     public void setRenderer(Func1<U, String> renderer) {
         this.renderer = renderer;
     }
 
-    public Source<T1, T1, T2, U> getSource1() {
+    public ISource<T1, WHEN> getSource1() {
         return source1;
     }
 
-    public Source<T2, T1, T2, U> getSource2() {
+    public ISource<T2, WHEN> getSource2() {
         return source2;
     }
 
@@ -59,28 +68,11 @@ public class ExecutionContext<T1, T2, U> {
         return streamUnderTest;
     }
 
-    public void addCommand(Consumer<ExecutionContext<T1, T2, U>> command) {
+    public void addCommand(Consumer<ExecutionContext<T1, T2, U, GIVEN, WHEN>> command) {
         commands.offer(command);
     }
 
-    public void addResource(String id, AutoCloseable resource) {
-        if (resources.containsKey(id)) throw new IllegalArgumentException("Resource with id: " + id + " already exists");
-        resources.put(id, new Resource<>(resource, this));
-    }
-
-    private void releaseResources() {
-        resources.values().forEach(r -> {
-            try {
-                r.close();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        });
-        resources.clear();
-    }
-
     public void cleanUp() {
-        releaseResources();
     }
 
     public boolean handleErrors() {
@@ -91,8 +83,16 @@ public class ExecutionContext<T1, T2, U> {
         this.handleErrors = handleErrors;
     }
 
-    public Subscriber<T1, T2, U> subscriber(String id) {
-        if (!subscribers.containsKey(id)) subscribers.put(id, new Subscriber<>(id, this));
+    public <WHEN extends IWhen> BaseSubscriber<U, WHEN> getOrCreateSubscriber(String id) {
+        if (!subscribers.containsKey(id)) {
+            ExecutionContext<?, ?, U, ?, WHEN> context = (ExecutionContext<?, ?, U, ?, WHEN>) this;
+            BaseSubscriber<U, WHEN> subscriber = new BaseSubscriber<>(id, context);
+            subscribers.put(id, subscriber);
+        }
+        return (BaseSubscriber<U, WHEN>) subscribers.get(id);
+    }
+
+    public BaseSubscriber<U, ? extends IWhen> getSubscriber(String id) {
         return subscribers.get(id);
     }
 
@@ -112,7 +112,7 @@ public class ExecutionContext<T1, T2, U> {
 
     public ConditionFactory await() {
         com.jayway.awaitility.Duration timeToWait = new com.jayway.awaitility.Duration(asyncTimeoutDuration.toMillis(), TimeUnit.MILLISECONDS);
-        return Awaitility.await().pollInterval(Math.min(100, asyncTimeoutDuration.toMillis() -1), TimeUnit.MILLISECONDS).atMost(timeToWait);
+        return Awaitility.await().pollInterval(Math.min(100, asyncTimeoutDuration.toMillis() - 1), TimeUnit.MILLISECONDS).atMost(timeToWait);
     }
 
     public Func1<U, String> getRenderer() {
@@ -124,7 +124,11 @@ public class ExecutionContext<T1, T2, U> {
         else this.asyncTimeoutDuration = duration;
     }
 
-    public Resource<T1, T2, U, ? extends AutoCloseable> getResource(String id) {
-        return resources.get(id);
+    public WHEN getWhen() {
+        return when;
+    }
+
+    public GIVEN getGiven() {
+        return given;
     }
 }

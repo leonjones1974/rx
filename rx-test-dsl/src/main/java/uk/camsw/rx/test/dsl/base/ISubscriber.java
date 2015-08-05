@@ -1,14 +1,14 @@
-package uk.camsw.rx.test.dsl.one;
+package uk.camsw.rx.test.dsl.base;
 
 import org.assertj.core.api.AbstractThrowableAssert;
 
-public interface Subscriber1<T1, U> {
+public interface ISubscriber<U, WHEN extends IWhen> {
 
-    String getId();
+    WHEN subscribes();
 
-    When1<T1, U> subscribes();
+    WHEN unsubscribes();
 
-    When1<T1, U> unsubscribes();
+    WHEN waitsforEvents(int eventCount);
 
     int eventCount();
 
@@ -22,5 +22,4 @@ public interface Subscriber1<T1, U> {
 
     AbstractThrowableAssert<?, ? extends Throwable> error(int index);
 
-    When1<T1, U> waitsforEvents(int eventCount);
 }

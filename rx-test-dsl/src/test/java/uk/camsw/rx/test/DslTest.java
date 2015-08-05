@@ -78,7 +78,6 @@ public class DslTest {
                 .eventCount().isEqualTo(1);
     }
 
-
     @Test
     public void completion() {
         Scenario1<String, Integer> testScenario = TestScenario.singleSource();
@@ -295,61 +294,4 @@ public class DslTest {
                 .go();
     }
 
-    @Test
-    public void externalResources() {
-        AtomicBoolean closed = new AtomicBoolean(false);
-        AutoCloseable resource = () -> closed.getAndSet(true);
-        Scenario1<String, String> testScenario = TestScenario.singleSource();
-
-        testScenario
-                .given()
-                    .theResource(() -> resource)
-                    .subjectCreated(source -> Observable.just("a", "b"))
-                .when()
-                    .subscriber("s1").subscribes()
-                .then()
-                   .subscriber("s1").eventCount().isEqualTo(2);
-
-        assertThat(closed.get()).isTrue();
-    }
-
-    @Test
-    public void externalResourcesWithHandledError() {
-        AtomicBoolean closed = new AtomicBoolean(false);
-        AutoCloseable resource = () -> closed.getAndSet(true);
-        Scenario1<String, String> testScenario = TestScenario.singleSource();
-
-        testScenario
-                .given()
-                .subjectCreated(source -> source.map(s -> s))
-                .theResource(() -> resource)
-                .errorsAreHandled()
-                .when()
-                .subscriber("s1").subscribes()
-                .theSource().errors(new RuntimeException("I'm broken"))
-                .go();
-
-        assertThat(closed.get()).isTrue();
-    }
-
-    @Test
-    public void externalResourcesWithUnhandledError() {
-        AtomicBoolean closed = new AtomicBoolean(false);
-        AutoCloseable resource = () -> closed.getAndSet(true);
-        Scenario1<String, String> testScenario = TestScenario.singleSource();
-
-        try {
-            testScenario
-                    .given()
-                    .subjectCreated(source -> source.map(s -> s))
-                    .theResource(() -> resource)
-                    .when()
-                    .subscriber("s1").subscribes()
-                    .theSource().errors(new RuntimeException("I'm broken"))
-                    .go();
-        } catch (OnErrorNotImplementedException e) {
-            // Expected
-            assertThat(closed.get()).isTrue();
-        }
-    }
 }

@@ -3,15 +3,17 @@ package uk.camsw.rx.test.dsl.impl;
 import com.google.common.base.Joiner;
 import rx.functions.Func1;
 import uk.camsw.rx.test.dsl.assertion.*;
+import uk.camsw.rx.test.dsl.base.BaseSubscriber;
+import uk.camsw.rx.test.dsl.base.IWhen;
 
 import java.util.stream.Collectors;
 
 public class SubscriberAssertions<U> implements ISubscriberAssertions<U> {
 
-    private final ExecutionContext<?, ?, U> context;
-    private final Subscriber<?, ?, U> testSubscriber;
+    private final ExecutionContext<?, ?, U,?,?> context;
+    private final BaseSubscriber<U, ? extends IWhen> testSubscriber;
 
-    public SubscriberAssertions(ExecutionContext<?, ?, U> context, Subscriber<?, ?, U> testSubscriber) {
+    public SubscriberAssertions(ExecutionContext<?, ?, U, ?, ?> context, BaseSubscriber<U, ? extends IWhen> testSubscriber) {
         this.context = context;
         this.testSubscriber = testSubscriber;
     }
