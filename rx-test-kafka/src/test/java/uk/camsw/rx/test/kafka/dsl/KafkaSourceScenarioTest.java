@@ -1,25 +1,22 @@
 package uk.camsw.rx.test.kafka.dsl;
 
+import org.junit.Ignore;
 import org.junit.Test;
-import uk.camsw.rx.test.kafka.EnvProperties;
 import uk.camsw.rx.test.kafka.KafkaStream;
-import uk.camsw.rx.test.kafka.TopicBuilder;
 
 import java.time.Duration;
 import java.util.UUID;
 
+@Ignore("Manual Integration")
 public class KafkaSourceScenarioTest {
 
     @Test
     public void exampleKafkaIntegrationTest() {
-        String topic = UUID.randomUUID().toString();
         String group = UUID.randomUUID().toString();
-
-        TopicBuilder<String, String> topicBuilder = TopicBuilder.<String, String>newBuilder(new EnvProperties()).forTopic(topic);
 
         new KafkaSourceScenario<String, String, String>()
                 .given()
-                    .theTopic(topicBuilder::build)
+                    .aNewTopic()
                     .asyncTimeout(Duration.ofSeconds(10))
                     .theStreamUnderTest(t -> KafkaStream.newBuilder(t.getName(), group).newMergedStream().map(e -> e.getValue().getValue()))
                 .when()
