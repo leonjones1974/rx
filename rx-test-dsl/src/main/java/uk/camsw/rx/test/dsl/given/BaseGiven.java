@@ -28,12 +28,12 @@ public abstract class BaseGiven<U, GIVEN extends IGiven, WHEN extends IWhen> imp
     }
 
     @Override
-    public GIVEN asyncTimeout(long timeout, TemporalUnit unit) {
-        return asyncTimeout(Duration.of(timeout, unit));
+    public GIVEN asyncTimeoutOf(long timeout, TemporalUnit unit) {
+        return asyncTimeoutOf(Duration.of(timeout, unit));
     }
 
     @Override
-    public GIVEN asyncTimeout(Duration duration) {
+    public GIVEN asyncTimeoutOf(Duration duration) {
         context.setAsyncTimeout(duration);
         return self();
     }

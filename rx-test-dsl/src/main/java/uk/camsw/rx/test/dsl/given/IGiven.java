@@ -12,9 +12,9 @@ public interface IGiven<U, GIVEN extends IGiven, WHEN extends IWhen> {
 
     GIVEN renderer(Func1<U, String> renderer);
 
-    GIVEN asyncTimeout(long timeout, TemporalUnit unit);
+    GIVEN asyncTimeoutOf(long timeout, TemporalUnit unit);
 
-    GIVEN asyncTimeout(Duration duration);
+    GIVEN asyncTimeoutOf(Duration duration);
 
     WHEN when();
 }

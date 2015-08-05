@@ -220,7 +220,7 @@ public class SingleSourceScenarioTest {
         testScenario
                 .given()
                 .theStreamUnderTest(source -> source.observeOn(Schedulers.computation()).delay(1, TimeUnit.SECONDS))
-                .asyncTimeout(Duration.ofSeconds(2))
+                .asyncTimeoutOf(Duration.ofSeconds(2))
                 .when()
                 .subscriber("s1").subscribes()
                 .theSource().emits("a")
@@ -239,7 +239,7 @@ public class SingleSourceScenarioTest {
         testScenario
                 .given()
                 .theStreamUnderTest(source -> source.observeOn(Schedulers.computation()).delay(10, TimeUnit.SECONDS))
-                .asyncTimeout(Duration.ofMillis(500))
+                .asyncTimeoutOf(Duration.ofMillis(500))
                 .when()
                 .subscriber("s1").subscribes()
                 .theSource().emits("a")
