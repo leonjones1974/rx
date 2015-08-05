@@ -6,7 +6,6 @@ import rx.functions.Func1;
 import rx.functions.Func2;
 import rx.subjects.PublishSubject;
 import uk.camsw.rx.test.dsl.given.BaseGiven;
-import uk.camsw.rx.test.dsl.scenario.ExecutionContext;
 import uk.camsw.rx.test.dsl.source.ISource;
 import uk.camsw.rx.test.dsl.when.BaseWhen;
 

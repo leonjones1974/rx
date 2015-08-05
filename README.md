@@ -57,7 +57,7 @@ rx-test aims to provide a simple DSL and associated capture libraries to make cr
 
 ### Multi source, multi-typed streams
 ```
-      Scenario2<String, Integer, String> testScenario = TestScenario.twoSources();
+      Scenario2<String, Integer, String> testScenario = TestScenario.dualSources();
 
         testScenario
                 .given()
@@ -119,11 +119,12 @@ rx-test aims to provide a simple DSL and associated capture libraries to make cr
 
 ```
 
-### Providing your own publisher 
+### Providing your own custom source (can be useful where you the source comes from say a stubbed provider in your test) 
 ```
         PublishSubject<String> customSource = PublishSubject.create();
-        TestScenario.singleSource(customSource)
+        TestScenario.singleSource()
                 .given()
+                    .theCustomSource(customSource)
                     .subjectCreated(_source -> customSource.map(String::toUpperCase))
                 .when()
                     .subscriber("s1").subscribes()
@@ -156,22 +157,3 @@ rx-test aims to provide a simple DSL and associated capture libraries to make cr
                         .eventCount().isEqualTo(2);
 ```
 
-
-### External resources
-```
-        AtomicBoolean closed = new AtomicBoolean(false);
-        AutoCloseable resource = () -> closed.getAndSet(true);
-        Scenario1<String, String> testScenario = TestScenario.singleSource();
-
-        testScenario
-                .given()
-                    .theResource(() -> resource)
-                    .subjectCreated(source -> Observable.just("a", "b"))
-                .when()
-                    .subscriber("s1").subscribes()
-                .then()
-                   .subscriber("s1").eventCount().isEqualTo(2);
-
-        assertThat(closed.get()).isTrue();
-
-```

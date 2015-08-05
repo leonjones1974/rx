@@ -1,7 +1,8 @@
-package uk.camsw.rx.test.dsl.assertion;
+package uk.camsw.rx.test.dsl.subscriber;
 
 import com.google.common.base.Joiner;
 import rx.functions.Func1;
+import uk.camsw.rx.test.dsl.assertion.*;
 import uk.camsw.rx.test.dsl.scenario.ExecutionContext;
 import uk.camsw.rx.test.dsl.subscriber.BaseSubscriber;
 import uk.camsw.rx.test.dsl.then.BaseThen;
