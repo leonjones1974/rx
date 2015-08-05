@@ -1,7 +1,7 @@
 package uk.camsw.rx.test.dsl.assertion;
 
 import org.assertj.core.api.AbstractIntegerAssert;
-import uk.camsw.rx.test.dsl.base.IThen;
+import uk.camsw.rx.test.dsl.then.IThen;
 
 public class IntegerAssertion<U> extends AbstractIntegerAssert<IntegerAssertion<U>> implements ISubscriberAssertions<U> {
 

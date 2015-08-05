@@ -1,6 +1,7 @@
-package uk.camsw.rx.test.dsl.base;
+package uk.camsw.rx.test.dsl.time;
 
-import uk.camsw.rx.test.dsl.impl.ExecutionContext;
+import uk.camsw.rx.test.dsl.scenario.ExecutionContext;
+import uk.camsw.rx.test.dsl.when.IWhen;
 
 import java.time.Duration;
 import java.util.concurrent.TimeUnit;

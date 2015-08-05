@@ -2,12 +2,8 @@ package uk.camsw.rx.test.kafka;
 
 import org.junit.Ignore;
 import org.junit.Test;
-import rx.Observable;
-import uk.camsw.rx.test.TestScenario;
 //import uk.camsw.rx.test.kafka.dsl.KafkaScenario;
 
-import java.time.Duration;
-import java.util.UUID;
 
 @Ignore("Integration test")
 public class DummyTest {
@@ -34,7 +30,7 @@ public class DummyTest {
 ////                    .receives("a", "a")
 ////                    .receives("b", "b")
 ////                    .and()
-//                    .subscriber("s1").waitsforEvents(2)
+//                    .subscriber("s1").waitsForEvents(2)
 //                    .then()
 //                    .subscriber("s1")
 //                    .renderedStream().isEqualTo("[a]-[b]");
@@ -51,7 +47,7 @@ public class DummyTest {
 //                                .does(t -> t.publish("a", "a"))
 //                                .does(t -> t.publish("b", "b"))
 //                                .and()
-//                                .subscriber("s1").waitsforEvents(2)
+//                                .subscriber("s1").waitsForEvents(2)
 //                                .then()
 //                                .subscriber("s1")
 //                                .renderedStream().isEqualTo("[a]-[b]");

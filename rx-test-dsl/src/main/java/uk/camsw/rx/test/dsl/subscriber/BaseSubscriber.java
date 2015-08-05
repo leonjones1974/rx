@@ -1,9 +1,10 @@
-package uk.camsw.rx.test.dsl.base;
+package uk.camsw.rx.test.dsl.subscriber;
 
 import org.assertj.core.api.AbstractThrowableAssert;
 import rx.exceptions.OnErrorNotImplementedException;
 import rx.subscriptions.SerialSubscription;
-import uk.camsw.rx.test.dsl.impl.ExecutionContext;
+import uk.camsw.rx.test.dsl.scenario.ExecutionContext;
+import uk.camsw.rx.test.dsl.when.IWhen;
 
 import java.util.List;
 
@@ -39,7 +40,7 @@ public class BaseSubscriber<U, WHEN extends IWhen> implements ISubscriber<U, WHE
     }
 
     @Override
-    public WHEN waitsforEvents(int eventCount) {
+    public WHEN waitsForEvents(int eventCount) {
         context.addCommand(context -> context.await().until(() -> inner.getOnNextEvents().size() >= eventCount));
         return context.getWhen();
     }

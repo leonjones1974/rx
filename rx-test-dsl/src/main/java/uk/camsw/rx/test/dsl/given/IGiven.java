@@ -1,6 +1,7 @@
-package uk.camsw.rx.test.dsl.base;
+package uk.camsw.rx.test.dsl.given;
 
 import rx.functions.Func1;
+import uk.camsw.rx.test.dsl.when.IWhen;
 
 import java.time.Duration;
 import java.time.temporal.TemporalUnit;

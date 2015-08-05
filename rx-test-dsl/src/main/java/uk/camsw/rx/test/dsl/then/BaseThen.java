@@ -1,8 +1,7 @@
-package uk.camsw.rx.test.dsl.base;
+package uk.camsw.rx.test.dsl.then;
 
-import uk.camsw.rx.test.dsl.base.IThen;
-import uk.camsw.rx.test.dsl.impl.ExecutionContext;
-import uk.camsw.rx.test.dsl.impl.SubscriberAssertions;
+import uk.camsw.rx.test.dsl.scenario.ExecutionContext;
+import uk.camsw.rx.test.dsl.assertion.SubscriberAssertions;
 
 public class BaseThen<U> implements IThen<U> {
 

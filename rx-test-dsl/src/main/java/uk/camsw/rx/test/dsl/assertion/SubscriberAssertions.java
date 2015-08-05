@@ -1,11 +1,11 @@
-package uk.camsw.rx.test.dsl.impl;
+package uk.camsw.rx.test.dsl.assertion;
 
 import com.google.common.base.Joiner;
 import rx.functions.Func1;
-import uk.camsw.rx.test.dsl.assertion.*;
-import uk.camsw.rx.test.dsl.base.BaseSubscriber;
-import uk.camsw.rx.test.dsl.base.BaseThen;
-import uk.camsw.rx.test.dsl.base.IWhen;
+import uk.camsw.rx.test.dsl.scenario.ExecutionContext;
+import uk.camsw.rx.test.dsl.subscriber.BaseSubscriber;
+import uk.camsw.rx.test.dsl.then.BaseThen;
+import uk.camsw.rx.test.dsl.when.IWhen;
 
 import java.util.stream.Collectors;
 

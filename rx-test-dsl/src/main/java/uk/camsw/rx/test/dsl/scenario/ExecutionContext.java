@@ -1,4 +1,4 @@
-package uk.camsw.rx.test.dsl.impl;
+package uk.camsw.rx.test.dsl.scenario;
 
 import com.jayway.awaitility.Awaitility;
 import com.jayway.awaitility.core.ConditionFactory;
@@ -6,7 +6,11 @@ import rx.Observable;
 import rx.functions.Func1;
 import rx.schedulers.TestScheduler;
 import rx.subjects.PublishSubject;
-import uk.camsw.rx.test.dsl.base.*;
+import uk.camsw.rx.test.dsl.given.IGiven;
+import uk.camsw.rx.test.dsl.source.BaseSource;
+import uk.camsw.rx.test.dsl.source.ISource;
+import uk.camsw.rx.test.dsl.subscriber.BaseSubscriber;
+import uk.camsw.rx.test.dsl.when.IWhen;
 
 import java.time.Duration;
 import java.util.HashMap;
@@ -26,8 +30,8 @@ public class ExecutionContext<T1, T2, U, GIVEN extends IGiven, WHEN extends IWhe
 
     private Observable<U> streamUnderTest;
 
-    private final BaseSource<T1, GIVEN, WHEN> source1;
-    private final BaseSource<T2, GIVEN, WHEN> source2;
+    private BaseSource<T1, GIVEN, WHEN> source1;
+    private BaseSource<T2, GIVEN, WHEN> source2;
 
     private boolean handleErrors = false;
     private Func1<U, String> renderer = Object::toString;
@@ -43,9 +47,12 @@ public class ExecutionContext<T1, T2, U, GIVEN extends IGiven, WHEN extends IWhe
         this.when = when;
     }
 
-    public ExecutionContext(PublishSubject<T1> customSource) {
+    public void setCustomSource1(PublishSubject<T1> customSource) {
         source1 = new BaseSource<>(customSource, this);
-        source2 = new BaseSource<>(this);
+    }
+
+    public void setCustomSource2(PublishSubject<T2> customSource) {
+        source2 = new BaseSource<>(customSource, this);
     }
 
     public void setRenderer(Func1<U, String> renderer) {

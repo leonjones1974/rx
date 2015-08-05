@@ -1,8 +1,10 @@
-package uk.camsw.rx.test.dsl.base;
+package uk.camsw.rx.test.dsl.source;
 
 import rx.Observable;
 import rx.subjects.PublishSubject;
-import uk.camsw.rx.test.dsl.impl.ExecutionContext;
+import uk.camsw.rx.test.dsl.given.IGiven;
+import uk.camsw.rx.test.dsl.scenario.ExecutionContext;
+import uk.camsw.rx.test.dsl.when.IWhen;
 
 public class BaseSource<T, GIVEN extends IGiven, WHEN extends IWhen> implements ISource<T, WHEN> {
 

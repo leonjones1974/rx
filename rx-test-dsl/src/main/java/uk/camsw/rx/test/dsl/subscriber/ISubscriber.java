@@ -1,6 +1,7 @@
-package uk.camsw.rx.test.dsl.base;
+package uk.camsw.rx.test.dsl.subscriber;
 
 import org.assertj.core.api.AbstractThrowableAssert;
+import uk.camsw.rx.test.dsl.when.IWhen;
 
 public interface ISubscriber<U, WHEN extends IWhen> {
 
@@ -8,7 +9,7 @@ public interface ISubscriber<U, WHEN extends IWhen> {
 
     WHEN unsubscribes();
 
-    WHEN waitsforEvents(int eventCount);
+    WHEN waitsForEvents(int eventCount);
 
     int eventCount();
 

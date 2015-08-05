@@ -4,15 +4,15 @@ import com.jayway.awaitility.core.ConditionTimeoutException;
 import rx.exceptions.OnErrorNotImplementedException;
 import rx.schedulers.Schedulers;
 import rx.subjects.PublishSubject;
-import uk.camsw.rx.test.dsl.one.Scenario1;
-import uk.camsw.rx.test.dsl.two.Scenario2;
+import uk.camsw.rx.test.dsl.scenario.SingleSourceScenario;
+import uk.camsw.rx.test.dsl.scenario.DualSourceScenario;
 import org.junit.Test;
 import rx.Observable;
+import uk.camsw.rx.test.dsl.TestScenario;
 
 import java.time.Duration;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -21,7 +21,7 @@ public class DslTest {
 
     @Test
     public void simple() {
-        Scenario1<String, Integer> testScenario = TestScenario.singleSource();
+        SingleSourceScenario<String, Integer> testScenario = TestScenario.singleSource();
 
         testScenario
                 .given()
@@ -40,7 +40,7 @@ public class DslTest {
 
     @Test
     public void multipleSubscribers() {
-        Scenario1<String, Integer> testScenario = TestScenario.singleSource();
+        SingleSourceScenario<String, Integer> testScenario = TestScenario.singleSource();
 
         testScenario
                 .given()
@@ -63,7 +63,7 @@ public class DslTest {
 
     @Test
     public void unsubscribe() {
-        Scenario1<String, Integer> testScenario = TestScenario.singleSource();
+        SingleSourceScenario<String, Integer> testScenario = TestScenario.singleSource();
 
         testScenario
                 .given()
@@ -80,7 +80,7 @@ public class DslTest {
 
     @Test
     public void completion() {
-        Scenario1<String, Integer> testScenario = TestScenario.singleSource();
+        SingleSourceScenario<String, Integer> testScenario = TestScenario.singleSource();
 
         testScenario
                 .given()
@@ -97,7 +97,7 @@ public class DslTest {
 
     @Test
     public void handledError() {
-        Scenario1<String, Integer> testScenario = TestScenario.singleSource();
+        SingleSourceScenario<String, Integer> testScenario = TestScenario.singleSource();
 
         testScenario
                 .given()
@@ -116,7 +116,7 @@ public class DslTest {
 
     @Test(expected = OnErrorNotImplementedException.class)
     public void unhandledError() {
-        Scenario1<String, Integer> testScenario = TestScenario.singleSource();
+        SingleSourceScenario<String, Integer> testScenario = TestScenario.singleSource();
 
         testScenario
                 .given()
@@ -130,11 +130,11 @@ public class DslTest {
 
     @Test
     public void temporal() {
-        Scenario1<String, List<String>> testScenario = TestScenario.singleSource();
+        SingleSourceScenario<String, List<String>> testScenario = TestScenario.singleSource();
 
         testScenario
                 .given()
-                .subjectCreatedWithScheduler((source, scheduler) -> source.buffer(10, TimeUnit.SECONDS, scheduler))
+                .subjectCreated((source, scheduler) -> source.buffer(10, TimeUnit.SECONDS, scheduler))
                 .when()
                 .subscriber("s1").subscribes()
                 .theSource().emits("1a")
@@ -153,7 +153,7 @@ public class DslTest {
 
     @Test
     public void merge() {
-        Scenario2<String, String, String> testScenario = TestScenario.twoSources();
+        DualSourceScenario<String, String, String> testScenario = TestScenario.twoSources();
 
         testScenario
                 .given()
@@ -177,7 +177,7 @@ public class DslTest {
 
     @Test
     public void zip() {
-        Scenario2<String, Integer, String> testScenario = TestScenario.twoSources();
+        DualSourceScenario<String, Integer, String> testScenario = TestScenario.twoSources();
 
         testScenario
                 .given()
@@ -198,10 +198,54 @@ public class DslTest {
     }
 
     @Test
+    public void customSourceZip() {
+
+        DualSourceScenario<String, Integer, String> testScenario = TestScenario.twoSources();
+        PublishSubject<String> source1 = PublishSubject.create();
+        PublishSubject<Integer> source2 = PublishSubject.create();
+
+        testScenario
+                .given()
+                .theCustomSource1(source1)
+                .theCustomSource2(source2)
+                .subjectCreated((s1, s2) -> s1.zipWith(s2, (z, n) -> z + n))
+                .renderer(s -> s)
+                .when()
+                .subscriber("s1").subscribes()
+                .source1().emits("a")
+                .source2().emits(1)
+                .source1().emits("b")
+                .source2().emits(2)
+                .source1().completes()
+                .source2().completes()
+                .then()
+                .subscriber("s1")
+                .eventCount().isEqualTo(2)
+                .renderedStream().isEqualTo("[a1]-[b2]-|");
+
+
+        PublishSubject<String> customSource = PublishSubject.create();
+        TestScenario.<String, String>singleSource()
+                .given()
+                .theCustomSource(customSource)
+                .subjectCreated(_source -> customSource.map(String::toUpperCase))
+                .when()
+                .subscriber("s1").subscribes()
+                .theSource().emits("a")
+                .theSource().emits("b")
+                .then()
+                .subscriber("s1")
+                .eventCount().isEqualTo(2)
+                .event(0).isEqualTo("A")
+                .event(1).isEqualTo("B");
+    }
+
+    @Test
     public void manualSingleSource() {
         PublishSubject<String> customSource = PublishSubject.create();
-        TestScenario.singleSource(customSource)
+        TestScenario.<String, String>singleSource()
                 .given()
+                .theCustomSource(customSource)
                 .subjectCreated(_source -> customSource.map(String::toUpperCase))
                 .when()
                 .subscriber("s1").subscribes()
@@ -215,9 +259,11 @@ public class DslTest {
 
     }
 
+
+
     @Test
     public void streamRendering() {
-        Scenario1<Integer, String> testScenario = TestScenario.singleSource();
+        SingleSourceScenario<Integer, String> testScenario = TestScenario.singleSource();
 
         testScenario
                 .given()
@@ -239,7 +285,7 @@ public class DslTest {
 
     @Test
     public void streamRenderingWithError() {
-        Scenario1<Integer, String> testScenario = TestScenario.singleSource();
+        SingleSourceScenario<Integer, String> testScenario = TestScenario.singleSource();
 
         testScenario
                 .given()
@@ -261,7 +307,7 @@ public class DslTest {
 
     @Test
     public void asyncWaitForEvents() {
-        Scenario1<String, String> testScenario = TestScenario.singleSource();
+        SingleSourceScenario<String, String> testScenario = TestScenario.singleSource();
 
         testScenario
                 .given()
@@ -271,7 +317,7 @@ public class DslTest {
                 .subscriber("s1").subscribes()
                 .theSource().emits("a")
                 .theSource().emits("b")
-                .subscriber("s1").waitsforEvents(2)
+                .subscriber("s1").waitsForEvents(2)
                 .then()
                 .subscriber("s1")
                 .renderedStream().isEqualTo("[a]-[b]")
@@ -280,7 +326,7 @@ public class DslTest {
 
     @Test(expected = ConditionTimeoutException.class)
     public void asyncWithTimeout() {
-        Scenario1<String, String> testScenario = TestScenario.singleSource();
+        SingleSourceScenario<String, String> testScenario = TestScenario.singleSource();
 
         testScenario
                 .given()
@@ -290,7 +336,7 @@ public class DslTest {
                 .subscriber("s1").subscribes()
                 .theSource().emits("a")
                 .theSource().emits("b")
-                .subscriber("s1").waitsforEvents(2)
+                .subscriber("s1").waitsForEvents(2)
                 .go();
     }
 

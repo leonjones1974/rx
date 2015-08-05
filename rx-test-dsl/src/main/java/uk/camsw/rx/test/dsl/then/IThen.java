@@ -1,6 +1,6 @@
-package uk.camsw.rx.test.dsl.base;
+package uk.camsw.rx.test.dsl.then;
 
-import uk.camsw.rx.test.dsl.impl.SubscriberAssertions;
+import uk.camsw.rx.test.dsl.assertion.SubscriberAssertions;
 
 public interface IThen<U> {
 
