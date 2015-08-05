@@ -31,14 +31,13 @@ public class SingleSourceScenario<T1, U> {
             this.context = context;
         }
 
-        public Given<T1, U> subjectCreated(Func1<Observable<T1>, Observable<U>> f) {
+        public Given<T1, U> theStreamUnderTest(Func1<Observable<T1>, Observable<U>> f) {
             Observable<U> sut = f.call(context.getSource1().asObservable());
             context.setStreamUnderTest(sut);
             return this;
         }
 
-        //todo: can call this subject created, or aSubject or theSubject
-        public Given<T1, U> subjectCreated(Func2<Observable<T1>, Scheduler, Observable<U>> f) {
+        public Given<T1, U> theStreamUnderTest(Func2<Observable<T1>, Scheduler, Observable<U>> f) {
             Observable<T1> source = context.getSource1().asObservable();
             Observable<U> sut = f.call(source, context.getScheduler());
             context.setStreamUnderTest(sut);

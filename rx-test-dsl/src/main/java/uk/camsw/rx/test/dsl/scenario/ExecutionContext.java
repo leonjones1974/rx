@@ -24,6 +24,9 @@ public class ExecutionContext<T1, T2, U, GIVEN extends IGiven, WHEN extends IWhe
 
     private final Queue<Consumer<ExecutionContext<T1, T2, U, GIVEN, WHEN>>> commands = new ArrayBlockingQueue<>(1000);
     private final Map<String, BaseSubscriber<U, ? extends IWhen>> subscribers = new HashMap<>();
+
+    private final Map<String, Object> store = new HashMap<>();
+
     private final TestScheduler scheduler = new TestScheduler();
     private GIVEN given;
     private WHEN when;
@@ -137,5 +140,14 @@ public class ExecutionContext<T1, T2, U, GIVEN extends IGiven, WHEN extends IWhe
 
     public GIVEN getGiven() {
         return given;
+    }
+
+    public void put(String key, Object object) {
+        if (store.containsKey(key)) throw new IllegalArgumentException("Existing values cannot be overwritten");
+        store.put(key, object);
+    }
+
+    public <O> O get(String id) {
+        return (O)store.get(id);
     }
 }

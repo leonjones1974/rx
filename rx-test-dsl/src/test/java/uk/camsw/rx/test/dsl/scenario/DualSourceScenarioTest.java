@@ -5,8 +5,6 @@ import rx.Observable;
 import rx.subjects.PublishSubject;
 import uk.camsw.rx.test.dsl.TestScenario;
 
-import static org.junit.Assert.*;
-
 public class DualSourceScenarioTest {
     @Test
     public void merge() {
@@ -14,7 +12,7 @@ public class DualSourceScenarioTest {
 
         testScenario
                 .given()
-                .subjectCreated(Observable::mergeWith)
+                .theStreamUnderTest(Observable::mergeWith)
                 .when()
                 .subscriber("s1").subscribes()
                 .source1().emits("1")
@@ -38,7 +36,7 @@ public class DualSourceScenarioTest {
 
         testScenario
                 .given()
-                .subjectCreated((s1, s2) -> s1.zipWith(s2, (z, n) -> z + n))
+                .theStreamUnderTest((s1, s2) -> s1.zipWith(s2, (z, n) -> z + n))
                 .renderer(s -> s)
                 .when()
                 .subscriber("s1").subscribes()
@@ -65,7 +63,7 @@ public class DualSourceScenarioTest {
                 .given()
                 .theCustomSource1(source1)
                 .theCustomSource2(source2)
-                .subjectCreated((s1, s2) -> s1.zipWith(s2, (z, n) -> z + n))
+                .theStreamUnderTest((s1, s2) -> s1.zipWith(s2, (z, n) -> z + n))
                 .renderer(s -> s)
                 .when()
                 .subscriber("s1").subscribes()
@@ -85,7 +83,7 @@ public class DualSourceScenarioTest {
         TestScenario.<String, String>singleSource()
                 .given()
                 .theCustomSource(customSource)
-                .subjectCreated(_source -> customSource.map(String::toUpperCase))
+                .theStreamUnderTest(_source -> customSource.map(String::toUpperCase))
                 .when()
                 .subscriber("s1").subscribes()
                 .theSource().emits("a")

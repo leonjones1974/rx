@@ -36,12 +36,12 @@ public class DualSourceScenario<T1, T2, U> {
             return context.getWhen();
         }
 
-        public Given<T1, T2, U> subjectCreated(Func2<Observable<T1>, Observable<T2>, Observable<U>> f) {
+        public Given<T1, T2, U> theStreamUnderTest(Func2<Observable<T1>, Observable<T2>, Observable<U>> f) {
             context.setStreamUnderTest(f.call(context.getSource1().asObservable(), context.getSource2().asObservable()));
             return this;
         }
 
-        public Given<T1, T2, U> subjectCreated(Func3<Observable<T1>, Observable<T2>, Scheduler, Observable<U>> f) {
+        public Given<T1, T2, U> theStreamUnderTest(Func3<Observable<T1>, Observable<T2>, Scheduler, Observable<U>> f) {
             context.setStreamUnderTest(f.call(context.getSource1().asObservable(), context.getSource2().asObservable(), context.getScheduler()));
             return this;
         }

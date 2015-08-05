@@ -21,7 +21,7 @@ public class SingleSourceScenarioTest {
 
         testScenario
                 .given()
-                .subjectCreated(source -> source.map(s -> Integer.parseInt(s) + 1))
+                .theStreamUnderTest(source -> source.map(s -> Integer.parseInt(s) + 1))
                 .when()
                 .subscriber("s1").subscribes()
                 .theSource().emits("1")
@@ -40,7 +40,7 @@ public class SingleSourceScenarioTest {
 
         testScenario
                 .given()
-                .subjectCreated(source -> source.map(s -> Integer.parseInt(s) + 1))
+                .theStreamUnderTest(source -> source.map(s -> Integer.parseInt(s) + 1))
                 .when()
                 .subscriber("s1").subscribes()
                 .theSource().emits("1")
@@ -63,7 +63,7 @@ public class SingleSourceScenarioTest {
 
         testScenario
                 .given()
-                .subjectCreated(source -> source.map(s -> Integer.parseInt(s) + 1))
+                .theStreamUnderTest(source -> source.map(s -> Integer.parseInt(s) + 1))
                 .when()
                 .subscriber("s1").subscribes()
                 .theSource().emits("1")
@@ -80,7 +80,7 @@ public class SingleSourceScenarioTest {
 
         testScenario
                 .given()
-                .subjectCreated(source -> source.map(s -> Integer.parseInt(s) + 1))
+                .theStreamUnderTest(source -> source.map(s -> Integer.parseInt(s) + 1))
                 .when()
                 .subscriber("s1").subscribes()
                 .theSource().emits("1")
@@ -97,7 +97,7 @@ public class SingleSourceScenarioTest {
 
         testScenario
                 .given()
-                .subjectCreated(source -> source.map(s -> Integer.parseInt(s) + 1))
+                .theStreamUnderTest(source -> source.map(s -> Integer.parseInt(s) + 1))
                 .errorsAreHandled()
                 .when()
                 .subscriber("s1").subscribes()
@@ -116,7 +116,7 @@ public class SingleSourceScenarioTest {
 
         testScenario
                 .given()
-                .subjectCreated(source -> source.map(s -> Integer.parseInt(s) + 1))
+                .theStreamUnderTest(source -> source.map(s -> Integer.parseInt(s) + 1))
                 .when()
                 .subscriber("s1").subscribes()
                 .theSource().emits("1")
@@ -130,7 +130,7 @@ public class SingleSourceScenarioTest {
 
         testScenario
                 .given()
-                .subjectCreated((source, scheduler) -> source.buffer(10, TimeUnit.SECONDS, scheduler))
+                .theStreamUnderTest((source, scheduler) -> source.buffer(10, TimeUnit.SECONDS, scheduler))
                 .when()
                 .subscriber("s1").subscribes()
                 .theSource().emits("1a")
@@ -154,7 +154,7 @@ public class SingleSourceScenarioTest {
         TestScenario.<String, String>singleSource()
                 .given()
                 .theCustomSource(customSource)
-                .subjectCreated(_source -> customSource.map(String::toUpperCase))
+                .theStreamUnderTest(_source -> customSource.map(String::toUpperCase))
                 .when()
                 .subscriber("s1").subscribes()
                 .theSource().emits("a")
@@ -175,7 +175,7 @@ public class SingleSourceScenarioTest {
 
         testScenario
                 .given()
-                .subjectCreated(source -> source.map(n -> n == 0 ? "a" : "B"))
+                .theStreamUnderTest(source -> source.map(n -> n == 0 ? "a" : "B"))
                 .renderer(event -> "'" + event + "'")
                 .when()
                 .subscriber("s1").subscribes()
@@ -197,7 +197,7 @@ public class SingleSourceScenarioTest {
 
         testScenario
                 .given()
-                .subjectCreated(source -> source.map(n -> n == 0 ? "a" : "B"))
+                .theStreamUnderTest(source -> source.map(n -> n == 0 ? "a" : "B"))
                 .errorsAreHandled()
                 .renderer(event -> "'" + event + "'")
                 .when()
@@ -219,7 +219,7 @@ public class SingleSourceScenarioTest {
 
         testScenario
                 .given()
-                .subjectCreated(source -> source.observeOn(Schedulers.computation()).delay(1, TimeUnit.SECONDS))
+                .theStreamUnderTest(source -> source.observeOn(Schedulers.computation()).delay(1, TimeUnit.SECONDS))
                 .asyncTimeout(Duration.ofSeconds(2))
                 .when()
                 .subscriber("s1").subscribes()
@@ -238,7 +238,7 @@ public class SingleSourceScenarioTest {
 
         testScenario
                 .given()
-                .subjectCreated(source -> source.observeOn(Schedulers.computation()).delay(10, TimeUnit.SECONDS))
+                .theStreamUnderTest(source -> source.observeOn(Schedulers.computation()).delay(10, TimeUnit.SECONDS))
                 .asyncTimeout(Duration.ofMillis(500))
                 .when()
                 .subscriber("s1").subscribes()

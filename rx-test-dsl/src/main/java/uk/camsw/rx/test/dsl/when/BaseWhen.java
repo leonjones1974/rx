@@ -1,10 +1,11 @@
 package uk.camsw.rx.test.dsl.when;
 
-import uk.camsw.rx.test.dsl.then.BaseThen;
-import uk.camsw.rx.test.dsl.time.BaseTime;
-import uk.camsw.rx.test.dsl.subscriber.ISubscriber;
-import uk.camsw.rx.test.dsl.then.IThen;
+import uk.camsw.rx.test.dsl.KeyConstants;
 import uk.camsw.rx.test.dsl.scenario.ExecutionContext;
+import uk.camsw.rx.test.dsl.subscriber.ISubscriber;
+import uk.camsw.rx.test.dsl.then.BaseThen;
+import uk.camsw.rx.test.dsl.then.IThen;
+import uk.camsw.rx.test.dsl.time.BaseTime;
 
 public class BaseWhen<U, WHEN extends IWhen> implements IWhen<U, WHEN> {
 
@@ -16,6 +17,16 @@ public class BaseWhen<U, WHEN extends IWhen> implements IWhen<U, WHEN> {
 
     public ISubscriber<U, WHEN> subscriber(String id) {
         return context.getOrCreateSubscriber(id);
+    }
+
+    @Override
+    public ISubscriber<U, WHEN> theSubscriber(String id) {
+        return subscriber(id);
+    }
+
+    @Override
+    public ISubscriber<U, WHEN> theSubscriber() {
+        return subscriber(KeyConstants.THE_SUBSCRIBER);
     }
 
     @Override

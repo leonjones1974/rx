@@ -21,9 +21,9 @@ public class DummyTest {
 //        KafkaScenario<String, String, String, String> scenario = KafkaScenario.newScenario();
 //
 //        scenario.given()
-//                    .theTopic("topic", topicBuilder::build)
+//                    .thePublisher("topic", topicBuilder::build)
 //                    .asyncTimeout(Duration.ofSeconds(10))
-//                    .subjectCreated(_source -> kafkaSource.map(e -> e.getValue().getValue()))
+//                    .theStreamUnderTest(_source -> kafkaSource.map(e -> e.getValue().getValue()))
 //                .when()
 //                    .subscriber("s1").subscribes()
 ////                    .topic("topic")
@@ -38,7 +38,7 @@ public class DummyTest {
 //
 //                        TestScenario.<Event<Try<String>>, String>singleSource()
 //                                .given()
-//                                .subjectCreated(_source -> kafkaSource.map(e -> e.getValue().getValue()))
+//                                .theStreamUnderTest(_source -> kafkaSource.map(e -> e.getValue().getValue()))
 //                                .theResource("t1", topicBuilder::build)
 //                                .asyncTimeout(Duration.ofSeconds(10))
 //                                .when()

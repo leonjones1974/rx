@@ -23,6 +23,10 @@ public class Topic<K, V> implements AutoCloseable {
         this.producer = createProducer();
     }
 
+    public String getName() {
+        return name;
+    }
+
     public void publish(K key, V message) {
         if (producer == null) throw new IllegalStateException("Producer has been closed");
         producer.send(new KeyedMessage<>(name, key, message));
@@ -52,6 +56,7 @@ public class Topic<K, V> implements AutoCloseable {
         }
     }
 
+    //todo: work out the serializers properly here
     private Producer<K, V> createProducer() {
         Properties props = new Properties();
         props.put("metadata.broker.list", envProperties.kafkaBrokers());
