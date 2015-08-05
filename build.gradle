@@ -155,8 +155,10 @@ subprojects { p ->
         resolutionStrategy {
             cacheChangingModulesFor 0, 'seconds'
         }
+        all*.exclude group: 'javax.jms', module: 'jms'
+        all*.exclude group: 'com.sun.jmx', module: 'jmxri'
+        all*.exclude group: 'com.sun.jdmk', module: 'jmxtools'
     }
-
     test {
         testLogging {
             events 'started', 'passed'

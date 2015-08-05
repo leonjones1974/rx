@@ -1,9 +1,5 @@
 
 dependencies {
-    compile ('org.apache.kafka:kafka_2.9.1:0.8.1.1') {
-        exclude module: 'com.sun.jmx:jmxri'
-        exclude module: 'com.sun.jdmk:jmxtools'
-        exclude module: 'javax.jms:jms'
-    }
+    compile 'org.apache.kafka:kafka_2.9.1:0.8.1.1'
     compile project(':rx-test-dsl')
 }
