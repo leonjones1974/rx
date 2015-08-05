@@ -36,20 +36,20 @@ public class DualSourceScenarioTest {
 
         testScenario
                 .given()
-                .theStreamUnderTest((s1, s2) -> s1.zipWith(s2, (z, n) -> z + n))
-                .renderer(s -> s)
+                    .theStreamUnderTest((s1, s2) -> s1.zipWith(s2, (z, n) -> z + n))
+                    .renderer(s -> s)
                 .when()
-                .subscriber("s1").subscribes()
-                .source1().emits("a")
-                .source2().emits(1)
-                .source1().emits("b")
-                .source2().emits(2)
-                .source1().completes()
-                .source2().completes()
+                    .theSubscriber().subscribes()
+                    .source1().emits("a")
+                    .source2().emits(1)
+                    .source1().emits("b")
+                    .source2().emits(2)
+                    .source1().completes()
+                    .source2().completes()
                 .then()
-                .subscriber("s1")
-                .eventCount().isEqualTo(2)
-                .renderedStream().isEqualTo("[a1]-[b2]-|");
+                    .theSubscribers()
+                        .eventCount().isEqualTo(2)
+                        .renderedStream().isEqualTo("[a1]-[b2]-|");
     }
 
     @Test
