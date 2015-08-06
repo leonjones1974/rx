@@ -3,6 +3,7 @@ package uk.camsw.rx.test.dsl.scenario;
 import com.jayway.awaitility.Awaitility;
 import com.jayway.awaitility.core.ConditionFactory;
 import rx.Observable;
+import rx.functions.Action1;
 import rx.functions.Func1;
 import rx.schedulers.TestScheduler;
 import rx.subjects.PublishSubject;
@@ -10,12 +11,11 @@ import uk.camsw.rx.test.dsl.given.IGiven;
 import uk.camsw.rx.test.dsl.source.BaseSource;
 import uk.camsw.rx.test.dsl.source.ISource;
 import uk.camsw.rx.test.dsl.subscriber.BaseSubscriber;
+import uk.camsw.rx.test.dsl.subscriber.ISubscriber;
 import uk.camsw.rx.test.dsl.when.IWhen;
 
 import java.time.Duration;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Queue;
+import java.util.*;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
@@ -23,11 +23,11 @@ import java.util.function.Consumer;
 public class ExecutionContext<T1, T2, U, GIVEN extends IGiven, WHEN extends IWhen> {
 
     private final Queue<Consumer<ExecutionContext<T1, T2, U, GIVEN, WHEN>>> commands = new ArrayBlockingQueue<>(1000);
-    private final Map<String, BaseSubscriber<U, ? extends IWhen>> subscribers = new HashMap<>();
+    private final Map<String, ISubscriber<U, WHEN>> subscribers = new HashMap<>();
+    private final List<Action1<ExecutionContext<T1, T2, U, GIVEN, WHEN>>> finalActions = new ArrayList<>();
+    private final Map<String, Object> customProperties = new HashMap<>();
 
-    private final Map<String, Object> store = new HashMap<>();
-
-    private final TestScheduler scheduler = new TestScheduler();
+    private TestScheduler scheduler = new TestScheduler();
     private GIVEN given;
     private WHEN when;
 
@@ -83,6 +83,12 @@ public class ExecutionContext<T1, T2, U, GIVEN extends IGiven, WHEN extends IWhe
     }
 
     public void cleanUp() {
+        /* todo: Think about the lifecycle more - this currently happens after then, rather than at end of assertions (there is no end).
+            That leaves the state of the context a little non-deterministic in that we can't really clean-up everything as assertions may reference stuff
+            Example: If a subscriber assertion used a topic that had been released as part of a final action, it would be closed before the assertion got it
+        */
+
+        finalActions.forEach(a -> a.call(this));
     }
 
     public boolean handleErrors() {
@@ -93,23 +99,24 @@ public class ExecutionContext<T1, T2, U, GIVEN extends IGiven, WHEN extends IWhe
         this.handleErrors = handleErrors;
     }
 
-    public <WHEN extends IWhen> BaseSubscriber<U, WHEN> getOrCreateSubscriber(String id) {
+    public ISubscriber<U, WHEN> getOrCreateSubscriber(String id) {
         if (!subscribers.containsKey(id)) {
-            ExecutionContext<?, ?, U, ?, WHEN> context = (ExecutionContext<?, ?, U, ?, WHEN>) this;
-            BaseSubscriber<U, WHEN> subscriber = new BaseSubscriber<>(id, context);
+            BaseSubscriber<U, WHEN> subscriber = new BaseSubscriber<>(id, this);
             subscribers.put(id, subscriber);
         }
-        return (BaseSubscriber<U, WHEN>) subscribers.get(id);
+        return subscribers.get(id);
     }
 
-    public BaseSubscriber<U, ? extends IWhen> getSubscriber(String id) {
+    public ISubscriber<U, WHEN> getSubscriber(String id) {
         return subscribers.get(id);
     }
 
     public void executeCommands() {
-        while (!commands.isEmpty()) {
-            commands.poll().accept(this);
-        }
+        while (!commands.isEmpty()) commands.poll().accept(this);
+    }
+
+    public void addFinally(Action1<ExecutionContext<T1, T2, U, GIVEN, WHEN>> f) {
+        finalActions.add(f);
     }
 
     public TestScheduler getScheduler() {
@@ -143,11 +150,11 @@ public class ExecutionContext<T1, T2, U, GIVEN extends IGiven, WHEN extends IWhe
     }
 
     public void put(String key, Object object) {
-        if (store.containsKey(key)) throw new IllegalArgumentException("Existing values cannot be overwritten");
-        store.put(key, object);
+        if (customProperties.containsKey(key)) throw new IllegalArgumentException("Existing values cannot be overwritten");
+        customProperties.put(key, object);
     }
 
     public <O> O get(String id) {
-        return (O)store.get(id);
+        return (O) customProperties.get(id);
     }
 }

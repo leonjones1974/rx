@@ -21,8 +21,8 @@ public class KafkaSourceScenarioTest {
                     .theStreamUnderTest(topic -> KafkaStream.newBuilder(topic.getName(), group).newMergedStream().map(e -> e.getValue().getValue()))
                 .when()
                     .theSubscriber().subscribes()
-                    .thePublisher().publishes("1", "1")
-                    .thePublisher().publishes("2", "2")
+                    .theProducer().produces("1", "1")
+                    .theProducer().produces("2", "2")
                     .theSubscriber().waitsForEvents(2)
                 .then()
                     .theSubscribers().renderedStream().isEqualTo("[1]-[2]");

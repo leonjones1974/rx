@@ -1,13 +1,21 @@
 package uk.camsw.rx.test.dsl.assertion;
 
-import org.assertj.core.api.AbstractObjectAssert;
+import com.google.common.base.Splitter;
+import com.google.common.collect.Lists;
+import org.assertj.core.api.AbstractCharSequenceAssert;
+import org.assertj.core.api.AssertionInfo;
+import org.assertj.core.api.WritableAssertionInfo;
+import org.assertj.core.internal.Failures;
 import uk.camsw.rx.test.dsl.then.IThen;
 
-public class ObjectAssertion<U> extends AbstractObjectAssert<ObjectAssertion<U>, U> implements ISubscriberAssertions<U> {
+import java.util.ArrayList;
+
+public class RenderedStreamAssertion<U> extends AbstractCharSequenceAssert<RenderedStreamAssertion<U>, CharSequence> implements ISubscriberAssertions<U>{
+
     private final ISubscriberAssertions<U> subscriberAssertions;
 
-    public ObjectAssertion(U actual, ISubscriberAssertions<U> subscriberAssertions) {
-        super(actual, ObjectAssertion.class);
+    public RenderedStreamAssertion(String value, ISubscriberAssertions<U> subscriberAssertions) {
+        super(value, RenderedStreamAssertion.class);
         this.subscriberAssertions = subscriberAssertions;
     }
 
@@ -50,4 +58,15 @@ public class ObjectAssertion<U> extends AbstractObjectAssert<ObjectAssertion<U>,
     public RenderedStreamAssertion<U> renderedStream() {
         return subscriberAssertions.renderedStream();
     }
+
+    public RenderedStreamAssertion<U> containsAllInAnyOrder(String expected) {
+        ArrayList<String> actualItems = Lists.newArrayList(Splitter.on('-').split(actual));
+        ArrayList<String> expectedItems = Lists.newArrayList(Splitter.on('-').split(expected));
+        if (actualItems.size() == expectedItems.size()
+            && actualItems.containsAll(expectedItems)) return this;
+
+        failWithMessage(actual + " does not contain all of " + expected);
+        return this;
+    }
+
 }

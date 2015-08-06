@@ -10,7 +10,7 @@ public interface IGiven<U, GIVEN extends IGiven, WHEN extends IWhen> {
 
     GIVEN errorsAreHandled();
 
-    GIVEN renderer(Func1<U, String> renderer);
+    GIVEN theRenderer(Func1<U, String> renderer);
 
     GIVEN asyncTimeoutOf(long timeout, TemporalUnit unit);
 

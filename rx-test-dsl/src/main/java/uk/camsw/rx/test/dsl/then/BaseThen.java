@@ -18,6 +18,11 @@ public class BaseThen<U> implements IThen<U> {
     }
 
     @Override
+    public SubscriberAssertions<U> subscriber(int id) {
+        return subscriber(String.valueOf(id));
+    }
+
+    @Override
     public SubscriberAssertions<U> subscriber(String id) {
         return new SubscriberAssertions<>(context, context.getSubscriber(id));
     }

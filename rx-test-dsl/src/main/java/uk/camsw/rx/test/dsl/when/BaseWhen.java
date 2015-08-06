@@ -7,12 +7,20 @@ import uk.camsw.rx.test.dsl.then.BaseThen;
 import uk.camsw.rx.test.dsl.then.IThen;
 import uk.camsw.rx.test.dsl.time.BaseTime;
 
+import java.time.Duration;
+import java.time.temporal.TemporalUnit;
+
 public class BaseWhen<U, WHEN extends IWhen> implements IWhen<U, WHEN> {
 
     private final ExecutionContext<?, ?, U, ?, WHEN> context;
 
     public BaseWhen(ExecutionContext<?, ?, U, ?, WHEN> context) {
         this.context = context;
+    }
+
+    @Override
+    public ISubscriber<U, WHEN> subscriber(int id) {
+        return subscriber(String.valueOf(id));
     }
 
     public ISubscriber<U, WHEN> subscriber(String id) {
@@ -25,6 +33,22 @@ public class BaseWhen<U, WHEN extends IWhen> implements IWhen<U, WHEN> {
     }
 
     @Override
+    public WHEN theCurrentThreadSleepsFor(long amount, TemporalUnit unit) {
+        return theCurrentThreadSleepsFor(Duration.of(amount, unit));
+    }
+
+    @Override
+    public WHEN theCurrentThreadSleepsFor(Duration duration) {
+        System.out.println("Waiting for " + duration);
+        try {
+            Thread.sleep(duration.toMillis());
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+        return context.getWhen();
+    }
+
+    @Override
     public ISubscriber<U, WHEN> theSubscriber() {
         return subscriber(KeyConstants.THE_SUBSCRIBER);
     }
@@ -32,8 +56,11 @@ public class BaseWhen<U, WHEN extends IWhen> implements IWhen<U, WHEN> {
     @Override
     public IThen<U> then() {
         BaseThen<U> then = new BaseThen<>(context);
-        context.addCommand(ExecutionContext::cleanUp);
-        then.executeCommands();
+        try {
+            then.executeCommands();
+        } finally {
+            context.cleanUp();
+        }
         return then;
     }
 

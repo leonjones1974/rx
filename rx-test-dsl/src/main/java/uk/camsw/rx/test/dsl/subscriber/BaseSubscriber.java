@@ -30,6 +30,9 @@ public class BaseSubscriber<U, WHEN extends IWhen> implements ISubscriber<U, WHE
     @Override
     public WHEN subscribes() {
         context.addCommand(c -> subscription.set(c.getStreamUnderTest().subscribe(this)));
+        context.addFinally(c -> {
+            if (!subscription.isUnsubscribed()) subscription.unsubscribe();
+        });
         return context.getWhen();
     }
 

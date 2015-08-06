@@ -14,9 +14,9 @@ public class Topic<K, V> implements AutoCloseable {
     private final Object lock = new Object();
     private Producer<K, V> producer;
     private ZkClient client;
-    private EnvProperties envProperties;
+    private KafkaEnv envProperties;
 
-    public Topic(String name, ZkClient client, EnvProperties envProperties) {
+    public Topic(String name, ZkClient client, KafkaEnv envProperties) {
         this.client = client;
         this.name = name;
         this.envProperties = envProperties;
@@ -35,6 +35,14 @@ public class Topic<K, V> implements AutoCloseable {
     @Override
     public void close() throws Exception {
         synchronized (lock) {
+            if (producer != null) {
+                try {
+                    System.out.println("Closing producer: " + name);
+                    producer.close();
+                } finally {
+                    producer = null;
+                }
+            }
             if (client != null) {
                 try {
                     System.out.println("Deleting topic: " + name);
@@ -42,15 +50,6 @@ public class Topic<K, V> implements AutoCloseable {
                 } finally {
                     client.close();
                     client = null;
-                }
-            }
-
-            if (producer != null) {
-                try {
-                    System.out.println("Closing producer: " + name);
-                    producer.close();
-                } finally {
-                    producer = null;
                 }
             }
         }

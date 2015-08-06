@@ -13,9 +13,9 @@ import java.util.stream.Collectors;
 public class SubscriberAssertions<U> implements ISubscriberAssertions<U> {
 
     private final ExecutionContext<?, ?, U,?,?> context;
-    private final BaseSubscriber<U, ? extends IWhen> testSubscriber;
+    private final ISubscriber<U, ? extends IWhen> testSubscriber;
 
-    public SubscriberAssertions(ExecutionContext<?, ?, U, ?, ?> context, BaseSubscriber<U, ? extends IWhen> testSubscriber) {
+    public SubscriberAssertions(ExecutionContext<?, ?, U, ?, ?> context, ISubscriber<U, ? extends IWhen> testSubscriber) {
         this.context = context;
         this.testSubscriber = testSubscriber;
     }
@@ -51,7 +51,7 @@ public class SubscriberAssertions<U> implements ISubscriberAssertions<U> {
     }
 
     @Override
-    public StringAssertion<U> renderedStream() {
+    public RenderedStreamAssertion<U> renderedStream() {
         StringBuilder rendering = new StringBuilder(Joiner.on('-').join(
                 testSubscriber.events().stream().map(e -> {
                     Func1<U, String> renderer = context.getRenderer();
@@ -61,7 +61,7 @@ public class SubscriberAssertions<U> implements ISubscriberAssertions<U> {
         for (int i = 0; i< testSubscriber.completedCount(); i++) rendering.append("-|");
 
         if (testSubscriber.isErrored()) rendering.append("-X[").append(testSubscriber.errorClass().getSimpleName()).append(": ").append(testSubscriber.errorMessage()).append("]");
-        return new StringAssertion<>(rendering.toString(), this);
+        return new RenderedStreamAssertion<>(rendering.toString(), this);
     }
 
     @Override

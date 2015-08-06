@@ -42,7 +42,7 @@ public class ClassAssertion<U> extends AbstractClassAssert<ClassAssertion<U>> im
     }
 
     @Override
-    public StringAssertion<U> renderedStream() {
+    public RenderedStreamAssertion<U> renderedStream() {
         return subscriberAssertions.renderedStream();
     }
 

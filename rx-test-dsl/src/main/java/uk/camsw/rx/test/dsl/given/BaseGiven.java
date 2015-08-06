@@ -22,7 +22,7 @@ public abstract class BaseGiven<U, GIVEN extends IGiven, WHEN extends IWhen> imp
     }
 
     @Override
-    public GIVEN renderer(Func1<U, String> renderer) {
+    public GIVEN theRenderer(Func1<U, String> renderer) {
         context.setRenderer(renderer);
         return self();
     }

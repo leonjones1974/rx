@@ -28,7 +28,7 @@ public class IntegerAssertion<U> extends AbstractIntegerAssert<IntegerAssertion<
     }
 
     @Override
-    public StringAssertion<U> renderedStream() {
+    public RenderedStreamAssertion<U> renderedStream() {
         return subscriberAssertions.renderedStream();
     }
 

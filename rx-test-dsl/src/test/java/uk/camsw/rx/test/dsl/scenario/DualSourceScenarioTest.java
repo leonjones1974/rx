@@ -37,7 +37,7 @@ public class DualSourceScenarioTest {
         testScenario
                 .given()
                     .theStreamUnderTest((s1, s2) -> s1.zipWith(s2, (z, n) -> z + n))
-                    .renderer(s -> s)
+                    .theRenderer(s -> s)
                 .when()
                     .theSubscriber().subscribes()
                     .source1().emits("a")
@@ -64,7 +64,7 @@ public class DualSourceScenarioTest {
                 .theCustomSource1(source1)
                 .theCustomSource2(source2)
                 .theStreamUnderTest((s1, s2) -> s1.zipWith(s2, (z, n) -> z + n))
-                .renderer(s -> s)
+                .theRenderer(s -> s)
                 .when()
                 .subscriber("s1").subscribes()
                 .source1().emits("a")

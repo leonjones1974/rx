@@ -18,5 +18,5 @@ public interface ISubscriberAssertions<U> {
 
     IThen<U> and();
 
-    StringAssertion<U> renderedStream();
+    RenderedStreamAssertion<U> renderedStream();
 }

@@ -176,7 +176,7 @@ public class SingleSourceScenarioTest {
         testScenario
                 .given()
                 .theStreamUnderTest(source -> source.map(n -> n == 0 ? "a" : "B"))
-                .renderer(event -> "'" + event + "'")
+                .theRenderer(event -> "'" + event + "'")
                 .when()
                 .subscriber("s1").subscribes()
                 .theSource().emits(0)
@@ -199,7 +199,7 @@ public class SingleSourceScenarioTest {
                 .given()
                 .theStreamUnderTest(source -> source.map(n -> n == 0 ? "a" : "B"))
                 .errorsAreHandled()
-                .renderer(event -> "'" + event + "'")
+                .theRenderer(event -> "'" + event + "'")
                 .when()
                 .subscriber("s1").subscribes()
                 .theSource().emits(0)

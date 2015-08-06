@@ -9,13 +9,13 @@ import java.util.UUID;
 
 public class TopicBuilder<K, V> {
 
-    private String topicName;
-    private final EnvProperties envProperties;
+    private final KafkaEnv envProperties;
     private final boolean createTopic;
-    private final int partitionCount;
+    private int partitionCount;
     private final int replicationFactor;
+    private String topicName;
 
-    public static <K, V> TopicBuilder<K, V> newBuilder(EnvProperties envProperties) {
+    public static <K, V> TopicBuilder<K, V> newBuilder(KafkaEnv envProperties) {
         return new TopicBuilder<>(envProperties);
     }
 
@@ -40,7 +40,7 @@ public class TopicBuilder<K, V> {
         return this;
     }
 
-    private TopicBuilder(EnvProperties envProperties) {
+    private TopicBuilder(KafkaEnv envProperties) {
         this.topicName = "test-" + UUID.randomUUID().toString();
         this.envProperties = envProperties;
         this.createTopic = true;
@@ -49,5 +49,7 @@ public class TopicBuilder<K, V> {
     }
 
 
-
+    public void withPartitionCount(int partitionCount) {
+        this.partitionCount = partitionCount;
+    }
 }

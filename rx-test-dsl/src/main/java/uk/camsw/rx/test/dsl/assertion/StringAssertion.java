@@ -48,7 +48,7 @@ public class StringAssertion<U> extends AbstractCharSequenceAssert<StringAsserti
     }
 
     @Override
-    public StringAssertion<U> renderedStream() {
+    public RenderedStreamAssertion<U> renderedStream() {
         return subscriberAssertions.renderedStream();
     }
 }
