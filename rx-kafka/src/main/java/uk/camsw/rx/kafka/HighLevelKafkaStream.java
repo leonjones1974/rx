@@ -12,25 +12,23 @@ import rx.Subscription;
 import rx.schedulers.Schedulers;
 import rx.subscriptions.Subscriptions;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Executors;
 
 public class HighLevelKafkaStream {
 
-    public static Observable<MessageAndMetadata<byte[], byte[]>> create(String topic, String group) {
+    public static Observable<MessageAndMetadata<byte[], byte[]>> create(String topic, ConsumerConfig config) {
         return Observable.<MessageAndMetadata<byte[], byte[]>>create(subscriber -> {
-            System.out.println("SUBSCRIBING: " + topic + ", " + group);
-            ConsumerConfig config = createConsumerConfig("localhost:2181", group);
+            System.out.println("SUBSCRIBING: " + topic);
             ConsumerConnector connector = Consumer.createJavaConsumerConnector(config);
             Map<String, Integer> topicCountMap = new HashMap<>();
             topicCountMap.put(topic, 1);
             Map<String, List<KafkaStream<byte[], byte[]>>> consumerMap = connector.createMessageStreams(topicCountMap);
             List<KafkaStream<byte[], byte[]>> streams = consumerMap.get(topic);
-
             System.out.println("Got streams: " + streams.size());
-
             streams.forEach(stream -> {
-                System.out.println("Iterating stream: " + group);
                 Scheduler scheduler = Schedulers.from(Executors.newSingleThreadExecutor());
                 ConsumerIterator<byte[], byte[]> iter = stream.iterator();
                 Subscription eventReaderSubscription = scheduler.createWorker().schedule(() -> {
@@ -52,25 +50,5 @@ public class HighLevelKafkaStream {
         }).doOnUnsubscribe(() -> System.out.println("Unsubscribed")).publish().refCount();
 
     }
-
-    public static Observable<MessageAndMetadata<byte[], byte[]>> create(String topic) {
-        return create(topic, UUID.randomUUID().toString());
-    }
-
-    //todo: use proper properties
-    private static ConsumerConfig createConsumerConfig(String zookeeperServers, String groupId) {
-        Properties props = new Properties();
-        props.put("zookeeper.connect", zookeeperServers);
-        props.put("group.id", groupId);
-        props.put("zookeeper.session.timeout.ms", "400");
-        props.put("zookeeper.sync.time.ms", "1");
-        props.put("auto.commit.interval.ms", "1");
-        props.put("retry.backoff.ms", "400");
-        props.put("rebalance.max.retries", "1000");
-        props.put("rebalance.backoff.ms", "10");
-
-        return new ConsumerConfig(props);
-    }
-
 
 }

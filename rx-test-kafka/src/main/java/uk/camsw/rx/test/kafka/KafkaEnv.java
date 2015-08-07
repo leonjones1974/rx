@@ -1,10 +1,15 @@
 package uk.camsw.rx.test.kafka;
 
 import com.google.common.base.MoreObjects;
+import kafka.consumer.Consumer;
+import kafka.consumer.ConsumerConfig;
+import rx.functions.Action1;
 import uk.camsw.rx.common.SystemPropertyOverrideMap;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Properties;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 public final class KafkaEnv {
@@ -53,6 +58,35 @@ public final class KafkaEnv {
 
     public int sessionTimeoutMs() {
         return Integer.valueOf(properties.get(KEY_SESSION_TIMEOUT));
+    }
+
+    public kafka.consumer.ConsumerConfig createConsumerConfig() {
+        Properties props = new Properties();
+        props.put("group.id", UUID.randomUUID().toString());
+        props.put("zookeeper.connect", zookeeperServers());
+        props.put("zookeeper.session.timeout.ms", "400");
+        props.put("zookeeper.sync.time.ms", "1");
+        props.put("auto.commit.interval.ms", "1");
+        props.put("retry.backoff.ms", "400");
+        props.put("rebalance.max.retries", "1000");
+        props.put("rebalance.backoff.ms", "10");
+
+        return new ConsumerConfig(props);
+    }
+
+    public kafka.consumer.ConsumerConfig createConsumerConfig(Action1<Properties> f) {
+        Properties props = new Properties();
+        props.put("group.id", UUID.randomUUID().toString());
+        props.put("zookeeper.connect", zookeeperServers());
+        props.put("zookeeper.session.timeout.ms", "400");
+        props.put("zookeeper.sync.time.ms", "1");
+        props.put("auto.commit.interval.ms", "1");
+        props.put("retry.backoff.ms", "400");
+        props.put("rebalance.max.retries", "1000");
+        props.put("rebalance.backoff.ms", "10");
+        if (f != null) f.call(props);
+
+        return new ConsumerConfig(props);
     }
 
     @Override

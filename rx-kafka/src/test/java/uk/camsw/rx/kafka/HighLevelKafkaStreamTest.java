@@ -1,12 +1,14 @@
 package uk.camsw.rx.kafka;
 
 import de.bechte.junit.runners.context.HierarchicalContextRunner;
+import kafka.consumer.ConsumerConfig;
 import kafka.message.MessageAndMetadata;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import rx.Observable;
+import uk.camsw.rx.test.kafka.KafkaEnv;
 import uk.camsw.rx.test.kafka.dsl.KafkaSourceScenario;
 import uk.camsw.rx.test.kafka.dsl.StringRenderers;
 
@@ -16,11 +18,14 @@ public class HighLevelKafkaStreamTest {
 
     private KafkaSourceScenario.Given<String, String, MessageAndMetadata<byte[], byte[]>> given;
     private KafkaSourceScenario.When<String, String, MessageAndMetadata<byte[], byte[]>> when;
-
+    private KafkaEnv env;
+    private ConsumerConfig consumerConfig;
 
     @Before
     public void before() {
-        given = new KafkaSourceScenario<String, String, MessageAndMetadata<byte[], byte[]>>().given();
+        env = new KafkaEnv();
+        consumerConfig = env.createConsumerConfig();
+        given = new KafkaSourceScenario<String, String, MessageAndMetadata<byte[], byte[]>>(env).given();
     }
 
     public class SinglePartition_SingleConsumer {
@@ -29,7 +34,7 @@ public class HighLevelKafkaStreamTest {
         public void before() {
             when = given
                     .aNewTopic(builder -> builder.withPartitionCount(1))
-                    .theStreamUnderTest(topic -> HighLevelKafkaStream.create(topic.getName()))
+                    .theStreamUnderTest(topic -> HighLevelKafkaStream.create(topic.getName(), consumerConfig))
                     .theRenderer(StringRenderers::keyAndMessage)
                     .when();
         }
@@ -93,7 +98,7 @@ public class HighLevelKafkaStreamTest {
         public void before() {
             when = given
                     .aNewTopic(builder -> builder.withPartitionCount(2))
-                    .theStreamUnderTest(topic -> HighLevelKafkaStream.create(topic.getName()))
+                    .theStreamUnderTest(topic -> HighLevelKafkaStream.create(topic.getName(), consumerConfig))
                     .theRenderer(StringRenderers::messageAndPartition)
                     .when();
         }
@@ -115,11 +120,13 @@ public class HighLevelKafkaStreamTest {
 
         @Before
         public void before() {
+            ConsumerConfig consumerConfig1 = env.createConsumerConfig(p -> p.setProperty("group.id", "some.group"));
+            ConsumerConfig consumerConfig2 = env.createConsumerConfig(p -> p.setProperty("group.id", "some.other.group"));
             when = given
                     .aNewTopic(builder -> builder.withPartitionCount(2))
                     .theStreamUnderTest(topic -> {
-                        Observable<MessageAndMetadata<byte[], byte[]>> stream1 = HighLevelKafkaStream.create(topic.getName(), "some.group");
-                        Observable<MessageAndMetadata<byte[], byte[]>> stream2 = HighLevelKafkaStream.create(topic.getName(), "some.other.group");
+                        Observable<MessageAndMetadata<byte[], byte[]>> stream1 = HighLevelKafkaStream.create(topic.getName(), consumerConfig1);
+                        Observable<MessageAndMetadata<byte[], byte[]>> stream2 = HighLevelKafkaStream.create(topic.getName(), consumerConfig2);
                         return stream1.mergeWith(stream2);
                     })
                     .theRenderer(StringRenderers::keyAndMessage)
@@ -137,18 +144,18 @@ public class HighLevelKafkaStreamTest {
                     .then()
                     .theSubscribers().renderedStream().containsAllInAnyOrder("[1=a]-[1=a]-[2=a]-[2=a]");
         }
-
     }
 
     public class MultiplePartitions_MultipleConsumers_SameGroup {
 
         @Test
         public void eventsShouldBeDistributedAcrossConsumers() {
-            new KafkaSourceScenario<String, String, String>().given()
+            ConsumerConfig consumerConfig = env.createConsumerConfig(p -> p.setProperty("group.id", "some.group"));
+            new KafkaSourceScenario<String, String, String>(env).given()
                     .aNewTopic(builder -> builder.withPartitionCount(2))
                     .theStreamUnderTest(topic -> {
-                        Observable<String> stream1 = HighLevelKafkaStream.create(topic.getName(), "some.group").map(mamb -> StringRenderers.messageAnd(mamb, "stream1"));
-                        Observable<String> stream2 = HighLevelKafkaStream.create(topic.getName(), "some.group").map(mamb -> StringRenderers.messageAnd(mamb, "stream2"));
+                        Observable<String> stream1 = HighLevelKafkaStream.create(topic.getName(), consumerConfig).map(mamd -> StringRenderers.messageAnd(mamd, "stream1"));
+                        Observable<String> stream2 = HighLevelKafkaStream.create(topic.getName(), consumerConfig).map(mamd -> StringRenderers.messageAnd(mamd, "stream2"));
                         return stream1.mergeWith(stream2);
                     })
                     .when()
@@ -162,13 +169,14 @@ public class HighLevelKafkaStreamTest {
         }
 
         @Test
-        public void additionalConsumersShouldBeDormant() {
-            new KafkaSourceScenario<String, String, String>().given()
+        public void additionalConsumersShouldBePassive() {
+            ConsumerConfig consumerConfig = env.createConsumerConfig(p -> p.setProperty("group.id", "some.group"));
+            new KafkaSourceScenario<String, String, String>(env).given()
                     .aNewTopic(builder -> builder.withPartitionCount(2))
                     .theStreamUnderTest(topic -> {
-                        Observable<String> stream1 = HighLevelKafkaStream.create(topic.getName(), "some.group").map(mamb -> StringRenderers.messageAnd(mamb, "stream1"));
-                        Observable<String> stream2 = HighLevelKafkaStream.create(topic.getName(), "some.group").map(mamb -> StringRenderers.messageAnd(mamb, "stream2"));
-                        Observable<String> stream3 = HighLevelKafkaStream.create(topic.getName(), "some.group").map(mamb -> StringRenderers.messageAnd(mamb, "stream3"));
+                        Observable<String> stream1 = HighLevelKafkaStream.create(topic.getName(), consumerConfig).map(mamd -> StringRenderers.messageAnd(mamd, "stream1"));
+                        Observable<String> stream2 = HighLevelKafkaStream.create(topic.getName(), consumerConfig).map(mamd -> StringRenderers.messageAnd(mamd, "stream2"));
+                        Observable<String> stream3 = HighLevelKafkaStream.create(topic.getName(), consumerConfig).map(mamd -> StringRenderers.messageAnd(mamd, "stream3"));
                         return stream1.mergeWith(stream2).mergeWith(stream3);
                     })
                     .when()
@@ -185,11 +193,12 @@ public class HighLevelKafkaStreamTest {
 
         @Test
         public void partitionConsumptionShouldFailOverToActiveConsumer() {
-            new KafkaSourceScenario<String, String, String>().given()
+            ConsumerConfig consumerConfig = env.createConsumerConfig(p -> p.setProperty("group.id", "some.group"));
+            new KafkaSourceScenario<String, String, String>(env).given()
                     .aNewTopic(builder -> builder.withPartitionCount(2))
                     .theStreamUnderTest(topic -> {
-                        Observable<String> stream1 = HighLevelKafkaStream.create(topic.getName(), "some.group").map(mamb -> StringRenderers.messageAnd(mamb, "stream1")).take(1);
-                        Observable<String> stream2 = HighLevelKafkaStream.create(topic.getName(), "some.group").map(mamb -> StringRenderers.messageAnd(mamb, "stream2"));
+                        Observable<String> stream1 = HighLevelKafkaStream.create(topic.getName(), consumerConfig).map(mamd -> StringRenderers.messageAnd(mamd, "stream1")).take(1);
+                        Observable<String> stream2 = HighLevelKafkaStream.create(topic.getName(), consumerConfig).map(mamd -> StringRenderers.messageAnd(mamd, "stream2"));
                         return stream1.mergeWith(stream2);
                     })
                     .when()
@@ -206,13 +215,14 @@ public class HighLevelKafkaStreamTest {
 
         @Test
         public void partitionConsumptionShouldFailOverToPassiveConsumer() {
-            new KafkaSourceScenario<String, String, String>()
+            ConsumerConfig consumerConfig = env.createConsumerConfig(p -> p.setProperty("group.id", "some.group"));
+            new KafkaSourceScenario<String, String, String>(env)
                     .given()
                     .aNewTopic(builder -> builder.withPartitionCount(2))
                     .theStreamUnderTest(topic -> {
-                        Observable<String> stream1 = HighLevelKafkaStream.create(topic.getName(), "some.group").map(mamb -> StringRenderers.messageAnd(mamb, "stream1"));
-                        Observable<String> stream2 = HighLevelKafkaStream.create(topic.getName(), "some.group").map(mamb -> StringRenderers.messageAnd(mamb, "stream2")).take(1);
-                        Observable<String> stream3 = HighLevelKafkaStream.create(topic.getName(), "some.group").map(mamb -> StringRenderers.messageAnd(mamb, "stream3"));
+                        Observable<String> stream1 = HighLevelKafkaStream.create(topic.getName(), consumerConfig).map(mamd -> StringRenderers.messageAnd(mamd, "stream1"));
+                        Observable<String> stream2 = HighLevelKafkaStream.create(topic.getName(), consumerConfig).map(mamd -> StringRenderers.messageAnd(mamd, "stream2")).take(1);
+                        Observable<String> stream3 = HighLevelKafkaStream.create(topic.getName(), consumerConfig).map(mamd -> StringRenderers.messageAnd(mamd, "stream3"));
                         return stream1.mergeWith(stream2).mergeWith(stream3);
                     })
                     .when()

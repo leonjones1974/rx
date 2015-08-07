@@ -28,11 +28,11 @@ public class KafkaSourceScenario<K, V, U> {
 
     private final ExecutionContext<MessageAndMetadata<byte[], byte[]>, ?, U, Given<K, V, U>, When<K, V, U>> context;
 
-    public KafkaSourceScenario() {
+    public KafkaSourceScenario(KafkaEnv env) {
         context = new ExecutionContext<>();
         Given<K, V, U> given = new Given<>(context);
         context.initSteps(given, new When<>(context));
-        given.kafkaEnvironment(new KafkaEnv());
+        given.kafkaEnvironment(env);
     }
 
     public Given<K, V, U> given() {
