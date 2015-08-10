@@ -101,7 +101,6 @@ public class BaseSubscriber<U, WHEN extends IWhen> implements ISubscriber<U, WHE
         if (context.handleErrors()) {
             inner.onError(e);
         } else {
-            context.cleanUp();
             throw new OnErrorNotImplementedException("Unhandled Error", e);
         }
     }
