@@ -15,6 +15,7 @@ import java.security.ProtectionDomain;
 
 public class CaptureAgent {
 
+    private static final Logger logger = LoggerFactory.getLogger(CaptureAgent.class);
     public static boolean initialized = false;
 
 
@@ -63,8 +64,7 @@ public class CaptureAgent {
                     byteCode = ctClass.toBytecode();
                     ctClass.detach();
                 } catch (Throwable ex) {
-                    System.out.println("Exception: " + ex);
-                    ex.printStackTrace();
+                    logger.error(ex);
                 }
             }
             return byteCode;
@@ -96,7 +96,6 @@ public class CaptureAgent {
                     byteCode = ctClass.toBytecode();
                     ctClass.detach();
                 } catch (Throwable ex) {
-                    System.out.println("Exception: " + ex);
                     ex.printStackTrace();
                 }
             }

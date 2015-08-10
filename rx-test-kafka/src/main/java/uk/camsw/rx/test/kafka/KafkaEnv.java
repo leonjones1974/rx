@@ -1,7 +1,6 @@
 package uk.camsw.rx.test.kafka;
 
 import com.google.common.base.MoreObjects;
-import kafka.consumer.Consumer;
 import kafka.consumer.ConsumerConfig;
 import rx.functions.Action1;
 import uk.camsw.rx.common.SystemPropertyOverrideMap;
@@ -41,7 +40,6 @@ public final class KafkaEnv {
             put(KEY_SESSION_TIMEOUT, "10000");
             put(KEY_CONNECTION_TIMEOUT, "10000");
         }};
-        System.out.println("toString() = " + toString());
     }
 
     public String zookeeperServers() {

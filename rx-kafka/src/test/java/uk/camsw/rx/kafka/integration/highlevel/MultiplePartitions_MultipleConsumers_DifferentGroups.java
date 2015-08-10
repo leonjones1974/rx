@@ -3,6 +3,8 @@ package uk.camsw.rx.kafka.integration.highlevel;
 import kafka.consumer.ConsumerConfig;
 import kafka.message.MessageAndMetadata;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import rx.Observable;
 import uk.camsw.rx.kafka.HighLevelKafkaStream;
 import uk.camsw.rx.test.kafka.KafkaEnv;

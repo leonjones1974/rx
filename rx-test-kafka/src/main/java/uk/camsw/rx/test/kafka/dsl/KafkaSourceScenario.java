@@ -1,6 +1,8 @@
 package uk.camsw.rx.test.kafka.dsl;
 
 import kafka.message.MessageAndMetadata;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import rx.Observable;
 import rx.functions.Action1;
 import rx.functions.Func0;
@@ -22,6 +24,7 @@ import java.util.UUID;
  * @param <U> The type of the Event emitted by stream under test
  */
 public class KafkaSourceScenario<K, V, U> {
+    private static final Logger logger = LoggerFactory.getLogger(KafkaSourceScenario.class);
 
     private static final String KEY_TOPIC = KafkaSourceScenario.class.getSimpleName() + "_topic";
     private static final String KEY_ENV = KafkaSourceScenario.class.getSimpleName() + "_env";
@@ -80,7 +83,7 @@ public class KafkaSourceScenario<K, V, U> {
                     try {
                         topic.close();
                     } catch (Exception e) {
-                        System.err.println(e);
+                        logger.error("Failed to cleanup topic", e);
                     }
                 });
                 return topic;
