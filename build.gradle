@@ -64,7 +64,7 @@ subprojects { p ->
                     beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
 
                     pom.groupId = GROUP
-                    pom.artifactId = POM_ARTIFACT_ID
+                    pom.artifactId = project.name
                     pom.version = currentVersion
 
                     repository(url: getReleaseRepositoryUrl()) {
@@ -75,9 +75,9 @@ subprojects { p ->
                     }
 
                     pom.project {
-                        name POM_NAME
+                        name project.name
                         packaging POM_PACKAGING
-                        description POM_DESCRIPTION
+                        description project.name
                         url POM_URL
 
                         scm {
@@ -155,8 +155,10 @@ subprojects { p ->
         resolutionStrategy {
             cacheChangingModulesFor 0, 'seconds'
         }
+        all*.exclude group: 'javax.jms', module: 'jms'
+        all*.exclude group: 'com.sun.jmx', module: 'jmxri'
+        all*.exclude group: 'com.sun.jdmk', module: 'jmxtools'
     }
-
     test {
         testLogging {
             events 'started', 'passed'
