@@ -42,7 +42,7 @@ public class HighLevelKafkaStream {
 
             // TODO: Sort out the race condition between consuming and the first publish
             try {
-                Thread.sleep(100);
+                Thread.sleep(300);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
