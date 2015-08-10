@@ -30,10 +30,11 @@ public class KafkaSourceScenario<K, V, U> {
 
     private final ExecutionContext<MessageAndMetadata<byte[], byte[]>, ?, U, Given<K, V, U>, When<K, V, U>> context;
 
-
     static {
-        InputStream kafkaConfigInput = Thread.currentThread().getContextClassLoader().getResourceAsStream("embedded-kafka/kafka.properties");
-        InputStream zookeeperConfigInput = Thread.currentThread().getContextClassLoader().getResourceAsStream("embedded-kafka/zookeeper.properties");
+        KafkaEnv env = new KafkaEnv();
+        logger.info("Creating embedded kafka/ zookeeper. Env: [{}]", env);
+        InputStream kafkaConfigInput = Thread.currentThread().getContextClassLoader().getResourceAsStream(env.kafkaServerProperties());
+        InputStream zookeeperConfigInput = Thread.currentThread().getContextClassLoader().getResourceAsStream(env.zookeeperServerProperties());
         new EmbeddedKafka().start(kafkaConfigInput, zookeeperConfigInput);
     }
 
