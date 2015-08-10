@@ -5,8 +5,3 @@ dependencies {
     compile 'org.apache.kafka:kafka_2.9.1:0.8.1.1'
     testCompile project(":rx-test-kafka")
 }
-
-
-test {
-    exclude '**/integration/**'
-}

@@ -145,10 +145,12 @@ subprojects { p ->
 
 
     dependencies {
+        compile 'org.slf4j:slf4j-api:1.7.7'
         testCompile 'org.mockito:mockito-all:1.9.5'
         testCompile 'de.bechte.junit:junit-hierarchicalcontextrunner:4.11.1'
         testCompile 'junit:junit:4.11'
         testCompile 'org.assertj:assertj-core:3.0.0'
+        testRuntime 'ch.qos.logback:logback-classic:1.1.2'
     }
 
     configurations.all {

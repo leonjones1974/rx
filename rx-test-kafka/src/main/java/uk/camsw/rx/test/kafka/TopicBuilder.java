@@ -3,11 +3,14 @@ package uk.camsw.rx.test.kafka;
 import kafka.admin.AdminUtils;
 import kafka.utils.ZKStringSerializer$;
 import org.I0Itec.zkclient.ZkClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Properties;
 import java.util.UUID;
 
 public class TopicBuilder<K, V> {
+    private static final Logger logger = LoggerFactory.getLogger(TopicBuilder.class);
 
     private final KafkaEnv envProperties;
     private final boolean createTopic;
@@ -22,9 +25,9 @@ public class TopicBuilder<K, V> {
     public Topic<K, V> build() {
         ZkClient client = null;
         try {
-            client = new ZkClient("localhost:2181", envProperties.sessionTimeoutMs(), envProperties.connectionTimeoutMs(), ZKStringSerializer$.MODULE$);
+            client = new ZkClient(envProperties.zookeeperServers(), envProperties.sessionTimeoutMs(), envProperties.connectionTimeoutMs(), ZKStringSerializer$.MODULE$);
             if (createTopic) {
-                System.out.println("Creating topic: " + topicName);
+                logger.info("Creating topic: [{}]", topicName);
                 AdminUtils.createTopic(client, topicName, partitionCount, replicationFactor, new Properties());
             }
             return new Topic<>(topicName, client, envProperties);
@@ -47,7 +50,6 @@ public class TopicBuilder<K, V> {
         this.replicationFactor = 1;
         this.partitionCount = 1;
     }
-
 
     public void withPartitionCount(int partitionCount) {
         this.partitionCount = partitionCount;

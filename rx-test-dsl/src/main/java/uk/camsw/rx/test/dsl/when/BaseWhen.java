@@ -1,5 +1,7 @@
 package uk.camsw.rx.test.dsl.when;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import uk.camsw.rx.test.dsl.KeyConstants;
 import uk.camsw.rx.test.dsl.scenario.ExecutionContext;
 import uk.camsw.rx.test.dsl.subscriber.ISubscriber;
@@ -11,6 +13,7 @@ import java.time.Duration;
 import java.time.temporal.TemporalUnit;
 
 public class BaseWhen<U, WHEN extends IWhen> implements IWhen<U, WHEN> {
+    private static final Logger logger = LoggerFactory.getLogger(BaseWhen.class);
 
     private final ExecutionContext<?, ?, U, ?, WHEN> context;
 
@@ -39,7 +42,7 @@ public class BaseWhen<U, WHEN extends IWhen> implements IWhen<U, WHEN> {
 
     @Override
     public WHEN theCurrentThreadSleepsFor(Duration duration) {
-        System.out.println("Waiting for " + duration);
+        logger.info("Sleeping current thread: [{}]", duration);
         try {
             Thread.sleep(duration.toMillis());
         } catch (InterruptedException e) {

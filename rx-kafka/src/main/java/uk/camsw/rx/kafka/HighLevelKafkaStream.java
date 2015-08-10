@@ -6,6 +6,8 @@ import kafka.consumer.ConsumerIterator;
 import kafka.consumer.KafkaStream;
 import kafka.javaapi.consumer.ConsumerConnector;
 import kafka.message.MessageAndMetadata;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import rx.Observable;
 import rx.Scheduler;
 import rx.Subscription;
@@ -18,16 +20,17 @@ import java.util.Map;
 import java.util.concurrent.Executors;
 
 public class HighLevelKafkaStream {
+    private static final Logger logger = LoggerFactory.getLogger(HighLevelKafkaStream.class);
 
     public static Observable<MessageAndMetadata<byte[], byte[]>> create(String topic, ConsumerConfig config) {
         return Observable.<MessageAndMetadata<byte[], byte[]>>create(subscriber -> {
-            System.out.println("SUBSCRIBING: " + topic);
+            logger.debug("Subscribing to: [{}]", topic);
             ConsumerConnector connector = Consumer.createJavaConsumerConnector(config);
             Map<String, Integer> topicCountMap = new HashMap<>();
             topicCountMap.put(topic, 1);
             Map<String, List<KafkaStream<byte[], byte[]>>> consumerMap = connector.createMessageStreams(topicCountMap);
             List<KafkaStream<byte[], byte[]>> streams = consumerMap.get(topic);
-            System.out.println("Got streams: " + streams.size());
+            logger.debug("Retrieved partition streams.  Size: [{}]", streams.size());
             streams.forEach(stream -> {
                 Scheduler scheduler = Schedulers.from(Executors.newSingleThreadExecutor());
                 ConsumerIterator<byte[], byte[]> iter = stream.iterator();
@@ -47,8 +50,6 @@ public class HighLevelKafkaStream {
                 e.printStackTrace();
             }
             subscriber.add(Subscriptions.create(connector::shutdown));
-        }).doOnUnsubscribe(() -> System.out.println("Unsubscribed")).publish().refCount();
-
+        }).doOnUnsubscribe(() -> logger.debug("Unsubscribed from topic: [{}]", topic)).publish().refCount();
     }
-
 }

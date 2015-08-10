@@ -1,7 +1,6 @@
 package uk.camsw.rx.test.kafka;
 
 import com.google.common.base.MoreObjects;
-import kafka.consumer.Consumer;
 import kafka.consumer.ConsumerConfig;
 import rx.functions.Action1;
 import uk.camsw.rx.common.SystemPropertyOverrideMap;
@@ -19,6 +18,8 @@ public final class KafkaEnv {
     private static final String KEY_KAFKA_BROKERS = "kafka.brokers";
     private static final String KEY_SESSION_TIMEOUT = "session.timeout";
     private static final String KEY_CONNECTION_TIMEOUT = "connection.timeout";
+    private static final String KEY_KAFKA_SERVER_PROPERTIES = "kafka.server.properties";
+    private static final String KEY_ZOOKEEPER_SERVER_PROPERTIES = "zookeeper.server.properties";
     private static final List<String> ALL_KEYS;
 
     static {
@@ -40,12 +41,19 @@ public final class KafkaEnv {
             put(KEY_KAFKA_BROKERS, "localhost:9092");
             put(KEY_SESSION_TIMEOUT, "10000");
             put(KEY_CONNECTION_TIMEOUT, "10000");
+            put(KEY_KAFKA_SERVER_PROPERTIES, "embedded-kafka/kafka.properties");
+            put(KEY_ZOOKEEPER_SERVER_PROPERTIES, "embedded-kafka/zookeeper.properties");
         }};
-        System.out.println("toString() = " + toString());
     }
 
     public String zookeeperServers() {
         return properties.get(KEY_ZOOKEEPER_SERVERS);
+    }
+    public String kafkaServerProperties() {
+        return properties.get(KEY_KAFKA_SERVER_PROPERTIES);
+    }
+    public String zookeeperServerProperties() {
+        return properties.get(KEY_ZOOKEEPER_SERVER_PROPERTIES);
     }
 
     public String kafkaBrokers() {

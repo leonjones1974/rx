@@ -5,10 +5,13 @@ import kafka.javaapi.producer.Producer;
 import kafka.producer.KeyedMessage;
 import kafka.producer.ProducerConfig;
 import org.I0Itec.zkclient.ZkClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Properties;
 
 public class Topic<K, V> implements AutoCloseable {
+    private static final Logger logger = LoggerFactory.getLogger(Topic.class);
 
     private final String name;
     private final Object lock = new Object();
@@ -37,7 +40,7 @@ public class Topic<K, V> implements AutoCloseable {
         synchronized (lock) {
             if (producer != null) {
                 try {
-                    System.out.println("Closing producer: " + name);
+                    logger.debug("Closing producer: [{}]", name);
                     producer.close();
                 } finally {
                     producer = null;
@@ -45,7 +48,7 @@ public class Topic<K, V> implements AutoCloseable {
             }
             if (client != null) {
                 try {
-                    System.out.println("Deleting topic: " + name);
+                    logger.debug("Deleting topic: [{}]", name);
                     AdminUtils.deleteTopic(client, name);
                 } finally {
                     client.close();
@@ -63,5 +66,4 @@ public class Topic<K, V> implements AutoCloseable {
         ProducerConfig config = new ProducerConfig(props);
         return new kafka.javaapi.producer.Producer<>(config);
     }
-
 }

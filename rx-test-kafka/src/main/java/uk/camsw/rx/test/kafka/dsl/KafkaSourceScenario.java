@@ -1,6 +1,8 @@
 package uk.camsw.rx.test.kafka.dsl;
 
 import kafka.message.MessageAndMetadata;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import rx.Observable;
 import rx.functions.Action1;
 import rx.functions.Func0;
@@ -8,10 +10,9 @@ import rx.functions.Func1;
 import uk.camsw.rx.test.dsl.given.BaseGiven;
 import uk.camsw.rx.test.dsl.scenario.ExecutionContext;
 import uk.camsw.rx.test.dsl.when.BaseWhen;
-import uk.camsw.rx.test.kafka.KafkaEnv;
-import uk.camsw.rx.test.kafka.Topic;
-import uk.camsw.rx.test.kafka.TopicBuilder;
+import uk.camsw.rx.test.kafka.*;
 
+import java.io.InputStream;
 import java.util.UUID;
 
 /**
@@ -22,11 +23,20 @@ import java.util.UUID;
  * @param <U> The type of the Event emitted by stream under test
  */
 public class KafkaSourceScenario<K, V, U> {
+    private static final Logger logger = LoggerFactory.getLogger(KafkaSourceScenario.class);
 
     private static final String KEY_TOPIC = KafkaSourceScenario.class.getSimpleName() + "_topic";
     private static final String KEY_ENV = KafkaSourceScenario.class.getSimpleName() + "_env";
 
     private final ExecutionContext<MessageAndMetadata<byte[], byte[]>, ?, U, Given<K, V, U>, When<K, V, U>> context;
+
+    static {
+        KafkaEnv env = new KafkaEnv();
+        logger.info("Creating embedded kafka/ zookeeper. Env: [{}]", env);
+        InputStream kafkaConfigInput = Thread.currentThread().getContextClassLoader().getResourceAsStream(env.kafkaServerProperties());
+        InputStream zookeeperConfigInput = Thread.currentThread().getContextClassLoader().getResourceAsStream(env.zookeeperServerProperties());
+        new EmbeddedKafka().start(kafkaConfigInput, zookeeperConfigInput);
+    }
 
     public KafkaSourceScenario(KafkaEnv env) {
         context = new ExecutionContext<>();
@@ -80,7 +90,7 @@ public class KafkaSourceScenario<K, V, U> {
                     try {
                         topic.close();
                     } catch (Exception e) {
-                        System.err.println(e);
+                        logger.error("Failed to cleanup topic", e);
                     }
                 });
                 return topic;
