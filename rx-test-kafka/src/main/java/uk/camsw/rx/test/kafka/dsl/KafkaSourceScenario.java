@@ -10,10 +10,9 @@ import rx.functions.Func1;
 import uk.camsw.rx.test.dsl.given.BaseGiven;
 import uk.camsw.rx.test.dsl.scenario.ExecutionContext;
 import uk.camsw.rx.test.dsl.when.BaseWhen;
-import uk.camsw.rx.test.kafka.KafkaEnv;
-import uk.camsw.rx.test.kafka.Topic;
-import uk.camsw.rx.test.kafka.TopicBuilder;
+import uk.camsw.rx.test.kafka.*;
 
+import java.io.InputStream;
 import java.util.UUID;
 
 /**
@@ -30,6 +29,13 @@ public class KafkaSourceScenario<K, V, U> {
     private static final String KEY_ENV = KafkaSourceScenario.class.getSimpleName() + "_env";
 
     private final ExecutionContext<MessageAndMetadata<byte[], byte[]>, ?, U, Given<K, V, U>, When<K, V, U>> context;
+
+
+    static {
+        InputStream kafkaConfigInput = Thread.currentThread().getContextClassLoader().getResourceAsStream("embedded-kafka/kafka.properties");
+        InputStream zookeeperConfigInput = Thread.currentThread().getContextClassLoader().getResourceAsStream("embedded-kafka/zookeeper.properties");
+        new EmbeddedKafka().start(kafkaConfigInput, zookeeperConfigInput);
+    }
 
     public KafkaSourceScenario(KafkaEnv env) {
         context = new ExecutionContext<>();
