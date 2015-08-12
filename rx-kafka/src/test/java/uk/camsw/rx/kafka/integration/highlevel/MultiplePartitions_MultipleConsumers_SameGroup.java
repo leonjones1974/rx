@@ -2,25 +2,26 @@ package uk.camsw.rx.kafka.integration.highlevel;
 
 import kafka.consumer.ConsumerConfig;
 import org.junit.Before;
+import org.junit.ClassRule;
 import org.junit.Test;
 import rx.Observable;
 import uk.camsw.rx.kafka.HighLevelKafkaStream;
 import uk.camsw.rx.test.kafka.KafkaEnv;
 import uk.camsw.rx.test.kafka.dsl.KafkaSourceScenario;
 import uk.camsw.rx.test.kafka.dsl.StringRenderers;
+import uk.camsw.rx.test.kafka.rule.EmbeddedKafka;
 
 public class MultiplePartitions_MultipleConsumers_SameGroup {
 
-
-    private  ConsumerConfig consumerConfig;
+    @ClassRule
+    public static EmbeddedKafka kafka = new EmbeddedKafka();
     private KafkaEnv env;
 
     @Before
     public void before() {
         env = new KafkaEnv();
-        consumerConfig = env.createConsumerConfig(p -> p.setProperty("group.id", "some.group"));
-
     }
+
     @Test
     public void eventsShouldBeDistributedAcrossConsumers() {
         ConsumerConfig consumerConfig = env.createConsumerConfig(p -> p.setProperty("group.id", "some.group"));

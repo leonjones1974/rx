@@ -1,7 +1,11 @@
 org.gradle.java.home=/usr/lib/jvm/java-8-oracle
 
+<<<<<<< HEAD
 currentVersion=2.1.0
+=======
+currentVersion=2.0.1
 
+>>>>>>> release/2.0.1
 nexusUser=not_set
 nexusPassword=not_set
 
