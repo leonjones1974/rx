@@ -3,11 +3,13 @@ package uk.camsw.rx.kafka.integration.highlevel;
 import kafka.consumer.ConsumerConfig;
 import kafka.message.MessageAndMetadata;
 import org.junit.Before;
+import org.junit.ClassRule;
 import org.junit.Test;
 import uk.camsw.rx.kafka.HighLevelKafkaStream;
 import uk.camsw.rx.test.kafka.KafkaEnv;
 import uk.camsw.rx.test.kafka.dsl.KafkaSourceScenario;
 import uk.camsw.rx.test.kafka.dsl.StringRenderers;
+import uk.camsw.rx.test.kafka.rule.EmbeddedKafka;
 
 public class SinglePartition_SingleConsumer {
 
@@ -15,6 +17,9 @@ public class SinglePartition_SingleConsumer {
     private KafkaSourceScenario.When<String, String, MessageAndMetadata<byte[], byte[]>> when;
     private KafkaEnv env;
     private ConsumerConfig consumerConfig;
+
+    @ClassRule
+    public static EmbeddedKafka kafka = new EmbeddedKafka();
 
     @Before
     public void before() {
