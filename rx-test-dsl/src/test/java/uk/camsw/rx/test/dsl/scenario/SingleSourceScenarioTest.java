@@ -251,17 +251,20 @@ public class SingleSourceScenarioTest {
     }
 
     @Test
-    public void customAction() {
+    public void customActions() {
         SingleSourceScenario<String, String> testScenario = TestScenario.singleSource();
-        AtomicBoolean state = new AtomicBoolean(false);
+        AtomicBoolean s1 = new AtomicBoolean(false);
+        AtomicBoolean s2 = new AtomicBoolean(true);
         testScenario
                 .given()
 
                 .when()
-                .actionIsPerformed(c -> state.set(true))
+                .actionIsPerformed(c -> s1.set(true))
+                .actionIsPerformed(c -> s2.set(false))
 
                 .go();
 
-        assertThat(state.get()).isTrue();
+        assertThat(s1.get()).isTrue();
+        assertThat(s2.get()).isFalse();
     }
 }

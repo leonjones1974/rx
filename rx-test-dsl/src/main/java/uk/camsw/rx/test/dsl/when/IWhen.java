@@ -1,5 +1,6 @@
 package uk.camsw.rx.test.dsl.when;
 
+import uk.camsw.rx.test.dsl.given.IGiven;
 import uk.camsw.rx.test.dsl.scenario.ExecutionContext;
 import uk.camsw.rx.test.dsl.subscriber.ISubscriber;
 import uk.camsw.rx.test.dsl.then.IThen;
@@ -22,7 +23,7 @@ public interface IWhen<U, WHEN extends IWhen> {
 
     ITime<WHEN> time();
 
-    WHEN actionIsPerformed(Consumer<ExecutionContext> action);
+    WHEN actionIsPerformed(Consumer<ExecutionContext<?, ?, U, ? extends IGiven, WHEN>> action);
 
     IThen<U> then();
 

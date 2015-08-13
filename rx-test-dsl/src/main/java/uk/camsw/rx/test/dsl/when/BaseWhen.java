@@ -3,6 +3,7 @@ package uk.camsw.rx.test.dsl.when;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.camsw.rx.test.dsl.KeyConstants;
+import uk.camsw.rx.test.dsl.given.IGiven;
 import uk.camsw.rx.test.dsl.scenario.ExecutionContext;
 import uk.camsw.rx.test.dsl.subscriber.ISubscriber;
 import uk.camsw.rx.test.dsl.then.BaseThen;
@@ -79,8 +80,8 @@ public class BaseWhen<U, WHEN extends IWhen> implements IWhen<U, WHEN> {
     }
 
     @Override
-    public WHEN actionIsPerformed(Consumer<ExecutionContext> action) {
-        action.accept(context);
+    public WHEN actionIsPerformed(Consumer<ExecutionContext<?, ?, U, ? extends IGiven, WHEN>> action) {
+        context.addCommand(action::accept);
         return context.getWhen();
     }
 
