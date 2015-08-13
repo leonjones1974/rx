@@ -10,8 +10,10 @@ import uk.camsw.rx.test.dsl.TestScenario;
 import java.time.Duration;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static java.util.Arrays.asList;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class SingleSourceScenarioTest {
 
@@ -248,4 +250,18 @@ public class SingleSourceScenarioTest {
                 .go();
     }
 
+    @Test
+    public void customAction() {
+        SingleSourceScenario<String, String> testScenario = TestScenario.singleSource();
+        AtomicBoolean state = new AtomicBoolean(false);
+        testScenario
+                .given()
+
+                .when()
+                .actionIsPerformed(c -> state.set(true))
+
+                .go();
+
+        assertThat(state.get()).isTrue();
+    }
 }

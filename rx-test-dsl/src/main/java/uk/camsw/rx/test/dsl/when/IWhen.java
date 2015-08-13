@@ -1,11 +1,13 @@
 package uk.camsw.rx.test.dsl.when;
 
+import uk.camsw.rx.test.dsl.scenario.ExecutionContext;
 import uk.camsw.rx.test.dsl.subscriber.ISubscriber;
 import uk.camsw.rx.test.dsl.then.IThen;
 import uk.camsw.rx.test.dsl.time.ITime;
 
 import java.time.Duration;
 import java.time.temporal.TemporalUnit;
+import java.util.function.Consumer;
 
 public interface IWhen<U, WHEN extends IWhen> {
 
@@ -19,6 +21,8 @@ public interface IWhen<U, WHEN extends IWhen> {
     ISubscriber<U, WHEN> theSubscriber();
 
     ITime<WHEN> time();
+
+    WHEN actionIsPerformed(Consumer<ExecutionContext> action);
 
     IThen<U> then();
 

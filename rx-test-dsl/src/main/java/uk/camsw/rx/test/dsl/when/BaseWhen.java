@@ -11,6 +11,7 @@ import uk.camsw.rx.test.dsl.time.BaseTime;
 
 import java.time.Duration;
 import java.time.temporal.TemporalUnit;
+import java.util.function.Consumer;
 
 public class BaseWhen<U, WHEN extends IWhen> implements IWhen<U, WHEN> {
     private static final Logger logger = LoggerFactory.getLogger(BaseWhen.class);
@@ -75,6 +76,12 @@ public class BaseWhen<U, WHEN extends IWhen> implements IWhen<U, WHEN> {
     @Override
     public BaseTime<WHEN> time() {
         return new BaseTime<>(context);
+    }
+
+    @Override
+    public WHEN actionIsPerformed(Consumer<ExecutionContext> action) {
+        action.accept(context);
+        return context.getWhen();
     }
 
 }
