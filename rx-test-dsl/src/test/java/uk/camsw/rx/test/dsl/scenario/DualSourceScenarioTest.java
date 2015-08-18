@@ -13,6 +13,7 @@ public class DualSourceScenarioTest {
         testScenario
                 .given()
                 .theStreamUnderTest(Observable::mergeWith)
+
                 .when()
                 .subscriber("s1").subscribes()
                 .source1().emits("1")
@@ -21,6 +22,7 @@ public class DualSourceScenarioTest {
                 .source2().emits("b")
                 .source1().completes()
                 .source2().completes()
+
                 .then()
                 .subscriber("s1")
                 .eventCount().isEqualTo(4)
@@ -36,20 +38,22 @@ public class DualSourceScenarioTest {
 
         testScenario
                 .given()
-                    .theStreamUnderTest((s1, s2) -> s1.zipWith(s2, (z, n) -> z + n))
-                    .theRenderer(s -> s)
+                .theStreamUnderTest((s1, s2) -> s1.zipWith(s2, (z, n) -> z + n))
+                .theRenderer(s -> s)
+
                 .when()
-                    .theSubscriber().subscribes()
-                    .source1().emits("a")
-                    .source2().emits(1)
-                    .source1().emits("b")
-                    .source2().emits(2)
-                    .source1().completes()
-                    .source2().completes()
+                .theSubscriber().subscribes()
+                .source1().emits("a")
+                .source2().emits(1)
+                .source1().emits("b")
+                .source2().emits(2)
+                .source1().completes()
+                .source2().completes()
+
                 .then()
-                    .theSubscribers()
-                        .eventCount().isEqualTo(2)
-                        .renderedStream().isEqualTo("[a1]-[b2]-|");
+                .theSubscribers()
+                .eventCount().isEqualTo(2)
+                .renderedStream().isEqualTo("[a1]-[b2]-|");
     }
 
     @Test
@@ -65,6 +69,7 @@ public class DualSourceScenarioTest {
                 .theCustomSource2(source2)
                 .theStreamUnderTest((s1, s2) -> s1.zipWith(s2, (z, n) -> z + n))
                 .theRenderer(s -> s)
+
                 .when()
                 .subscriber("s1").subscribes()
                 .source1().emits("a")
@@ -73,6 +78,7 @@ public class DualSourceScenarioTest {
                 .source2().emits(2)
                 .source1().completes()
                 .source2().completes()
+
                 .then()
                 .subscriber("s1")
                 .eventCount().isEqualTo(2)
@@ -84,10 +90,12 @@ public class DualSourceScenarioTest {
                 .given()
                 .theCustomSource(customSource)
                 .theStreamUnderTest(_source -> customSource.map(String::toUpperCase))
+
                 .when()
                 .subscriber("s1").subscribes()
                 .theSource().emits("a")
                 .theSource().emits("b")
+
                 .then()
                 .subscriber("s1")
                 .eventCount().isEqualTo(2)

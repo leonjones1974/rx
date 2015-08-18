@@ -24,11 +24,13 @@ public class SingleSourceScenarioTest {
         testScenario
                 .given()
                 .theStreamUnderTest(source -> source.map(s -> Integer.parseInt(s) + 1))
+
                 .when()
                 .subscriber("s1").subscribes()
                 .theSource().emits("1")
                 .theSource().emits("2")
                 .theSource().completes()
+
                 .then()
                 .subscriber("s1")
                 .eventCount().isEqualTo(2)
@@ -43,11 +45,13 @@ public class SingleSourceScenarioTest {
         testScenario
                 .given()
                 .theStreamUnderTest(source -> source.map(s -> Integer.parseInt(s) + 1))
+
                 .when()
                 .subscriber("s1").subscribes()
                 .theSource().emits("1")
                 .subscriber("s2").subscribes()
                 .theSource().emits("2")
+
                 .then()
                 .subscriber("s1")
                 .event(0).isEqualTo(2)
@@ -66,11 +70,13 @@ public class SingleSourceScenarioTest {
         testScenario
                 .given()
                 .theStreamUnderTest(source -> source.map(s -> Integer.parseInt(s) + 1))
+
                 .when()
                 .subscriber("s1").subscribes()
                 .theSource().emits("1")
                 .subscriber("s1").unsubscribes()
                 .theSource().emits("2")
+
                 .then()
                 .subscriber("s1")
                 .eventCount().isEqualTo(1);
@@ -83,10 +89,12 @@ public class SingleSourceScenarioTest {
         testScenario
                 .given()
                 .theStreamUnderTest(source -> source.map(s -> Integer.parseInt(s) + 1))
+
                 .when()
                 .subscriber("s1").subscribes()
                 .theSource().emits("1")
                 .theSource().completes()
+
                 .then()
                 .subscriber("s1")
                 .isErrored().isFalse()
@@ -101,10 +109,12 @@ public class SingleSourceScenarioTest {
                 .given()
                 .theStreamUnderTest(source -> source.map(s -> Integer.parseInt(s) + 1))
                 .errorsAreHandled()
+
                 .when()
                 .subscriber("s1").subscribes()
                 .theSource().emits("1")
                 .theSource().errors(new IllegalArgumentException("oh no"))
+
                 .then()
                 .subscriber("s1")
                 .isErrored().isTrue()
@@ -119,10 +129,12 @@ public class SingleSourceScenarioTest {
         testScenario
                 .given()
                 .theStreamUnderTest(source -> source.map(s -> Integer.parseInt(s) + 1))
+
                 .when()
                 .subscriber("s1").subscribes()
                 .theSource().emits("1")
                 .theSource().errors(new IllegalArgumentException("oh no"))
+
                 .go();
     }
 
@@ -133,6 +145,7 @@ public class SingleSourceScenarioTest {
         testScenario
                 .given()
                 .theStreamUnderTest((source, scheduler) -> source.buffer(10, TimeUnit.SECONDS, scheduler))
+
                 .when()
                 .subscriber("s1").subscribes()
                 .theSource().emits("1a")
@@ -142,6 +155,7 @@ public class SingleSourceScenarioTest {
                 .theSource().emits("2a")
                 .theSource().emits("2b")
                 .theSource().completes()
+
                 .then()
                 .subscriber("s1")
                 .eventCount().isEqualTo(2)
@@ -157,10 +171,12 @@ public class SingleSourceScenarioTest {
                 .given()
                 .theCustomSource(customSource)
                 .theStreamUnderTest(_source -> customSource.map(String::toUpperCase))
+
                 .when()
                 .subscriber("s1").subscribes()
                 .theSource().emits("a")
                 .theSource().emits("b")
+
                 .then()
                 .subscriber("s1")
                 .eventCount().isEqualTo(2)
@@ -179,11 +195,13 @@ public class SingleSourceScenarioTest {
                 .given()
                 .theStreamUnderTest(source -> source.map(n -> n == 0 ? "a" : "B"))
                 .theRenderer(event -> "'" + event + "'")
+
                 .when()
                 .subscriber("s1").subscribes()
                 .theSource().emits(0)
                 .theSource().emits(1)
                 .theSource().completes()
+
                 .then()
                 .subscriber("s1")
                 .eventCount().isEqualTo(2)
@@ -202,11 +220,13 @@ public class SingleSourceScenarioTest {
                 .theStreamUnderTest(source -> source.map(n -> n == 0 ? "a" : "B"))
                 .errorsAreHandled()
                 .theRenderer(event -> "'" + event + "'")
+
                 .when()
                 .subscriber("s1").subscribes()
                 .theSource().emits(0)
                 .theSource().emits(1)
                 .theSource().errors(new RuntimeException("I'm broken"))
+
                 .then()
                 .subscriber("s1")
                 .renderedStream().isEqualTo("['a']-['B']-X[RuntimeException: I'm broken]")
@@ -223,11 +243,13 @@ public class SingleSourceScenarioTest {
                 .given()
                 .theStreamUnderTest(source -> source.observeOn(Schedulers.computation()).delay(1, TimeUnit.SECONDS))
                 .asyncTimeoutOf(Duration.ofSeconds(2))
+
                 .when()
                 .subscriber("s1").subscribes()
                 .theSource().emits("a")
                 .theSource().emits("b")
                 .subscriber("s1").waitsForEvents(2)
+
                 .then()
                 .subscriber("s1")
                 .renderedStream().isEqualTo("[a]-[b]")
@@ -242,11 +264,13 @@ public class SingleSourceScenarioTest {
                 .given()
                 .theStreamUnderTest(source -> source.observeOn(Schedulers.computation()).delay(10, TimeUnit.SECONDS))
                 .asyncTimeoutOf(Duration.ofMillis(500))
+
                 .when()
                 .subscriber("s1").subscribes()
                 .theSource().emits("a")
                 .theSource().emits("b")
                 .subscriber("s1").waitsForEvents(2)
+
                 .go();
     }
 
@@ -267,4 +291,6 @@ public class SingleSourceScenarioTest {
         assertThat(s1.get()).isTrue();
         assertThat(s2.get()).isFalse();
     }
+
+
 }
