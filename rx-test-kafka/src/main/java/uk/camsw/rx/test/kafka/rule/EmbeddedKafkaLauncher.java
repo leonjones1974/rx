@@ -1,5 +1,6 @@
 package uk.camsw.rx.test.kafka.rule;
 
+import com.google.common.util.concurrent.Uninterruptibles;
 import kafka.server.KafkaConfig;
 import kafka.server.KafkaServerStartable;
 import org.apache.zookeeper.server.ServerConfig;
@@ -14,8 +15,11 @@ import rx.subscriptions.Subscriptions;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.InetSocketAddress;
+import java.net.Socket;
 import java.util.Properties;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 public class EmbeddedKafkaLauncher {
 
@@ -37,8 +41,6 @@ public class EmbeddedKafkaLauncher {
                 try {
                     zookeeperServerMain.runFromConfig(configuration);
                 } catch (IOException e) {
-                    e.printStackTrace();
-                    logger.error("Failed to start zookeeper");
                     throw new RuntimeException(e);
                 }
             });
@@ -62,10 +64,17 @@ public class EmbeddedKafkaLauncher {
 
             Thread shutdown = new Thread(subscriptions::unsubscribe);
             Runtime.getRuntime().addShutdownHook(shutdown);
+
+            logger.info("Waiting for kafka to start");
+            Socket socket = new Socket();
+            socket.connect(new InetSocketAddress("127.0.0.1", kafkaConfig.port()), 10000);
+            socket.close();
+            logger.info("Kafka started");
+//            Uninterruptibles.sleepUninterruptibly(1, TimeUnit.SECONDS);
+
             logger.info("Started kafka/ zookeeper");
             return subscriptions;
         } catch (IOException | QuorumPeerConfig.ConfigException e) {
-            e.printStackTrace();
             logger.error("Failed to start kafka/ zookeeper", e);
             throw new RuntimeException(e);
         }
