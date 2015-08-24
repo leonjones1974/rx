@@ -51,7 +51,8 @@ public class TopicBuilder<K, V> {
         this.partitionCount = 1;
     }
 
-    public void withPartitionCount(int partitionCount) {
+    public TopicBuilder withPartitionCount(int partitionCount) {
         this.partitionCount = partitionCount;
+        return this;
     }
 }

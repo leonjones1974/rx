@@ -2,6 +2,9 @@ package uk.camsw.rx.test.kafka;
 
 import com.google.common.base.MoreObjects;
 import kafka.consumer.ConsumerConfig;
+import kafka.producer.ProducerConfig;
+import kafka.serializer.Encoder;
+import kafka.serializer.StringEncoder;
 import rx.functions.Action1;
 import uk.camsw.rx.common.SystemPropertyOverrideMap;
 
@@ -9,6 +12,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 import java.util.UUID;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 public final class KafkaEnv {
@@ -68,39 +72,52 @@ public final class KafkaEnv {
         return Integer.valueOf(properties.get(KEY_SESSION_TIMEOUT));
     }
 
-    public kafka.consumer.ConsumerConfig createConsumerConfig() {
-        Properties props = new Properties();
-        props.put("group.id", UUID.randomUUID().toString());
-        props.put("zookeeper.connect", zookeeperServers());
-        props.put("zookeeper.session.timeout.ms", "400");
-        props.put("zookeeper.sync.time.ms", "1");
-        props.put("auto.commit.interval.ms", "1");
-        props.put("retry.backoff.ms", "400");
-        props.put("rebalance.max.retries", "1000");
-        props.put("rebalance.backoff.ms", "10");
+    public ConsumerConfig createConsumerConfig() {
+       return createConsumerConfig(null);
+    }
 
+    public ConsumerConfig createConsumerConfig(Consumer<Properties> f) {
+        Properties props = defaultConsumerProperties();
+        if (f != null) f.accept(props);
         return new ConsumerConfig(props);
     }
 
-    public kafka.consumer.ConsumerConfig createConsumerConfig(Action1<Properties> f) {
-        Properties props = new Properties();
-        props.put("group.id", UUID.randomUUID().toString());
-        props.put("zookeeper.connect", zookeeperServers());
-        props.put("zookeeper.session.timeout.ms", "400");
-        props.put("zookeeper.sync.time.ms", "1");
-        props.put("auto.commit.interval.ms", "1");
-        props.put("retry.backoff.ms", "400");
-        props.put("rebalance.max.retries", "1000");
-        props.put("rebalance.backoff.ms", "10");
-        if (f != null) f.call(props);
-
-        return new ConsumerConfig(props);
+    public ProducerConfig createProducerConfig(Class<? extends Encoder> encoder) {
+        return createProducerConfig(encoder, null);
     }
+
+    public ProducerConfig createProducerConfig(Class<? extends Encoder> encoder, Consumer<Properties> f) {
+        Properties properties = defaultProducerProperties(encoder);
+        if (f != null) f.accept(properties);
+        return new ProducerConfig(properties);
+    }
+
 
     @Override
     public String toString() {
         MoreObjects.ToStringHelper helper = MoreObjects.toStringHelper(this);
         ALL_KEYS.forEach(k -> helper.add(k, properties.get(k)));
         return helper.toString();
+    }
+
+    private Properties defaultConsumerProperties() {
+        Properties props = new Properties();
+        props.put("group.id", UUID.randomUUID().toString());
+        props.put("zookeeper.connect", zookeeperServers());
+        props.put("zookeeper.session.timeout.ms", "400");
+        props.put("zookeeper.sync.time.ms", "1");
+        props.put("auto.commit.interval.ms", "1");
+        props.put("retry.backoff.ms", "400");
+        props.put("rebalance.max.retries", "1000");
+        props.put("rebalance.backoff.ms", "10");
+        return props;
+    }
+
+    private Properties defaultProducerProperties(Class<? extends Encoder> encoder) {
+        Properties properties = new Properties();
+        properties.put("metadata.broker.list", kafkaBrokers());
+        properties.put("serializer.class", encoder.getName());
+        properties.put("key.serializer.class", StringEncoder.class.getName());
+        return properties;
     }
 }
