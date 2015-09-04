@@ -2,6 +2,7 @@ package uk.camsw.rx.test.dsl.scenario;
 
 import rx.Observable;
 import rx.Scheduler;
+import rx.functions.Func0;
 import rx.functions.Func1;
 import rx.functions.Func2;
 import rx.subjects.PublishSubject;
@@ -33,6 +34,12 @@ public class SingleSourceScenario<T1, U> {
 
         public Given<T1, U> theStreamUnderTest(Func1<Observable<T1>, Observable<U>> f) {
             Observable<U> sut = f.call(context.getSource1().asObservable());
+            context.setStreamUnderTest(sut);
+            return this;
+        }
+
+        public Given<T1, U> theStreamUnderTest(Func0<Observable<U>> f) {
+            Observable<U> sut = f.call();
             context.setStreamUnderTest(sut);
             return this;
         }
