@@ -185,8 +185,6 @@ public class SingleSourceScenarioTest {
 
     }
 
-
-
     @Test
     public void streamRendering() {
         SingleSourceScenario<Integer, String> testScenario = TestScenario.singleSource();

@@ -48,7 +48,6 @@ public class DualSourceScenarioTest {
                 .source1().emits("b")
                 .source2().emits(2)
                 .source1().completes()
-                .source2().completes()
 
                 .then()
                 .theSubscribers()
