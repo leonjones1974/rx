@@ -1,8 +1,6 @@
-rootProject.name = 'uk.camsw.rx'
+rootProject.name = 'uk.camsw'
 
 
-include ':rx-test-dsl'
-include ':rx-common'
-include ':rx-kafka'
-include ':rx-test-kafka'
-//include ':rx-capture'
+include ':rxjava-test-dsl'
+include ':rxjava-kafka'
+include ':rxjava-test-kafka'

@@ -1,8 +1,0 @@
-
-dependencies {
-    compile 'org.apache.kafka:kafka_2.9.1:0.8.1.1'
-    compile project(':rx-test-dsl')
-    compile project(':rx-common')
-    compile 'junit:junit:4.11'
-
-}

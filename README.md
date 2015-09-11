@@ -1,4 +1,6 @@
-# rx-test
+A Collection of rx related libraries
+
+# rxjava-test-dsl
 
 ## Overview
 
@@ -23,15 +25,40 @@ rx-test aims to provide a simple, extensible DSL to enable easier, more declarat
                 .source1().emits("b")
                 .source2().emits(2)
                 .source1().completes()
-                .source2().completes()
             .then()
                 .theSubscribers()
                     .eventCount().isEqualTo(2)
                     .renderedStream().isEqualTo("[a1]-[b2]-|");
+                                                                       
+```
+
+```
+    SingleSourceScenario<String, List<String>> testScenario = TestScenario.singleSource();
+
+    testScenario
+            .given()
+            .theStreamUnderTest((source, scheduler) -> source.buffer(10, TimeUnit.SECONDS, scheduler))
+
+            .when()
+            .subscriber("s1").subscribes()
+            .theSource().emits("1a")
+            .theSource().emits("1b")
+            .theSource().emits("1c")
+            .time().advancesBy(Duration.ofSeconds(11))
+            .theSource().emits("2a")
+            .theSource().emits("2b")
+            .theSource().completes()
+
+            .then()
+            .subscriber("s1")
+            .eventCount().isEqualTo(2)
+            .event(0).isEqualTo(asList("1a", "1b", "1c"))
+            .event(1).isEqualTo(asList("2a", "2b"));
+
 ```
 
 
-# rx-test-kafka
+# rxjava-test-kafka
 
 ## Overview 
 
@@ -56,3 +83,10 @@ An extension to rx-test that allows for the incorporation of kafka publisher/ co
             .then()
                 .theSubscribers().renderedStream().isEqualTo("[1]-[2]");
 ```
+
+
+# rxjava-capture
+
+## Overview
+
+Work in progress - come back later!
