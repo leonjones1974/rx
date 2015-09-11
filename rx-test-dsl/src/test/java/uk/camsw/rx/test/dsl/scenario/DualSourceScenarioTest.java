@@ -56,6 +56,30 @@ public class DualSourceScenarioTest {
     }
 
     @Test
+    public void zipWithBackpressure() {
+        DualSourceScenario<String, Integer, String> testScenario = TestScenario.dualSources();
+
+        testScenario
+                .given()
+                .theStreamUnderTest((s1, s2) -> s1.zipWith(s2, (z, n) -> z + n))
+                .theRenderer(s -> s)
+
+                .when()
+                .theSubscriber().subscribes()
+                .source1().emits("a")
+                .source1().emits("b")
+                .source1().emits("c")
+                .source2().emits(1)
+                .source2().emits(2)
+                .source2().emits(3)
+                .source1().completes()
+
+                .then()
+                .theSubscribers()
+                .renderedStream().isEqualTo("[a1]-[b2]-[c3]-|");
+    }
+
+    @Test
     public void customSourceZip() {
 
         DualSourceScenario<String, Integer, String> testScenario = TestScenario.dualSources();
