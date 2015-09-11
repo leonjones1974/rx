@@ -90,3 +90,15 @@ An extension to rx-test that allows for the incorporation of kafka publisher/ co
 ## Overview
 
 Work in progress - come back later!
+
+# Binaries
+
+Binaries and dependency information for Maven, Ivy, Gradle and others can be found at http://search.maven.org.
+
+Example for Maven:
+
+<dependency>
+    <groupId>uk.camsw</groupId>
+    <artifactId>rxjava-test-dsl</artifactId>
+    <version>x.y.z</version>
+</dependency>
