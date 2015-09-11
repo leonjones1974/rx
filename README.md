@@ -1,4 +1,6 @@
-# rx-test
+A Collection of rx related libraries
+
+# rxjava-test-dsl
 
 ## Overview
 
@@ -56,7 +58,7 @@ rx-test aims to provide a simple, extensible DSL to enable easier, more declarat
 ```
 
 
-# rx-test-kafka
+# rxjava-test-kafka
 
 ## Overview 
 
@@ -81,3 +83,10 @@ An extension to rx-test that allows for the incorporation of kafka publisher/ co
             .then()
                 .theSubscribers().renderedStream().isEqualTo("[1]-[2]");
 ```
+
+
+# rxjava-capture
+
+## Overview
+
+Work in progress - come back later!
