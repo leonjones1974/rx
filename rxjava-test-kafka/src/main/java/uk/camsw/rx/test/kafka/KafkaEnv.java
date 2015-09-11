@@ -5,8 +5,6 @@ import kafka.consumer.ConsumerConfig;
 import kafka.producer.ProducerConfig;
 import kafka.serializer.Encoder;
 import kafka.serializer.StringEncoder;
-import rx.functions.Action1;
-import uk.camsw.rx.common.SystemPropertyOverrideMap;
 
 import java.util.Arrays;
 import java.util.List;

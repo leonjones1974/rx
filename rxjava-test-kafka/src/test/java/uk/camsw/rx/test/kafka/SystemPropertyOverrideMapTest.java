@@ -1,4 +1,4 @@
-package uk.camsw.rx.common;
+package uk.camsw.rx.test.kafka;
 
 import org.junit.Before;
 import org.junit.Test;

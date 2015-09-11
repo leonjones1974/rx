@@ -1,4 +1,4 @@
-package uk.camsw.rx.common;
+package uk.camsw.rx.test.kafka;
 
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Objects;
