@@ -1,6 +1,6 @@
 
 dependencies {
-    compile 'io.reactivex:rxjava:1.0.8'
+    compile 'io.reactivex:rxjava:1.0.13'
     compile 'com.google.guava:guava:18.0'
     compile 'org.javassist:javassist:3.19.0-GA'
     compile files("${System.properties['java.home']}/../lib/tools.jar")

@@ -1,5 +1,6 @@
 package uk.camsw.rx.test.dsl.scenario;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import rx.Observable;
 import rx.subjects.PublishSubject;
@@ -56,7 +57,7 @@ public class DualSourceScenarioTest {
     }
 
     @Test
-    public void zipWithBackpressure() {
+    public void zipWithBackPressure() {
         DualSourceScenario<String, Integer, String> testScenario = TestScenario.dualSources();
 
         testScenario
@@ -72,6 +73,54 @@ public class DualSourceScenarioTest {
                 .source2().emits(1)
                 .source2().emits(2)
                 .source2().emits(3)
+                .source1().completes()
+
+                .then()
+                .theSubscribers()
+                .renderedStream().isEqualTo("[a1]-[b2]-[c3]-|");
+    }
+
+    @Test
+    @Ignore("This operator doesn't behave like this - raised question against RXJava")
+    public void withLatestFromBackPressure() {
+        DualSourceScenario<String, Integer, String> testScenario = TestScenario.dualSources();
+
+        testScenario
+                .given()
+                .theStreamUnderTest((s1, s2) -> s1.withLatestFrom(s2, (z, n) -> z + n))
+                .theRenderer(s -> s)
+
+                .when()
+                .theSubscriber().subscribes()
+                .source1().emits("a")
+                .source2().emits(1)
+                .source1().emits("b")
+                .source2().emits(2)
+                .source1().emits("c")
+                .source1().completes()
+
+                .then()
+                .theSubscribers()
+                .renderedStream().isEqualTo("[a1]-[b1]-[c2]-|");
+    }
+
+    @Test
+    public void zipWithBackPressureOnSource2() {
+        DualSourceScenario<String, Integer, String> testScenario = TestScenario.dualSources();
+
+        testScenario
+                .given()
+                .theStreamUnderTest((s1, s2) -> s1.zipWith(s2, (z, n) -> z + n))
+                .theRenderer(s -> s)
+
+                .when()
+                .theSubscriber().subscribes()
+                .source2().emits(1)
+                .source2().emits(2)
+                .source2().emits(3)
+                .source1().emits("a")
+                .source1().emits("b")
+                .source1().emits("c")
                 .source1().completes()
 
                 .then()
