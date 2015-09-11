@@ -1,6 +1,5 @@
 package uk.camsw.rx.test.kafka.rule;
 
-import com.google.common.util.concurrent.Uninterruptibles;
 import kafka.server.KafkaConfig;
 import kafka.server.KafkaServerStartable;
 import org.apache.zookeeper.server.ServerConfig;
@@ -19,7 +18,6 @@ import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.util.Properties;
 import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 
 public class EmbeddedKafkaLauncher {
 

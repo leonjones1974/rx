@@ -81,7 +81,7 @@ public class DualSourceScenarioTest {
     }
 
     @Test
-    @Ignore("This operator doesn't behave like this - raised question against RXJava")
+    @Ignore("This operator doesn't behave like tis - raised question against RXJava")
     public void withLatestFromBackPressure() {
         DualSourceScenario<String, Integer, String> testScenario = TestScenario.dualSources();
 
