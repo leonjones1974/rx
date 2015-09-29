@@ -46,7 +46,7 @@ subprojects { p ->
         pom
     }
 
-    group = 'uk.camsw.rx'
+    group = 'uk.camsw'
     version = currentVersion
 
     apply plugin: 'idea'
