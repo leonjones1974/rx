@@ -16,7 +16,7 @@ generated/
 **/*.asc
 **/**pom.xml
 **/tmp
-
+**/target/
 # Idea artifacts
 out/
 .idea

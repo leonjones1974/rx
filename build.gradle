@@ -6,8 +6,8 @@ buildscript {
 }
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '2.2'
-    distributionUrl = 'http://services.gradle.org/distributions/gradle-2.2-bin.zip'
+    gradleVersion = '2.8'
+    distributionUrl = 'http://services.gradle.org/distributions/gradle-2.8-bin.zip'
 }
 
 
