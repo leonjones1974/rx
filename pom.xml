@@ -13,9 +13,13 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <scala.version.major>2.11</scala.version.major>
+        <scala.version.build>7</scala.version.build>
+        <scala.version>${scala.version.major}.${scala.version.build}</scala.version>
     </properties>
 
     <modules>
+        <module>rxscala-test-dsl</module>
         <module>rxjava-kafka</module>
         <module>rxjava-test-dsl</module>
         <module>rxjava-test-kafka</module>
@@ -86,7 +90,6 @@
                 <artifactId>rxjava</artifactId>
                 <version>1.0.14</version>
             </dependency>
-
             <dependency>
                 <groupId>com.google.guava</groupId>
                 <artifactId>guava</artifactId>
@@ -242,7 +245,13 @@
                 <dependency>
                     <groupId>org.scala-lang</groupId>
                     <artifactId>scala-library</artifactId>
-                    <version>2.11.7</version>
+                    <version>${scala.version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>org.scalatest</groupId>
+                    <artifactId>scalatest_${scala.version.major}</artifactId>
+                    <version>2.2.4</version>
+                    <scope>test</scope>
                 </dependency>
             </dependencies>
             <build>
@@ -258,6 +267,14 @@
                                 </goals>
                             </execution>
                         </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>net.alchim31.maven</groupId>
+                        <artifactId>scala-maven-plugin</artifactId>
+                        <version>3.2.1</version>
+                        <configuration>
+                            <recompileMode>incremental</recompileMode>
+                        </configuration>
                     </plugin>
                 </plugins>
             </build>
@@ -316,6 +333,26 @@
                     </plugin>
                 </plugins>
             </build>
+            <dependencies>
+                <dependency>
+                    <groupId>com.google.guava</groupId>
+                    <artifactId>guava</artifactId>
+                </dependency>
+                <dependency>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-api</artifactId>
+                </dependency>
+                <dependency>
+                    <groupId>org.assertj</groupId>
+                    <artifactId>assertj-core</artifactId>
+                    <scope>test</scope>
+                </dependency>
+                <dependency>
+                    <groupId>junit</groupId>
+                    <artifactId>junit</artifactId>
+                    <scope>test</scope>
+                </dependency>
+            </dependencies>
 
         </profile>
     </profiles>
