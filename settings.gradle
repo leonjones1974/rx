@@ -1,6 +1,0 @@
-rootProject.name = 'uk.camsw'
-
-
-include ':rxjava-test-dsl'
-include ':rxjava-test-kafka'
-include ':rxjava-kafka'
