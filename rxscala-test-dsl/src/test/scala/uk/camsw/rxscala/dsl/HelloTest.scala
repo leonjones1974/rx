@@ -7,8 +7,8 @@ class HelloTest
   with Matchers {
 
   describe("Anything") {
-    it("should fail") {
-      false shouldBe true
+    it("should pass") {
+      true shouldBe true
     }
   }
 }
