@@ -1,4 +1,4 @@
-package uk.camsw.rxscala.test.dsl
+package uk.camsw.rxscala.test.dsl.single
 
 import uk.camsw.rxjava.test.dsl.scenario.ExecutionContext
 

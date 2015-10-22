@@ -1,6 +1,5 @@
 package uk.camsw.rxjava.test.dsl.scenario;
 
-import org.junit.Ignore;
 import org.junit.Test;
 import rx.Observable;
 import rx.subjects.PublishSubject;
@@ -81,30 +80,6 @@ public class DualSourceScenarioTest {
     }
 
     @Test
-    @Ignore("This operator doesn't behave like tis - raised question against RXJava")
-    public void withLatestFromBackPressure() {
-        DualSourceScenario<String, Integer, String> testScenario = TestScenario.dualSources();
-
-        testScenario
-                .given()
-                .theStreamUnderTest((s1, s2) -> s1.withLatestFrom(s2, (z, n) -> z + n))
-                .theRenderer(s -> s)
-
-                .when()
-                .theSubscriber().subscribes()
-                .source1().emits("a")
-                .source2().emits(1)
-                .source1().emits("b")
-                .source2().emits(2)
-                .source1().emits("c")
-                .source1().completes()
-
-                .then()
-                .theSubscribers()
-                .renderedStream().isEqualTo("[a1]-[b1]-[c2]-|");
-    }
-
-    @Test
     public void zipWithBackPressureOnSource2() {
         DualSourceScenario<String, Integer, String> testScenario = TestScenario.dualSources();
 
@@ -144,35 +119,18 @@ public class DualSourceScenarioTest {
 
                 .when()
                 .subscriber("s1").subscribes()
-                .source1().emits("a")
-                .source2().emits(1)
-                .source1().emits("b")
-                .source2().emits(2)
-                .source1().completes()
-                .source2().completes()
+                .theActionIsPerformed(() -> source1.onNext("a"))
+                .theActionIsPerformed(() -> source2.onNext(1))
+                .theActionIsPerformed(() -> source1.onNext("b"))
+                .theActionIsPerformed(() -> source2.onNext(2))
+                .theActionIsPerformed(source1::onCompleted)
+                .theActionIsPerformed(source2::onCompleted)
 
                 .then()
                 .subscriber("s1")
                 .eventCount().isEqualTo(2)
                 .renderedStream().isEqualTo("[a1]-[b2]-|");
 
-
-        PublishSubject<String> customSource = PublishSubject.create();
-        TestScenario.<String, String>singleSource()
-                .given()
-                .theCustomSource(customSource)
-                .theStreamUnderTest(_source -> customSource.map(String::toUpperCase))
-
-                .when()
-                .subscriber("s1").subscribes()
-                .theSource().emits("a")
-                .theSource().emits("b")
-
-                .then()
-                .subscriber("s1")
-                .eventCount().isEqualTo(2)
-                .event(0).isEqualTo("A")
-                .event(1).isEqualTo("B");
     }
 
 }

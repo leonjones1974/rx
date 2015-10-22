@@ -206,7 +206,6 @@ public class SingleSourceScenarioTest {
                 .renderedStream().isEqualTo("['a']-['B']-|")
                 .completedCount().isEqualTo(1)
         ;
-
     }
 
     @Test

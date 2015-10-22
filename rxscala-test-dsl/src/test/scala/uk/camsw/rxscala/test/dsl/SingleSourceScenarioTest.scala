@@ -1,21 +1,17 @@
 package uk.camsw.rxscala.test.dsl
 
 
-import java.time
 import java.util.concurrent.atomic.AtomicBoolean
 
 import com.jayway.awaitility.core.ConditionTimeoutException
-import rx.lang.scala.schedulers.ComputationScheduler
-import rx.lang.scala.subjects.PublishSubject
-import uk.camsw.rxjava.test.dsl.scenario.ExecutionContext
-
-import scala.concurrent.duration._
-
 import org.scalatest.{FunSpec, Matchers}
 import rx.exceptions.OnErrorNotImplementedException
-import uk.camsw.rxscala.test.dsl.TestScenario._
-import rx.lang.scala.JavaConversions._
 import rx.lang.scala.ImplicitFunctionConversions._
+import rx.lang.scala.schedulers.ComputationScheduler
+import rx.lang.scala.subjects.PublishSubject
+import uk.camsw.rxscala.test.dsl.TestScenario._
+
+import scala.concurrent.duration._
 
 class SingleSourceScenarioTest
   extends FunSpec
@@ -24,7 +20,7 @@ class SingleSourceScenarioTest
   describe("A single source scenario") {
     it("should support a simple scenario") {
 
-      TestScenario.singleSourceScenario[String, Int]()
+      TestScenario.singleSource[String, Int]()
         .given()
         .theStreamUnderTest((source, _) => source.map(s => Integer.parseInt(s) + 1))
 
@@ -42,7 +38,7 @@ class SingleSourceScenarioTest
     }
 
     it("should support multiple subscribers") {
-      TestScenario.singleSourceScenario[String, Int]()
+      TestScenario.singleSource[String, Int]()
         .given()
         .theStreamUnderTest((source, _) => source.map(s => Integer.parseInt(s) + 1))
 
@@ -66,7 +62,7 @@ class SingleSourceScenarioTest
     }
 
     it("should support unsubscribe") {
-      TestScenario.singleSourceScenario[String, Int]()
+      TestScenario.singleSource[String, Int]()
         .given()
         .theStreamUnderTest((source, _) => source.map(s => Integer.parseInt(s) + 1))
 
@@ -82,7 +78,7 @@ class SingleSourceScenarioTest
     }
 
     it("should support completion") {
-      TestScenario.singleSourceScenario[String, Int]()
+      TestScenario.singleSource[String, Int]()
         .given()
         .theStreamUnderTest((source, _) => source.map(s => Integer.parseInt(s) + 1))
 
@@ -98,7 +94,7 @@ class SingleSourceScenarioTest
     }
 
     it("should capture errors") {
-      TestScenario.singleSourceScenario[String, Int]()
+      TestScenario.singleSource[String, Int]()
         .given()
         .theStreamUnderTest((source, _) => source.map(s => Integer.parseInt(s) + 1))
         .errorsAreHandled()
@@ -117,7 +113,7 @@ class SingleSourceScenarioTest
 
     it("should support raise uncaptured errors") {
       intercept[OnErrorNotImplementedException] {
-        TestScenario.singleSourceScenario[String, Int]()
+        TestScenario.singleSource[String, Int]()
           .given()
           .theStreamUnderTest((source, _) => source.map(s => Integer.parseInt(s) + 1))
 
@@ -131,7 +127,7 @@ class SingleSourceScenarioTest
     }
 
     it("should support temporal operators") {
-      TestScenario.singleSourceScenario[String, Seq[String]]()
+      TestScenario.singleSource[String, Seq[String]]()
         .given()
         .theStreamUnderTest((source, scheduler) => source.tumblingBuffer(10 seconds, scheduler))
 
@@ -152,26 +148,8 @@ class SingleSourceScenarioTest
         .event(1).isEqualTo(Seq("2a", "2b"))
     }
 
-    it("should support a custom source") {
-      val customSource = PublishSubject[String]()
-      TestScenario.singleSourceScenario[String, String]()
-        .given()
-        .theCustomSource(customSource.asJavaSubject)
-        .theStreamUnderTest((source, _) => source.map(s => s.toUpperCase))
-
-        .when()
-        .subscriber("s1").subscribes()
-        .theActionIsPerformed(() => customSource.onNext("a"))
-        .theActionIsPerformed(() => customSource.onNext("b"))
-        .theActionIsPerformed(() => customSource.onCompleted())
-
-        .then()
-        .subscriber("s1")
-        .renderedStream().isEqualTo("[A]-[B]-|")
-    }
-
     it("should support stream rendering") {
-      TestScenario.singleSourceScenario[Integer, String]()
+      TestScenario.singleSource[Integer, String]()
         .given()
         .theStreamUnderTest((source, _) => source.map(n => if (n == 0) "a" else "B"))
         .theRenderer((event: String) => s"'$event'")
@@ -190,7 +168,7 @@ class SingleSourceScenarioTest
     }
 
     it("should support stream rendering with errors") {
-      TestScenario.singleSourceScenario[Integer, String]()
+      TestScenario.singleSource[Integer, String]()
         .given()
         .theStreamUnderTest((source, _) => source.map(n => if (n == 0) "a" else "B"))
         .errorsAreHandled()
@@ -210,7 +188,7 @@ class SingleSourceScenarioTest
     }
 
     it("should support asyn wait") {
-      TestScenario.singleSourceScenario[String, String]()
+      TestScenario.singleSource[String, String]()
         .given()
         .theStreamUnderTest((source, _) => source.observeOn(ComputationScheduler()).delay(1 second))
         .asyncTimeoutOf(2 seconds)
@@ -229,7 +207,7 @@ class SingleSourceScenarioTest
 
     it("should support asyn wait with timeout") {
       intercept[ConditionTimeoutException] {
-        TestScenario.singleSourceScenario[String, String]()
+        TestScenario.singleSource[String, String]()
           .given()
           .theStreamUnderTest((source, _) => source.observeOn(ComputationScheduler()).delay(10 seconds))
           .asyncTimeoutOf(500 milliseconds)
@@ -246,7 +224,7 @@ class SingleSourceScenarioTest
 
     it ("should support custom actions") {
       val s1 = new AtomicBoolean(false)
-      TestScenario.singleSourceScenario[String, String]()
+      TestScenario.singleSource[String, String]()
         .when()
         .actionIsPerformed(() => s1.set(true))
 
