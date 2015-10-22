@@ -1,4 +1,4 @@
-package uk.camsw.rxscala.dsl;
+package uk.camsw.rxscala.test.dsl;
 
 /**
  * Exists to cheat sonotype release rules

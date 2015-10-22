@@ -4,7 +4,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import rx.functions.Action0;
 import uk.camsw.rxjava.test.dsl.KeyConstants;
-import uk.camsw.rxjava.test.dsl.given.IGiven;
 import uk.camsw.rxjava.test.dsl.scenario.ExecutionContext;
 import uk.camsw.rxjava.test.dsl.subscriber.ISubscriber;
 import uk.camsw.rxjava.test.dsl.then.BaseThen;
@@ -13,7 +12,6 @@ import uk.camsw.rxjava.test.dsl.time.BaseTime;
 
 import java.time.Duration;
 import java.time.temporal.TemporalUnit;
-import java.util.function.Consumer;
 
 public class BaseWhen<U, WHEN extends IWhen> implements IWhen<U, WHEN> {
     private static final Logger logger = LoggerFactory.getLogger(BaseWhen.class);
@@ -78,17 +76,6 @@ public class BaseWhen<U, WHEN extends IWhen> implements IWhen<U, WHEN> {
     @Override
     public BaseTime<WHEN> time() {
         return new BaseTime<>(context);
-    }
-
-    @Override
-    public WHEN actionIsPerformed(Consumer<ExecutionContext<?, ?, U, ? extends IGiven, WHEN>> action) {
-        context.addCommand(action::accept);
-        return context.getWhen();
-    }
-
-    @Override
-    public WHEN theActionIsPerformed(Consumer<ExecutionContext<?, ?, U, ? extends IGiven, WHEN>> action) {
-        return actionIsPerformed(action);
     }
 
     @Override

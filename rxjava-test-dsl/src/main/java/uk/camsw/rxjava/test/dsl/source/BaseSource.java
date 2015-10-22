@@ -2,6 +2,7 @@ package uk.camsw.rxjava.test.dsl.source;
 
 import rx.Observable;
 import rx.subjects.PublishSubject;
+import rx.subjects.Subject;
 import uk.camsw.rxjava.test.dsl.given.IGiven;
 import uk.camsw.rxjava.test.dsl.scenario.ExecutionContext;
 import uk.camsw.rxjava.test.dsl.when.IWhen;
@@ -9,7 +10,7 @@ import uk.camsw.rxjava.test.dsl.when.IWhen;
 public class BaseSource<T, GIVEN extends IGiven, WHEN extends IWhen> implements ISource<T, WHEN> {
 
     private final ExecutionContext<?, ?, ?, GIVEN, WHEN> context;
-    private final PublishSubject<T> publisher;
+    private final Subject<T, T> publisher;
 
 
     public BaseSource(ExecutionContext<?, ?, ?, GIVEN, WHEN> context) {
@@ -17,13 +18,15 @@ public class BaseSource<T, GIVEN extends IGiven, WHEN extends IWhen> implements 
         this.publisher = PublishSubject.create();
     }
 
-    public <T1> BaseSource(PublishSubject<T> customSource, ExecutionContext<?, ?, ?, GIVEN, WHEN> context) {
+    public BaseSource(Subject<T, T> customSource, ExecutionContext<?, ?, ?, GIVEN, WHEN> context) {
         this.context = context;
         this.publisher = customSource;
     }
 
     public WHEN emits(T event) {
-        context.addCommand(c -> publisher.onNext(event));
+        context.addCommand(c -> {
+            publisher.onNext(event);
+        });
         return context.getWhen();
     }
 

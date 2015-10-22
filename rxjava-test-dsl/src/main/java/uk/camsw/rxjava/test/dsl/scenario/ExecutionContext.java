@@ -7,6 +7,7 @@ import rx.functions.Action1;
 import rx.functions.Func1;
 import rx.schedulers.TestScheduler;
 import rx.subjects.PublishSubject;
+import rx.subjects.Subject;
 import uk.camsw.rxjava.test.dsl.given.IGiven;
 import uk.camsw.rxjava.test.dsl.source.BaseSource;
 import uk.camsw.rxjava.test.dsl.source.ISource;
@@ -31,7 +32,7 @@ public class ExecutionContext<T1, T2, U, GIVEN extends IGiven, WHEN extends IWhe
     private GIVEN given;
     private WHEN when;
 
-    private Observable<U> streamUnderTest;
+    private Observable<? extends U> streamUnderTest;
 
     private BaseSource<T1, GIVEN, WHEN> source1;
     private BaseSource<T2, GIVEN, WHEN> source2;
@@ -50,7 +51,7 @@ public class ExecutionContext<T1, T2, U, GIVEN extends IGiven, WHEN extends IWhe
         this.when = when;
     }
 
-    public void setCustomSource1(PublishSubject<T1> customSource) {
+    public void setCustomSource1(Subject<T1, T1> customSource) {
         source1 = new BaseSource<>(customSource, this);
     }
 
@@ -70,11 +71,11 @@ public class ExecutionContext<T1, T2, U, GIVEN extends IGiven, WHEN extends IWhe
         return source2;
     }
 
-    public void setStreamUnderTest(Observable<U> streamUnderTest) {
+    public void setStreamUnderTest(Observable<? extends U> streamUnderTest) {
         this.streamUnderTest = streamUnderTest;
     }
 
-    public Observable<U> getStreamUnderTest() {
+    public Observable<? extends U> getStreamUnderTest() {
         return streamUnderTest;
     }
 

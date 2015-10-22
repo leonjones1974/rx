@@ -2,6 +2,7 @@ package uk.camsw.rxjava.test.dsl.scenario;
 
 import rx.Observable;
 import rx.Scheduler;
+import rx.functions.Action0;
 import rx.functions.Func2;
 import rx.functions.Func3;
 import rx.subjects.PublishSubject;
@@ -46,11 +47,19 @@ public class DualSourceScenario<T1, T2, U> {
             return this;
         }
 
+        /**
+         * @deprecated Use {@link uk.camsw.rxjava.test.dsl.when.IWhen#actionIsPerformed(Action0)}
+         */
+        @Deprecated
         public Given<T1, T2, U> theCustomSource1(PublishSubject<T1> customSource) {
             context.setCustomSource1(customSource);
             return this;
         }
 
+        /**
+         * @deprecated Use {@link uk.camsw.rxjava.test.dsl.when.IWhen#actionIsPerformed(Action0)}
+         */
+        @Deprecated
         public Given<T1, T2, U> theCustomSource2(PublishSubject<T2> customSource) {
             context.setCustomSource2(customSource);
             return this;
