@@ -101,6 +101,11 @@
                 <version>1.7.12</version>
             </dependency>
             <dependency>
+                <groupId>io.reactivex</groupId>
+                <artifactId>rxscala_${scala.version.major}</artifactId>
+                <version>0.25.0</version>
+            </dependency>
+            <dependency>
                 <groupId>org.apache.kafka</groupId>
                 <artifactId>kafka_2.9.1</artifactId>
                 <version>0.8.1.1</version>

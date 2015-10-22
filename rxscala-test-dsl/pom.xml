@@ -20,7 +20,6 @@
 		<dependency>
 			<groupId>io.reactivex</groupId>
 			<artifactId>rxscala_2.11</artifactId>
-			<version>0.25.0</version>
 		</dependency>
 	</dependencies>
 </project>
