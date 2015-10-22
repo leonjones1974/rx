@@ -32,21 +32,21 @@ public class SingleSourceScenario<T1, U> {
             this.context = context;
         }
 
-        public Given<T1, U> theStreamUnderTest(Func1<Observable<T1>, Observable<U>> f) {
-            Observable<U> sut = f.call(context.getSource1().asObservable());
+        public Given<T1, U> theStreamUnderTest(Func1<Observable<T1>, Observable<? extends U>> f) {
+            Observable<? extends U> sut = f.call(context.getSource1().asObservable());
             context.setStreamUnderTest(sut);
             return this;
         }
 
-        public Given<T1, U> theStreamUnderTest(Func0<Observable<U>> f) {
-            Observable<U> sut = f.call();
+        public Given<T1, U> theStreamUnderTest(Func0<Observable<? extends U>> f) {
+            Observable<? extends U> sut = f.call();
             context.setStreamUnderTest(sut);
             return this;
         }
 
-        public Given<T1, U> theStreamUnderTest(Func2<Observable<T1>, Scheduler, Observable<U>> f) {
+        public Given<T1, U> theStreamUnderTest(Func2<Observable<T1>, Scheduler, Observable<? extends U>> f) {
             Observable<T1> source = context.getSource1().asObservable();
-            Observable<U> sut = f.call(source, context.getScheduler());
+            Observable<? extends U> sut = f.call(source, context.getScheduler());
             context.setStreamUnderTest(sut);
             return this;
         }
@@ -58,7 +58,7 @@ public class SingleSourceScenario<T1, U> {
 
         @Override
         public When<T1, U> when() {
-            return new When<>(context);
+            return context.getWhen();
         }
     }
 

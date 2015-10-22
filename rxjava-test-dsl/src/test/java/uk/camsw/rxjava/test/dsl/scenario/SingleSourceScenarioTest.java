@@ -170,7 +170,7 @@ public class SingleSourceScenarioTest {
         TestScenario.<String, String>singleSource()
                 .given()
                 .theCustomSource(customSource)
-                .theStreamUnderTest(_source -> customSource.map(String::toUpperCase))
+                .theStreamUnderTest(() -> customSource.map(String::toUpperCase))
 
                 .when()
                 .subscriber("s1").subscribes()
@@ -276,18 +276,15 @@ public class SingleSourceScenarioTest {
     public void customActions() {
         SingleSourceScenario<String, String> testScenario = TestScenario.singleSource();
         AtomicBoolean s1 = new AtomicBoolean(false);
-        AtomicBoolean s2 = new AtomicBoolean(true);
         testScenario
                 .given()
 
                 .when()
-                .actionIsPerformed(c -> s1.set(true))
-                .actionIsPerformed(c -> s2.set(false))
+                .actionIsPerformed(() -> s1.set(true))
 
                 .go();
 
         assertThat(s1.get()).isTrue();
-        assertThat(s2.get()).isFalse();
     }
 
 
