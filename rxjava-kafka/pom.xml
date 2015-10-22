@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>uk.camsw</groupId>
 		<artifactId>rx</artifactId>
-		<version>5.0.0-SNAPSHOT</version>
+		<version>5.0.0</version>
 	</parent>
 	<artifactId>rxjava-kafka</artifactId>
 
