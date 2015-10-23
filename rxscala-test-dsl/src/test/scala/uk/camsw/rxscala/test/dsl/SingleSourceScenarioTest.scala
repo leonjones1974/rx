@@ -1,6 +1,5 @@
 package uk.camsw.rxscala.test.dsl
 
-
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.function.{Predicate => JPredicate}
 
@@ -30,7 +29,7 @@ class SingleSourceScenarioTest
         .theSource().emits("2")
         .theSource().completes()
 
-        .then()
+        .so()
         .theSubscriber()
         .eventCount().isEqualTo(2)
         .event(0).isEqualTo(2)
@@ -51,7 +50,8 @@ class SingleSourceScenarioTest
         .theSource()
         .emits("2")
 
-        .then().subscriber("s1")
+        .so()
+        .subscriber("s1")
         .event(0).isEqualTo(2)
         .event(1).isEqualTo(3)
         .eventCount().isEqualTo(2)
@@ -72,7 +72,7 @@ class SingleSourceScenarioTest
         .subscriber("s1").unsubscribes()
         .theSource().emits("2")
 
-        .then()
+        .so()
         .subscriber("s1")
         .eventCount().isEqualTo(1)
     }
@@ -87,7 +87,7 @@ class SingleSourceScenarioTest
         .theSource().emits("1")
         .theSource().completes()
 
-        .then()
+        .so()
         .subscriber("s1")
         .isErrored.isFalse
         .completedCount().isEqualTo(1)
@@ -104,7 +104,7 @@ class SingleSourceScenarioTest
         .theSource().emits("1")
         .theSource().errors(new IllegalArgumentException("oh no"))
 
-        .then()
+        .so()
         .subscriber("s1")
         .isErrored.isTrue
         .errorClass().isAssignableFrom(classOf[IllegalArgumentException])
@@ -141,7 +141,7 @@ class SingleSourceScenarioTest
         .theSource().emits("2b")
         .theSource().completes()
 
-        .then()
+        .so()
         .subscriber("s1")
         .eventCount().isEqualTo(2)
         .event(0).isEqualTo(Seq("1a", "1b", "1c"))
@@ -160,7 +160,7 @@ class SingleSourceScenarioTest
         .theSource().emits(1)
         .theSource().completes()
 
-        .then()
+        .so()
         .subscriber("s1")
         .eventCount().isEqualTo(2)
         .renderedStream().isEqualTo("['a']-['B']-|")
@@ -180,7 +180,7 @@ class SingleSourceScenarioTest
         .theSource().emits(1)
         .theSource().errors(new RuntimeException("I'm broken"))
 
-        .then()
+        .so()
         .subscriber("s1")
         .renderedStream().isEqualTo("['a']-['B']-X[RuntimeException: I'm broken]")
         .isErrored.isTrue
@@ -199,7 +199,7 @@ class SingleSourceScenarioTest
         .theSource().emits("b")
         .subscriber("s1").waitsForEvents(2)
 
-        .then()
+        .so()
         .subscriber("s1")
         .renderedStream().isEqualTo("[a]-[b]")
         .eventCount().isEqualTo(2)
@@ -244,8 +244,9 @@ class SingleSourceScenarioTest
         .theSource().emits(3)
         .theSource().emits(4)
 
-        .then()
-        .theSubscriber().allEventsMatch((n: Int) => n >= 2 && n <= 4, "Event must be between 2 and 4 inclusive")
+        .so()
+        .theSubscriber()
+        .receivedOnlyEventsMatching((n: Int) => n >= 2 && n <= 4, "Event must be between 2 and 4 inclusive")
     }
 
     it("should support at least one event matches") {
@@ -259,11 +260,11 @@ class SingleSourceScenarioTest
         .theSource().emits(3)
         .theSource().emits(4)
 
-        .then()
+        .so()
         .theSubscriber()
-        .atLeastOneEventMatches((n: Int) => n == 2, "Events should contain 2")
-        .atLeastOneEventMatches((n: Int) => n == 3, "Events should contain 3")
-        .atLeastOneEventMatches((n: Int) => n == 4, "Events should contain 4")
+        .receivedAtLeastOneMatch((n: Int) => n == 2, "Events should contain 2")
+        .receivedAtLeastOneMatch((n: Int) => n == 3, "Events should contain 3")
+        .receivedAtLeastOneMatch((n: Int) => n == 4, "Events should contain 4")
     }
   }
 }

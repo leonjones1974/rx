@@ -55,26 +55,26 @@ public class IntegerAssertion<U> extends AbstractIntegerAssert<IntegerAssertion<
     }
 
     @Override
-    public ISubscriberAssertions<U> allEventsMatch(Predicate<? super U> p) {
-        subscriberAssertions.allEventsMatch(p);
+    public ISubscriberAssertions<U> receivedOnlyEventsMatching(Predicate<U> p) {
+        subscriberAssertions.receivedOnlyEventsMatching(p);
         return this;
     }
 
     @Override
-    public ISubscriberAssertions<U> allEventsMatch(Predicate<? super U> p, String description) {
-        subscriberAssertions.allEventsMatch(p, description);
+    public ISubscriberAssertions<U> receivedOnlyEventsMatching(Predicate<U> p, String description) {
+        subscriberAssertions.receivedOnlyEventsMatching(p, description);
         return this;
     }
 
     @Override
-    public ISubscriberAssertions<U> atLeastOneEventMatches(Predicate<? super U> p) {
-        subscriberAssertions.atLeastOneEventMatches(p);
+    public ISubscriberAssertions<U> receivedAtLeastOneMatch(Predicate<U> p) {
+        subscriberAssertions.receivedAtLeastOneMatch(p);
         return this;
     }
 
     @Override
-    public ISubscriberAssertions<U> atLeastOneEventMatches(Predicate<? super U> p, String description) {
-        subscriberAssertions.atLeastOneEventMatches(p, description);
+    public ISubscriberAssertions<U> receivedAtLeastOneMatch(Predicate<U> p, String description) {
+        subscriberAssertions.receivedAtLeastOneMatch(p, description);
         return this;
     }
 

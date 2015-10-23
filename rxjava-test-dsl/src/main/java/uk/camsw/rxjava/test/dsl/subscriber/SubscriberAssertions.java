@@ -68,28 +68,28 @@ public class SubscriberAssertions<U> implements ISubscriberAssertions<U> {
     }
 
     @Override
-    public ISubscriberAssertions<U> allEventsMatch(Predicate<? super U> p) {
+    public ISubscriberAssertions<U> receivedOnlyEventsMatching(Predicate<U> p) {
         testSubscriber.events()
                 .forEach(e -> new ObjectAssertion<>(e, this).matches(p));
         return this;
     }
 
     @Override
-    public ISubscriberAssertions<U> allEventsMatch(Predicate<? super U> p, String description) {
+    public ISubscriberAssertions<U> receivedOnlyEventsMatching(Predicate<U> p, String description) {
         testSubscriber.events()
                 .forEach(e -> new ObjectAssertion<>(e, this).matches(p, description));
         return this;
     }
 
     @Override
-    public ISubscriberAssertions<U> atLeastOneEventMatches(Predicate<? super U> p) {
+    public ISubscriberAssertions<U> receivedAtLeastOneMatch(Predicate<U> p) {
         assertThat(testSubscriber.events().stream()
                 .anyMatch(p)).isTrue();
         return this;
     }
 
     @Override
-    public ISubscriberAssertions<U> atLeastOneEventMatches(Predicate<? super U> p, String description) {
+    public ISubscriberAssertions<U> receivedAtLeastOneMatch(Predicate<U> p, String description) {
         assertThat(testSubscriber.events().stream()
                 .anyMatch(p)).withFailMessage(description).isTrue();
         return this;
