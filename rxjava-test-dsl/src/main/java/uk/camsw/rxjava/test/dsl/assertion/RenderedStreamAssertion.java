@@ -6,6 +6,7 @@ import org.assertj.core.api.AbstractCharSequenceAssert;
 import uk.camsw.rxjava.test.dsl.then.IThen;
 
 import java.util.ArrayList;
+import java.util.function.Predicate;
 
 public class RenderedStreamAssertion<U> extends AbstractCharSequenceAssert<RenderedStreamAssertion<U>, CharSequence> implements ISubscriberAssertions<U>{
 
@@ -54,6 +55,18 @@ public class RenderedStreamAssertion<U> extends AbstractCharSequenceAssert<Rende
     @Override
     public RenderedStreamAssertion<U> renderedStream() {
         return subscriberAssertions.renderedStream();
+    }
+
+    @Override
+    public ISubscriberAssertions<U> eventsMatch(Predicate<? super U> p) {
+        subscriberAssertions.eventsMatch(p);
+        return this;
+    }
+
+    @Override
+    public ISubscriberAssertions<U> eventsMatch(Predicate<? super U> p, String description) {
+        subscriberAssertions.eventsMatch(p, description);
+        return this;
     }
 
     public RenderedStreamAssertion<U> containsAllInAnyOrder(String expected) {

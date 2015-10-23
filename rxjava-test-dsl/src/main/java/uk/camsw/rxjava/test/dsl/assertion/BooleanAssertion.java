@@ -3,6 +3,8 @@ package uk.camsw.rxjava.test.dsl.assertion;
 import org.assertj.core.api.AbstractBooleanAssert;
 import uk.camsw.rxjava.test.dsl.then.IThen;
 
+import java.util.function.Predicate;
+
 public class BooleanAssertion<U> extends AbstractBooleanAssert<BooleanAssertion<U>> implements ISubscriberAssertions<U> {
 
     private final ISubscriberAssertions<U> subscriberAssertions;
@@ -45,6 +47,18 @@ public class BooleanAssertion<U> extends AbstractBooleanAssert<BooleanAssertion<
     @Override
     public RenderedStreamAssertion<U> renderedStream() {
         return subscriberAssertions.renderedStream();
+    }
+
+    @Override
+    public ISubscriberAssertions<U> eventsMatch(Predicate<? super U> p) {
+        subscriberAssertions.eventsMatch(p);
+        return this;
+    }
+
+    @Override
+    public ISubscriberAssertions<U> eventsMatch(Predicate<? super U> p, String description) {
+        subscriberAssertions.eventsMatch(p, description);
+        return this;
     }
 
     @Override

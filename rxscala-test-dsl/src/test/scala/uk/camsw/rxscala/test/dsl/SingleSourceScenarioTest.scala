@@ -2,13 +2,13 @@ package uk.camsw.rxscala.test.dsl
 
 
 import java.util.concurrent.atomic.AtomicBoolean
+import java.util.function.{Predicate => JPredicate}
 
 import com.jayway.awaitility.core.ConditionTimeoutException
 import org.scalatest.{FunSpec, Matchers}
 import rx.exceptions.OnErrorNotImplementedException
 import rx.lang.scala.ImplicitFunctionConversions._
 import rx.lang.scala.schedulers.ComputationScheduler
-import rx.lang.scala.subjects.PublishSubject
 import uk.camsw.rxscala.test.dsl.TestScenario._
 
 import scala.concurrent.duration._
@@ -232,5 +232,21 @@ class SingleSourceScenarioTest
 
       s1.get() shouldBe true
     }
+
+    it ("should support multiple event matching") {
+      TestScenario.singleSource[Int, Int]()
+        .given()
+        .theStreamUnderTest((source, _) => source)
+
+        .when()
+        .theSubscriber().subscribes()
+        .theSource().emits(2)
+        .theSource().emits(3)
+        .theSource().emits(4)
+
+        .then()
+        .theSubscriber().eventsMatch((n: Int) => n >= 2 && n <= 4, "Event must be between 2 and 4 inclusive")
+    }
+
   }
 }
