@@ -10,6 +10,8 @@ import uk.camsw.rxjava.test.dsl.when.IWhen;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 public class SubscriberAssertions<U> implements ISubscriberAssertions<U> {
 
     private final ExecutionContext<?, ?, U, ?, ?> context;
@@ -66,16 +68,30 @@ public class SubscriberAssertions<U> implements ISubscriberAssertions<U> {
     }
 
     @Override
-    public ISubscriberAssertions<U> eventsMatch(Predicate<? super U> p) {
+    public ISubscriberAssertions<U> allEventsMatch(Predicate<? super U> p) {
         testSubscriber.events()
                 .forEach(e -> new ObjectAssertion<>(e, this).matches(p));
         return this;
     }
 
     @Override
-    public ISubscriberAssertions<U> eventsMatch(Predicate<? super U> p, String description) {
+    public ISubscriberAssertions<U> allEventsMatch(Predicate<? super U> p, String description) {
         testSubscriber.events()
                 .forEach(e -> new ObjectAssertion<>(e, this).matches(p, description));
+        return this;
+    }
+
+    @Override
+    public ISubscriberAssertions<U> atLeastOneEventMatches(Predicate<? super U> p) {
+        assertThat(testSubscriber.events().stream()
+                .anyMatch(p)).isTrue();
+        return this;
+    }
+
+    @Override
+    public ISubscriberAssertions<U> atLeastOneEventMatches(Predicate<? super U> p, String description) {
+        assertThat(testSubscriber.events().stream()
+                .anyMatch(p)).isTrue().withFailMessage(description);
         return this;
     }
 

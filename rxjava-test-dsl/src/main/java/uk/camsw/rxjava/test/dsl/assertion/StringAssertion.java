@@ -55,14 +55,26 @@ public class StringAssertion<U> extends AbstractCharSequenceAssert<StringAsserti
     }
 
     @Override
-    public ISubscriberAssertions<U> eventsMatch(Predicate<? super U> p, String description) {
-        subscriberAssertions.eventsMatch(p, description);
+    public ISubscriberAssertions<U> allEventsMatch(Predicate<? super U> p, String description) {
+        subscriberAssertions.allEventsMatch(p, description);
         return this;
     }
 
     @Override
-    public ISubscriberAssertions<U> eventsMatch(Predicate<? super U> p) {
-        subscriberAssertions.eventsMatch(p);
+    public ISubscriberAssertions<U> atLeastOneEventMatches(Predicate<? super U> p) {
+        subscriberAssertions.atLeastOneEventMatches(p);
+        return this;
+    }
+
+    @Override
+    public ISubscriberAssertions<U> atLeastOneEventMatches(Predicate<? super U> p, String description) {
+        subscriberAssertions.atLeastOneEventMatches(p, description);
+        return this;
+    }
+
+    @Override
+    public ISubscriberAssertions<U> allEventsMatch(Predicate<? super U> p) {
+        subscriberAssertions.allEventsMatch(p);
         return this;
     }
 }

@@ -222,7 +222,7 @@ class SingleSourceScenarioTest
       }
     }
 
-    it ("should support custom actions") {
+    it("should support custom actions") {
       val s1 = new AtomicBoolean(false)
       TestScenario.singleSource[String, String]()
         .when()
@@ -233,7 +233,7 @@ class SingleSourceScenarioTest
       s1.get() shouldBe true
     }
 
-    it ("should support multiple event matching") {
+    it("should support multiple event matching") {
       TestScenario.singleSource[Int, Int]()
         .given()
         .theStreamUnderTest((source, _) => source)
@@ -245,8 +245,25 @@ class SingleSourceScenarioTest
         .theSource().emits(4)
 
         .then()
-        .theSubscriber().eventsMatch((n: Int) => n >= 2 && n <= 4, "Event must be between 2 and 4 inclusive")
+        .theSubscriber().allEventsMatch((n: Int) => n >= 2 && n <= 4, "Event must be between 2 and 4 inclusive")
     }
 
+    it("should support multiple events contain") {
+      TestScenario.singleSource[Int, Int]()
+        .given()
+        .theStreamUnderTest((source, _) => source)
+
+        .when()
+        .theSubscriber().subscribes()
+        .theSource().emits(2)
+        .theSource().emits(3)
+        .theSource().emits(4)
+
+        .then()
+        .theSubscriber()
+        .atLeastOneEventMatches((n: Int) => n == 2, "Event should contain 2")
+        .atLeastOneEventMatches((n: Int) => n == 3, "Event should contain 3")
+        .atLeastOneEventMatches((n: Int) => n == 4, "Event should contain 4")
+    }
   }
 }

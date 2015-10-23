@@ -22,7 +22,9 @@ public interface ISubscriberAssertions<U> {
 
     RenderedStreamAssertion<U> renderedStream();
 
-    ISubscriberAssertions<U> eventsMatch(Predicate<? super U> p);
-    ISubscriberAssertions<U> eventsMatch(Predicate<? super U> p, String description);
+    ISubscriberAssertions<U> allEventsMatch(Predicate<? super U> p);
+    ISubscriberAssertions<U> allEventsMatch(Predicate<? super U> p, String description);
+    ISubscriberAssertions<U> atLeastOneEventMatches(Predicate<? super U> p);
+    ISubscriberAssertions<U> atLeastOneEventMatches(Predicate<? super U> p, String description);
 
 }

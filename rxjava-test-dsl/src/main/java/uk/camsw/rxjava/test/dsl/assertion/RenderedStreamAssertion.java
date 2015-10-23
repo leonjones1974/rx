@@ -8,7 +8,7 @@ import uk.camsw.rxjava.test.dsl.then.IThen;
 import java.util.ArrayList;
 import java.util.function.Predicate;
 
-public class RenderedStreamAssertion<U> extends AbstractCharSequenceAssert<RenderedStreamAssertion<U>, CharSequence> implements ISubscriberAssertions<U>{
+public class RenderedStreamAssertion<U> extends AbstractCharSequenceAssert<RenderedStreamAssertion<U>, CharSequence> implements ISubscriberAssertions<U> {
 
     private final ISubscriberAssertions<U> subscriberAssertions;
 
@@ -58,14 +58,26 @@ public class RenderedStreamAssertion<U> extends AbstractCharSequenceAssert<Rende
     }
 
     @Override
-    public ISubscriberAssertions<U> eventsMatch(Predicate<? super U> p) {
-        subscriberAssertions.eventsMatch(p);
+    public ISubscriberAssertions<U> allEventsMatch(Predicate<? super U> p) {
+        subscriberAssertions.allEventsMatch(p);
         return this;
     }
 
     @Override
-    public ISubscriberAssertions<U> eventsMatch(Predicate<? super U> p, String description) {
-        subscriberAssertions.eventsMatch(p, description);
+    public ISubscriberAssertions<U> allEventsMatch(Predicate<? super U> p, String description) {
+        subscriberAssertions.allEventsMatch(p, description);
+        return this;
+    }
+
+    @Override
+    public ISubscriberAssertions<U> atLeastOneEventMatches(Predicate<? super U> p) {
+        subscriberAssertions.atLeastOneEventMatches(p);
+        return this;
+    }
+
+    @Override
+    public ISubscriberAssertions<U> atLeastOneEventMatches(Predicate<? super U> p, String description) {
+        subscriberAssertions.atLeastOneEventMatches(p, description);
         return this;
     }
 
@@ -73,7 +85,7 @@ public class RenderedStreamAssertion<U> extends AbstractCharSequenceAssert<Rende
         ArrayList<String> actualItems = Lists.newArrayList(Splitter.on('-').split(actual));
         ArrayList<String> expectedItems = Lists.newArrayList(Splitter.on('-').split(expected));
         if (actualItems.size() == expectedItems.size()
-            && actualItems.containsAll(expectedItems)) return this;
+                && actualItems.containsAll(expectedItems)) return this;
 
         failWithMessage(actual + " does not contain all of " + expected);
         return this;

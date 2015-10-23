@@ -300,7 +300,27 @@ public class SingleSourceScenarioTest {
                 .theSource().emits(4)
 
                 .then()
-                .theSubscriber().eventsMatch(n -> n > 1 && n < 5, "Event must be between 2 and 4 inclusive");
+                .theSubscriber().allEventsMatch(n -> n > 1 && n < 5, "Event must be between 2 and 4 inclusive");
+    }
+
+    @Test
+    public void eventsContain() {
+        SingleSourceScenario<Integer, Integer> testScenario = TestScenario.singleSource();
+
+        testScenario.given()
+                .theStreamUnderTest(source -> source)
+
+                .when()
+                .theSubscriber().subscribes()
+                .theSource().emits(2)
+                .theSource().emits(3)
+                .theSource().emits(4)
+
+                .then()
+                .theSubscriber()
+                .atLeastOneEventMatches(n -> n == 2, "Event should contain 2")
+                .atLeastOneEventMatches(n -> n == 3, "Event should contain 3")
+                .atLeastOneEventMatches(n -> n == 4, "Event should contain 4");
     }
 
 
