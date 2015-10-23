@@ -287,7 +287,7 @@ public class SingleSourceScenarioTest {
     }
 
     @Test
-    public void multipleEventMatching() {
+    public void allEventsMatch() {
         SingleSourceScenario<Integer, Integer> testScenario = TestScenario.singleSource();
 
         testScenario.given()
@@ -304,7 +304,7 @@ public class SingleSourceScenarioTest {
     }
 
     @Test
-    public void eventsContain() {
+    public void atLeastOneEventMatches() {
         SingleSourceScenario<Integer, Integer> testScenario = TestScenario.singleSource();
 
         testScenario.given()
@@ -318,9 +318,9 @@ public class SingleSourceScenarioTest {
 
                 .then()
                 .theSubscriber()
-                .atLeastOneEventMatches(n -> n == 2, "Event should contain 2")
-                .atLeastOneEventMatches(n -> n == 3, "Event should contain 3")
-                .atLeastOneEventMatches(n -> n == 4, "Event should contain 4");
+                .atLeastOneEventMatches(n -> n == 2, "Events should contain 2")
+                .atLeastOneEventMatches(n -> n == 3, "Events should contain 3")
+                .atLeastOneEventMatches(n -> n == 4, "Events should contain 4");
     }
 
 

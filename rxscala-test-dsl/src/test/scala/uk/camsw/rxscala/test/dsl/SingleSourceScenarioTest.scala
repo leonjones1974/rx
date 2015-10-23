@@ -233,7 +233,7 @@ class SingleSourceScenarioTest
       s1.get() shouldBe true
     }
 
-    it("should support multiple event matching") {
+    it("should support all events match") {
       TestScenario.singleSource[Int, Int]()
         .given()
         .theStreamUnderTest((source, _) => source)
@@ -248,7 +248,7 @@ class SingleSourceScenarioTest
         .theSubscriber().allEventsMatch((n: Int) => n >= 2 && n <= 4, "Event must be between 2 and 4 inclusive")
     }
 
-    it("should support multiple events contain") {
+    it("should support at least one event matches") {
       TestScenario.singleSource[Int, Int]()
         .given()
         .theStreamUnderTest((source, _) => source)
@@ -261,9 +261,9 @@ class SingleSourceScenarioTest
 
         .then()
         .theSubscriber()
-        .atLeastOneEventMatches((n: Int) => n == 2, "Event should contain 2")
-        .atLeastOneEventMatches((n: Int) => n == 3, "Event should contain 3")
-        .atLeastOneEventMatches((n: Int) => n == 4, "Event should contain 4")
+        .atLeastOneEventMatches((n: Int) => n == 2, "Events should contain 2")
+        .atLeastOneEventMatches((n: Int) => n == 3, "Events should contain 3")
+        .atLeastOneEventMatches((n: Int) => n == 4, "Events should contain 4")
     }
   }
 }

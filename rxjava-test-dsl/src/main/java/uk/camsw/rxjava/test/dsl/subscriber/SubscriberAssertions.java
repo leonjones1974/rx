@@ -91,7 +91,7 @@ public class SubscriberAssertions<U> implements ISubscriberAssertions<U> {
     @Override
     public ISubscriberAssertions<U> atLeastOneEventMatches(Predicate<? super U> p, String description) {
         assertThat(testSubscriber.events().stream()
-                .anyMatch(p)).isTrue().withFailMessage(description);
+                .anyMatch(p)).withFailMessage(description).isTrue();
         return this;
     }
 
