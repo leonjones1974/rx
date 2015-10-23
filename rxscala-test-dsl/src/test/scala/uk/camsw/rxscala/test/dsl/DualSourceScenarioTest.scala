@@ -26,7 +26,7 @@ class DualSourceScenarioTest
         .source1().completes()
         .source2().completes()
 
-        .then()
+        .so()
         .subscriber("s1")
         .eventCount().isEqualTo(4)
         .event(0).isEqualTo("1")
@@ -52,7 +52,7 @@ class DualSourceScenarioTest
         .source2().emits(2)
         .source1().completes()
 
-        .then()
+        .so()
         .theSubscribers()
         .eventCount().isEqualTo(2)
         .renderedStream().isEqualTo("[a1]-[b2]-|")

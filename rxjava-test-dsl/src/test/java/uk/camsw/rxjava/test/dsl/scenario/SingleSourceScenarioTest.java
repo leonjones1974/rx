@@ -286,5 +286,42 @@ public class SingleSourceScenarioTest {
         assertThat(s1.get()).isTrue();
     }
 
+    @Test
+    public void allEventsMatch() {
+        SingleSourceScenario<Integer, Integer> testScenario = TestScenario.singleSource();
+
+        testScenario.given()
+                .theStreamUnderTest(source -> source)
+
+                .when()
+                .theSubscriber().subscribes()
+                .theSource().emits(2)
+                .theSource().emits(3)
+                .theSource().emits(4)
+
+                .then()
+                .theSubscriber().receivedOnlyEventsMatching(n -> n > 1 && n < 5, "Event must be between 2 and 4 inclusive");
+    }
+
+    @Test
+    public void atLeastOneEventMatches() {
+        SingleSourceScenario<Integer, Integer> testScenario = TestScenario.singleSource();
+
+        testScenario.given()
+                .theStreamUnderTest(source -> source)
+
+                .when()
+                .theSubscriber().subscribes()
+                .theSource().emits(2)
+                .theSource().emits(3)
+                .theSource().emits(4)
+
+                .then()
+                .theSubscriber()
+                .receivedAtLeastOneMatch(n -> n == 2, "Events should contain 2")
+                .receivedAtLeastOneMatch(n -> n == 3, "Events should contain 3")
+                .receivedAtLeastOneMatch(n -> n == 4, "Events should contain 4");
+    }
+
 
 }

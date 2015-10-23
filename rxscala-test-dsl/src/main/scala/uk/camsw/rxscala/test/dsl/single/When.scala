@@ -8,4 +8,10 @@ class When[T1, U](ctx: ExecutionContext[T1, _, U, Given[T1, U], When[T1, U]]) ex
   val _source = ctx.getSource1
 
   def theSource() = _source
+
+  override def then() = throw new UnsupportedOperationException("Then not supported in scala api, use so")
+
+  override def go()  = so()
+
+  def so() = super.then()
 }

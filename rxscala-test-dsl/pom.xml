@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>uk.camsw</groupId>
 		<artifactId>rx</artifactId>
-		<version>5.1.0-SNAPSHOT</version>
+		<version>6.0.0-SNAPSHOT</version>
 	</parent>
 	<artifactId>rxscala-test-dsl</artifactId>
 

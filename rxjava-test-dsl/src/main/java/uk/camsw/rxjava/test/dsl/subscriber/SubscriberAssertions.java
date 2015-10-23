@@ -2,16 +2,19 @@ package uk.camsw.rxjava.test.dsl.subscriber;
 
 import com.google.common.base.Joiner;
 import rx.functions.Func1;
+import uk.camsw.rxjava.test.dsl.assertion.*;
 import uk.camsw.rxjava.test.dsl.scenario.ExecutionContext;
 import uk.camsw.rxjava.test.dsl.then.BaseThen;
 import uk.camsw.rxjava.test.dsl.when.IWhen;
-import uk.camsw.rxjava.test.dsl.assertion.*;
 
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class SubscriberAssertions<U> implements ISubscriberAssertions<U> {
 
-    private final ExecutionContext<?, ?, U,?,?> context;
+    private final ExecutionContext<?, ?, U, ?, ?> context;
     private final ISubscriber<U, ? extends IWhen> testSubscriber;
 
     public SubscriberAssertions(ExecutionContext<?, ?, U, ?, ?> context, ISubscriber<U, ? extends IWhen> testSubscriber) {
@@ -57,10 +60,39 @@ public class SubscriberAssertions<U> implements ISubscriberAssertions<U> {
                     return "[" + renderer.call(e) + "]";
                 }).collect(Collectors.toList())));
 
-        for (int i = 0; i< testSubscriber.completedCount(); i++) rendering.append("-|");
+        for (int i = 0; i < testSubscriber.completedCount(); i++) rendering.append("-|");
 
-        if (testSubscriber.isErrored()) rendering.append("-X[").append(testSubscriber.errorClass().getSimpleName()).append(": ").append(testSubscriber.errorMessage()).append("]");
+        if (testSubscriber.isErrored())
+            rendering.append("-X[").append(testSubscriber.errorClass().getSimpleName()).append(": ").append(testSubscriber.errorMessage()).append("]");
         return new RenderedStreamAssertion<>(rendering.toString(), this);
+    }
+
+    @Override
+    public ISubscriberAssertions<U> receivedOnlyEventsMatching(Predicate<U> p) {
+        testSubscriber.events()
+                .forEach(e -> new ObjectAssertion<>(e, this).matches(p));
+        return this;
+    }
+
+    @Override
+    public ISubscriberAssertions<U> receivedOnlyEventsMatching(Predicate<U> p, String description) {
+        testSubscriber.events()
+                .forEach(e -> new ObjectAssertion<>(e, this).matches(p, description));
+        return this;
+    }
+
+    @Override
+    public ISubscriberAssertions<U> receivedAtLeastOneMatch(Predicate<U> p) {
+        assertThat(testSubscriber.events().stream()
+                .anyMatch(p)).isTrue();
+        return this;
+    }
+
+    @Override
+    public ISubscriberAssertions<U> receivedAtLeastOneMatch(Predicate<U> p, String description) {
+        assertThat(testSubscriber.events().stream()
+                .anyMatch(p)).withFailMessage(description).isTrue();
+        return this;
     }
 
     @Override
