@@ -1,13 +1,13 @@
 package uk.camsw.rxscala.test.dsl
 
 import java.util.concurrent.atomic.AtomicBoolean
-import java.util.function.{Predicate => JPredicate}
 
 import com.jayway.awaitility.core.ConditionTimeoutException
 import org.scalatest.{FunSpec, Matchers}
 import rx.exceptions.OnErrorNotImplementedException
 import rx.lang.scala.ImplicitFunctionConversions._
 import rx.lang.scala.schedulers.ComputationScheduler
+import uk.camsw.rxjava.test.dsl.subscriber.SubscriberAssertions
 import uk.camsw.rxscala.test.dsl.TestScenario._
 
 import scala.concurrent.duration._
@@ -266,5 +266,49 @@ class SingleSourceScenarioTest
         .receivedAtLeastOneMatch((n: Int) => n == 3, "Events should contain 3")
         .receivedAtLeastOneMatch((n: Int) => n == 4, "Events should contain 4")
     }
+
+    it("should support inlined assertions using default subscriber") {
+      TestScenario.singleSource[Int, Int]()
+        .given()
+        .theStreamUnderTest((source, _) => source)
+
+        .when()
+        .theSubscriber().subscribes()
+        .theSource().emits(2)
+        .so(s => s.eventCount().isEqualTo(1))
+        .theSource().emits(3)
+        .so(s => s.eventCount().isEqualTo(2))
+        .theSource().emits(4)
+
+        .so()
+        .theSubscriber()
+        .receivedAtLeastOneMatch((n: Int) => n == 2, "Events should contain 2")
+        .receivedAtLeastOneMatch((n: Int) => n == 3, "Events should contain 3")
+        .receivedAtLeastOneMatch((n: Int) => n == 4, "Events should contain 4")
+    }
+  }
+
+  it("should support inlined assertions using named subscriber") {
+    TestScenario.singleSource[Int, Int]()
+      .given()
+      .theStreamUnderTest((source, _) => source)
+
+      .when()
+      .theSubscriber("s1").subscribes()
+      .theSubscriber("s2").subscribes()
+      .theSource().emits(2)
+      .so("s1")(s => s.eventCount().isEqualTo(1))
+      .so("s2")(s => s.eventCount().isEqualTo(1))
+      .subscriber("s2").unsubscribes()
+      .theSource().emits(3)
+      .so("s1")(s => s.eventCount().isEqualTo(2))
+      .so("s2")(s => s.eventCount().isEqualTo(1))
+      .theSource().emits(4)
+
+      .so()
+      .theSubscriber("s1")
+      .receivedAtLeastOneMatch((n: Int) => n == 2, "Events should contain 2")
+      .receivedAtLeastOneMatch((n: Int) => n == 3, "Events should contain 3")
+      .receivedAtLeastOneMatch((n: Int) => n == 4, "Events should contain 4")
   }
 }
