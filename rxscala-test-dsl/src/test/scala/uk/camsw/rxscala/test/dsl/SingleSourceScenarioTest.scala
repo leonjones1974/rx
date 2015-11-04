@@ -7,7 +7,6 @@ import org.scalatest.{FunSpec, Matchers}
 import rx.exceptions.OnErrorNotImplementedException
 import rx.lang.scala.ImplicitFunctionConversions._
 import rx.lang.scala.schedulers.ComputationScheduler
-import uk.camsw.rxjava.test.dsl.subscriber.SubscriberAssertions
 import uk.camsw.rxscala.test.dsl.TestScenario._
 
 import scala.concurrent.duration._
@@ -275,9 +274,9 @@ class SingleSourceScenarioTest
         .when()
         .theSubscriber().subscribes()
         .theSource().emits(2)
-        .so(s => s.eventCount().isEqualTo(1))
+        .check(s => s.eventCount().isEqualTo(1))
         .theSource().emits(3)
-        .so(s => s.eventCount().isEqualTo(2))
+        .check(s => s.eventCount().isEqualTo(2))
         .theSource().emits(4)
 
         .so()
@@ -286,6 +285,23 @@ class SingleSourceScenarioTest
         .receivedAtLeastOneMatch((n: Int) => n == 3, "Events should contain 3")
         .receivedAtLeastOneMatch((n: Int) => n == 4, "Events should contain 4")
     }
+  }
+
+  it("should support inlined assertions without requiring subscriber") {
+    val signal: AtomicBoolean = new AtomicBoolean(false)
+
+    TestScenario.singleSource[Int, Int]()
+      .given()
+      .theStreamUnderTest((source, _) => source)
+
+      .when()
+      .theActionIsPerformed(() => signal.set(true))
+      .check(signal.get() shouldBe true )
+      .check(signal.set(false))
+
+      .go()
+
+    signal.get shouldBe false     // Double check to get red/green test
   }
 
   it("should support inlined assertions using named subscriber") {
@@ -297,12 +313,12 @@ class SingleSourceScenarioTest
       .theSubscriber("s1").subscribes()
       .theSubscriber("s2").subscribes()
       .theSource().emits(2)
-      .so("s1")(s => s.eventCount().isEqualTo(1))
-      .so("s2")(s => s.eventCount().isEqualTo(1))
+      .check("s1")(s => s.eventCount().isEqualTo(1))
+      .check("s2")(s => s.eventCount().isEqualTo(1))
       .subscriber("s2").unsubscribes()
       .theSource().emits(3)
-      .so("s1")(s => s.eventCount().isEqualTo(2))
-      .so("s2")(s => s.eventCount().isEqualTo(1))
+      .check("s1")(s => s.eventCount().isEqualTo(2))
+      .check("s2")(s => s.eventCount().isEqualTo(1))
       .theSource().emits(4)
 
       .so()
