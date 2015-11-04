@@ -1,7 +1,9 @@
 package uk.camsw.rxjava.test.dsl.scenario;
 
+import com.google.common.util.concurrent.Uninterruptibles;
 import com.jayway.awaitility.core.ConditionTimeoutException;
 import org.junit.Test;
+import rx.Observable;
 import rx.exceptions.OnErrorNotImplementedException;
 import rx.schedulers.Schedulers;
 import rx.subjects.PublishSubject;
@@ -253,6 +255,57 @@ public class SingleSourceScenarioTest {
                 .eventCount().isEqualTo(2);
     }
 
+    @Test
+    public void asyncWaitForTerminal_Error() {
+        SingleSourceScenario<String, String> testScenario = TestScenario.singleSource();
+
+        Observable<String> sut = Observable.create(subscriber -> {
+            Schedulers.io().createWorker().schedule(() -> {
+                subscriber.onNext("a");
+                Uninterruptibles.sleepUninterruptibly(1, TimeUnit.SECONDS);
+                subscriber.onError(new RuntimeException("Ouch"));
+            });
+        });
+
+        testScenario
+                .given()
+                .theStreamUnderTest(() -> sut)
+                .errorsAreHandled()
+                .asyncTimeoutOf(Duration.ofSeconds(2))
+
+                .when()
+                .theSubscriber().subscribes()
+                .theSubscriber().waitsForTermination()
+
+                .then()
+                .theSubscriber()
+                .renderedStream().isEqualTo("[a]-X[RuntimeException: Ouch]");
+    }
+
+    @Test
+    public void asyncWaitForTerminal_Completion() {
+        SingleSourceScenario<String, String> testScenario = TestScenario.singleSource();
+        Observable<String> sut = Observable.just("a")
+                .observeOn(Schedulers.io())
+                .delay(1, TimeUnit.SECONDS);
+
+        testScenario
+                .given()
+                .errorsAreHandled()
+                .theStreamUnderTest(() -> sut)
+                .asyncTimeoutOf(Duration.ofSeconds(2))
+
+                .when()
+                .theSubscriber().subscribes()
+                .theSubscriber().waitsForTermination()
+
+                .then()
+                .theSubscriber()
+                .renderedStream().isEqualTo("[a]-|");
+    }
+
+
+
     @Test(expected = ConditionTimeoutException.class)
     public void asyncWithTimeout() {
         SingleSourceScenario<String, String> testScenario = TestScenario.singleSource();
@@ -322,6 +375,7 @@ public class SingleSourceScenarioTest {
                 .receivedAtLeastOneMatch(n -> n == 3, "Events should contain 3")
                 .receivedAtLeastOneMatch(n -> n == 4, "Events should contain 4");
     }
+
 
 
 }

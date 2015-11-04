@@ -19,7 +19,7 @@ public class BaseSubscriber<U, WHEN extends IWhen> implements ISubscriber<U, WHE
 
     public BaseSubscriber(String id, ExecutionContext<?, ?, U, ?, WHEN> context) {
         this.id = id;
-        this.context= context;
+        this.context = context;
         this.inner = new rx.observers.TestSubscriber<>();
     }
 
@@ -45,6 +45,16 @@ public class BaseSubscriber<U, WHEN extends IWhen> implements ISubscriber<U, WHE
     @Override
     public WHEN waitsForEvents(int eventCount) {
         context.addCommand(context -> context.await().until(() -> inner.getOnNextEvents().size() >= eventCount));
+        return context.getWhen();
+    }
+
+    @Override
+    public WHEN waitsForTermination() {
+        context.addCommand(context -> {
+            context.await().until(() ->
+                            inner.getOnCompletedEvents().size() > 0 || inner.getOnErrorEvents().size() > 0
+            );
+        });
         return context.getWhen();
     }
 
@@ -90,6 +100,7 @@ public class BaseSubscriber<U, WHEN extends IWhen> implements ISubscriber<U, WHE
     public AbstractThrowableAssert<?, ? extends Throwable> error(int index) {
         return assertThat(inner.getOnErrorEvents().get(index));
     }
+
 
     @Override
     public void onCompleted() {

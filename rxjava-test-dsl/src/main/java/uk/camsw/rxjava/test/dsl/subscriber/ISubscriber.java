@@ -30,4 +30,5 @@ public interface ISubscriber<U, WHEN extends IWhen> {
 
     AbstractThrowableAssert<?, ? extends Throwable> error(int index);
 
+    WHEN waitsForTermination();
 }
