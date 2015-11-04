@@ -18,8 +18,8 @@ class Given[T1, U](ctx: ExecutionContext[T1, T1, U, Given[T1, U], When[T1, U]]) 
     this
   }
 
-  def theStreamUnderTest(f: () => Observable[U]) = {
-    ctx.setStreamUnderTest(toJavaObservable[U](f()))
+  def theStreamUnderTest(f: => Observable[U]) = {
+    ctx.setStreamUnderTest(toJavaObservable[U](f))
     this
   }
 

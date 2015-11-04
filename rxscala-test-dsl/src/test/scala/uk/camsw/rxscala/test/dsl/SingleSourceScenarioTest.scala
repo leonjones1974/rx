@@ -6,6 +6,7 @@ import com.jayway.awaitility.core.ConditionTimeoutException
 import org.scalatest.{FunSpec, Matchers}
 import rx.exceptions.OnErrorNotImplementedException
 import rx.lang.scala.ImplicitFunctionConversions._
+import rx.lang.scala.Observable
 import rx.lang.scala.schedulers.ComputationScheduler
 import uk.camsw.rxscala.test.dsl.TestScenario._
 
@@ -296,12 +297,12 @@ class SingleSourceScenarioTest
 
       .when()
       .theActionIsPerformed(() => signal.set(true))
-      .check(signal.get() shouldBe true )
+      .check(signal.get() shouldBe true)
       .check(signal.set(false))
 
       .go()
 
-    signal.get shouldBe false     // Double check to get red/green test
+    signal.get shouldBe false // Double check to get red/green test
   }
 
   it("should support inlined assertions using named subscriber") {
@@ -327,4 +328,37 @@ class SingleSourceScenarioTest
       .receivedAtLeastOneMatch((n: Int) => n == 3, "Events should contain 3")
       .receivedAtLeastOneMatch((n: Int) => n == 4, "Events should contain 4")
   }
+
+  it("should support stream under test, passed by name") {
+    TestScenario.singleSource[Int, Int]()
+      .given()
+      .theStreamUnderTest(Observable.just(1, 2))
+
+      .when()
+      .theSubscriber().subscribes()
+
+      .so()
+      .theSubscribers().renderedStream().isEqualTo("[1]-[2]-|")
+  }
+
+  it("should support actions, passed by name") {
+    val s1 = new AtomicBoolean(false)
+    TestScenario.singleSource[String, String]()
+      .when()
+      .actionIsPerformed(s1.set(true))
+      .check(s1.get() shouldBe true)
+
+      .go()
+  }
+
+  it("should support actions (aliased), passed by name") {
+    val s1 = new AtomicBoolean(false)
+    TestScenario.singleSource[String, String]()
+      .when()
+      .doAction(s1.set(true))
+      .check(s1.get() shouldBe true)
+
+      .go()
+  }
+
 }

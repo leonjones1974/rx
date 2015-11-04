@@ -21,16 +21,20 @@ class When[T1, U](ctx: ExecutionContext[T1, T1, U, Given[T1, U], When[T1, U]]) e
 
   def so() = super.then()
 
+  def doAction(f: => Unit): When[T1, U] = {
+    execute(f)
+  }
+
+  def actionIsPerformed(f: => Unit): When[T1, U] = {
+    execute(f)
+  }
+
   def check(f: => Unit): When[T1, U] = {
-    ctx.addCommand(new Consumer[ExecutionContext[T1, T1, U, Given[T1, U], When[T1, U]]] {
-      override def accept(t: ExecutionContext[T1, T1, U, Given[T1, U], When[T1, U]]): Unit = f
-    })
-    this
+    execute(f)
   }
 
   def check(f: SubscriberAssertions[U] => Unit): When[T1, U] = {
     check(KeyConstants.THE_SUBSCRIBER)(f)
-    this
   }
 
   def check(id: String)(f: SubscriberAssertions[U] => Unit): When[T1, U] = {
@@ -41,4 +45,12 @@ class When[T1, U](ctx: ExecutionContext[T1, T1, U, Given[T1, U], When[T1, U]]) e
     })
     this
   }
+
+  private def execute(f: => Unit) : When[T1, U] = {
+    ctx.addCommand(new Consumer[ExecutionContext[T1, T1, U, Given[T1, U], When[T1, U]]] {
+      override def accept(t: ExecutionContext[T1, T1, U, Given[T1, U], When[T1, U]]): Unit = f
+    })
+    this
+  }
+
 }
