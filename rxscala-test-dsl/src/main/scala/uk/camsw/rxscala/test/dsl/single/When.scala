@@ -49,8 +49,9 @@ class When[T1, U](ctx: ExecutionContext[T1, T1, U, Given[T1, U], When[T1, U]]) e
     this
   }
 
-  def print(x: Any) = {
+  def print(x: Any) : When[T1, U] = {
     execute(println(x))
+    this
   }
 
   def check(id: String)(f: SubscriberAssertions[U] => Unit): When[T1, U] = {
