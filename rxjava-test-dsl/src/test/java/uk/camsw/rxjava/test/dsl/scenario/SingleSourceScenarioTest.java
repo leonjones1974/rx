@@ -376,6 +376,25 @@ public class SingleSourceScenarioTest {
                 .receivedAtLeastOneMatch(n -> n == 4, "Events should contain 4");
     }
 
+    @Test
+    @org.junit.Ignore("Manual test")
+    public void sleep() {
+        SingleSourceScenario<String, String> testScenario = TestScenario.singleSource();
+
+        testScenario
+                .given()
+                .theStreamUnderTest(source -> source.doOnUnsubscribe(() -> System.out.println("Unsubscribed")))
+                .asyncTimeoutOf(Duration.ofMillis(500))
+
+                .when()
+                .subscriber("s1").subscribes()
+                .theActionIsPerformed(() -> System.out.println("Before sleep"))
+                .sleepFor(Duration.ofSeconds(4))
+                .theActionIsPerformed(() -> System.out.println("After sleep"))
+                .subscriber("s1").unsubscribes()
+
+                .go();
+    }
 
 
 }

@@ -1,5 +1,6 @@
 package uk.camsw.rxscala.test.dsl
 
+import java.time
 import java.util.concurrent.atomic.AtomicBoolean
 
 import com.jayway.awaitility.core.ConditionTimeoutException
@@ -360,6 +361,22 @@ class SingleSourceScenarioTest
       .check(s1.get() shouldBe true)
 
       .go()
+  }
+
+  ignore("should support sleep - manual test") {
+    TestScenario.singleSource[String, String]()
+      .given()
+      .theStreamUnderTest((source, _) => source.doOnUnsubscribe(println("Unsubscribed")))
+
+      .when()
+      .subscriber("s1").subscribes()
+      .doAction(println("Before sleep"))
+      .sleepFor(5 seconds)
+      .doAction(println("After sleep"))
+      .subscriber("s1").unsubscribes()
+
+      .go()
+
   }
 
 }
