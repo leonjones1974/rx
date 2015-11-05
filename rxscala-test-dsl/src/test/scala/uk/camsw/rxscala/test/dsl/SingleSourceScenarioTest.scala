@@ -19,6 +19,7 @@ class SingleSourceScenarioTest
   describe("A single source scenario") {
     it("should support a simple scenario") {
 
+
       TestScenario.singleSource[String, Int]()
         .given()
         .theStreamUnderTest((source, _) => source.map(s => Integer.parseInt(s) + 1))

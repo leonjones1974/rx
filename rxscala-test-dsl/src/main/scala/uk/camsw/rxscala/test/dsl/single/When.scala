@@ -7,6 +7,9 @@ import uk.camsw.rxjava.test.dsl.scenario.ExecutionContext
 import uk.camsw.rxjava.test.dsl.subscriber.SubscriberAssertions
 import uk.camsw.rxjava.test.dsl.then.BaseThen
 import uk.camsw.rxjava.test.dsl.when.BaseWhen
+import uk.camsw.rxscala.test.dsl.TestScenario._
+
+import scala.concurrent.duration.Duration
 
 class When[T1, U](ctx: ExecutionContext[T1, T1, U, Given[T1, U], When[T1, U]]) extends BaseWhen[U, When[T1, U]](ctx) {
 
@@ -35,6 +38,10 @@ class When[T1, U](ctx: ExecutionContext[T1, T1, U, Given[T1, U], When[T1, U]]) e
 
   def check(f: SubscriberAssertions[U] => Unit): When[T1, U] = {
     check(KeyConstants.THE_SUBSCRIBER)(f)
+  }
+
+  def sleepFor(duration: Duration) : When[T1, U] = {
+    execute(super.sleepFor(duration))
   }
 
   def check(id: String)(f: SubscriberAssertions[U] => Unit): When[T1, U] = {
