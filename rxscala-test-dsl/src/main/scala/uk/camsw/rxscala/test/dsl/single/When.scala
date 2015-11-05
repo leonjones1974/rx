@@ -40,7 +40,7 @@ class When[T1, U](ctx: ExecutionContext[T1, T1, U, Given[T1, U], When[T1, U]]) e
     check(KeyConstants.THE_SUBSCRIBER)(f)
   }
 
-  def sleepFor(duration: Duration) : When[T1, U] = {
+  def doSleep(duration: Duration) : When[T1, U] = {
     execute(super.sleepFor(duration))
   }
 
