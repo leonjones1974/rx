@@ -4,7 +4,7 @@ import java.time
 import java.util.concurrent.atomic.AtomicBoolean
 
 import com.jayway.awaitility.core.ConditionTimeoutException
-import org.scalatest.{FunSpec, Matchers}
+import org.scalatest.{ FunSpec, Matchers }
 import rx.exceptions.OnErrorNotImplementedException
 import rx.lang.scala.ImplicitFunctionConversions._
 import rx.lang.scala.Observable
@@ -19,7 +19,6 @@ class SingleSourceScenarioTest
 
   describe("A single source scenario") {
     it("should support a simple scenario") {
-
 
       TestScenario.singleSource[String, Int]()
         .given()

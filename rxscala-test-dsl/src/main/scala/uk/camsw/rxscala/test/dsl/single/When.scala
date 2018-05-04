@@ -45,27 +45,25 @@ class When[T1, U](ctx: ExecutionContext[T1, T1, U, Given[T1, U], When[T1, U]]) e
     this
   }
 
-
   def checkSubscriber(f: SubscriberAssertions[U] => Unit): When[T1, U] = {
     check(KeyConstants.THE_SUBSCRIBER)(f)
   }
 
-  def sleepFor(duration: Duration) : When[T1, U] = {
+  def sleepFor(duration: Duration): When[T1, U] = {
     doSleep(duration)
   }
 
-  def doSleep(duration: Duration) : When[T1, U] = {
+  def doSleep(duration: Duration): When[T1, U] = {
     sleepFor(duration)
     this
   }
 
-  def print(x: Any) : When[T1, U] = {
+  def print(x: Any): When[T1, U] = {
     execute(println(x))
     this
   }
 
-
-  private def execute(f: => Unit) : When[T1, U] = {
+  private def execute(f: => Unit): When[T1, U] = {
     ctx.addCommand(new Consumer[ExecutionContext[T1, T1, U, Given[T1, U], When[T1, U]]] {
       override def accept(t: ExecutionContext[T1, T1, U, Given[T1, U], When[T1, U]]): Unit = f
     })
