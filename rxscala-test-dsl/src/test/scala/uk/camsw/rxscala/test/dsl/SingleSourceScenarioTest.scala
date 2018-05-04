@@ -277,9 +277,9 @@ class SingleSourceScenarioTest
         .when()
         .theSubscriber().subscribes()
         .theSource().emits(2)
-        .check(s => s.eventCount().isEqualTo(1))
+        .checkSubscriber(s => s.eventCount().isEqualTo(1))
         .theSource().emits(3)
-        .check(s => s.eventCount().isEqualTo(2))
+        .checkSubscriber(s => s.eventCount().isEqualTo(2))
         .theSource().emits(4)
 
         .so()
@@ -299,8 +299,8 @@ class SingleSourceScenarioTest
 
       .when()
       .theActionIsPerformed(() => signal.set(true))
-      .check(signal.get() shouldBe true)
-      .check(signal.set(false))
+      .checkF(signal.get() shouldBe true)
+      .checkF(signal.set(false))
 
       .go()
 
@@ -348,7 +348,7 @@ class SingleSourceScenarioTest
     TestScenario.singleSource[String, String]()
       .when()
       .actionIsPerformed(s1.set(true))
-      .check(s1.get() shouldBe true)
+      .checkF(s1.get() shouldBe true)
 
       .go()
   }
@@ -358,7 +358,7 @@ class SingleSourceScenarioTest
     TestScenario.singleSource[String, String]()
       .when()
       .doAction(s1.set(true))
-      .check(s1.get() shouldBe true)
+      .checkF(s1.get() shouldBe true)
 
       .go()
   }

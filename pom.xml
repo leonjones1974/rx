@@ -13,16 +13,14 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <scala.version.major>2.11</scala.version.major>
-        <scala.version.build>7</scala.version.build>
+        <scala.version.major>2.12</scala.version.major>
+        <scala.version.build>4</scala.version.build>
         <scala.version>${scala.version.major}.${scala.version.build}</scala.version>
     </properties>
 
     <modules>
         <module>rxscala-test-dsl</module>
-        <module>rxjava-kafka</module>
         <module>rxjava-test-dsl</module>
-        <module>rxjava-test-kafka</module>
     </modules>
 
     <developers>
@@ -64,23 +62,18 @@
             <id>sonatype-nexus-snapshots</id>
             <url>https://oss.sonatype.org/content/repositories/snapshots</url>
         </repository>
-        <repository>
-            <id>scala-tools.org</id>
-            <name>Scala-tools Maven2 Repository</name>
-            <url>http://scala-tools.org/repo-releases</url>
-        </repository>
     </repositories>
 
     <pluginRepositories>
-        <pluginRepository>
-            <id>scala-tools.org</id>
-            <name>Scala-tools Maven2 Repository</name>
-            <url>http://scala-tools.org/repo-releases</url>
-        </pluginRepository>
-        <pluginRepository>
-            <id>dtrott</id>
-            <url>http://maven.davidtrott.com/repository</url>
-        </pluginRepository>
+        <!--<pluginRepository>-->
+            <!--<id>scala-tools.org</id>-->
+            <!--<name>Scala-tools Maven2 Repository</name>-->
+            <!--<url>http://scala-tools.org/repo-releases</url>-->
+        <!--</pluginRepository>-->
+        <!--<pluginRepository>-->
+            <!--<id>dtrott</id>-->
+            <!--<url>http://maven.davidtrott.com/repository</url>-->
+        <!--</pluginRepository>-->
     </pluginRepositories>
 
     <dependencyManagement>
@@ -102,27 +95,8 @@
             </dependency>
             <dependency>
                 <groupId>io.reactivex</groupId>
-                <artifactId>rxscala_${scala.version.major}</artifactId>
-                <version>0.25.0</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.kafka</groupId>
-                <artifactId>kafka_2.9.1</artifactId>
-                <version>0.8.1.1</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>com.sun.jmx</groupId>
-                        <artifactId>jmxri</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>com.sun.jdmk</groupId>
-                        <artifactId>jmxtools</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>javax.jms</groupId>
-                        <artifactId>jms</artifactId>
-                    </exclusion>
-                </exclusions>
+                <artifactId>rxscala_2.12.0-M5</artifactId>
+                <version>0.26.3</version>
             </dependency>
             <dependency>
                 <groupId>com.jayway.awaitility</groupId>
@@ -253,7 +227,7 @@
                 <dependency>
                     <groupId>org.scalatest</groupId>
                     <artifactId>scalatest_${scala.version.major}</artifactId>
-                    <version>2.2.4</version>
+                    <version>3.0.5</version>
                     <scope>test</scope>
                 </dependency>
             </dependencies>

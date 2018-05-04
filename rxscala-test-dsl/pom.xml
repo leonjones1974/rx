@@ -19,7 +19,7 @@
 		</dependency>
 		<dependency>
 			<groupId>io.reactivex</groupId>
-			<artifactId>rxscala_2.11</artifactId>
+			<artifactId>rxscala_2.12.0-M5</artifactId>
 		</dependency>
 	</dependencies>
 </project>
