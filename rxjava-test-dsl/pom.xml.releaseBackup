@@ -7,23 +7,30 @@
 		<artifactId>rx</artifactId>
 		<version>6.0.0-SNAPSHOT</version>
 	</parent>
-	<artifactId>rxjava-test-kafka</artifactId>
+	<artifactId>rxjava-test-dsl</artifactId>
 
-	<name>rxjava-test-kafka</name>
+	<name>rxjava-test-dsl</name>
 
 	<dependencies>
 		<dependency>
-			<groupId>org.apache.kafka</groupId>
-			<artifactId>kafka_2.9.1</artifactId>
+			<groupId>org.assertj</groupId>
+			<artifactId>assertj-core</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>uk.camsw</groupId>
-			<artifactId>rxjava-test-dsl</artifactId>
-			<version>${project.version}</version>
+			<groupId>io.reactivex</groupId>
+			<artifactId>rxjava</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
+			<groupId>com.jayway.awaitility</groupId>
+			<artifactId>awaitility</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
 		</dependency>
 	</dependencies>
 

@@ -1,6 +1,6 @@
 package uk.camsw.rxscala.test.dsl
 
-import org.scalatest.{FunSpec, Matchers}
+import org.scalatest.{ FunSpec, Matchers }
 import rx.lang.scala.Observable
 import rx.lang.scala.subjects.PublishSubject
 

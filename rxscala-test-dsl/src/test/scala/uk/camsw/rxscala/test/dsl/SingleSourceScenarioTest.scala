@@ -4,7 +4,7 @@ import java.time
 import java.util.concurrent.atomic.AtomicBoolean
 
 import com.jayway.awaitility.core.ConditionTimeoutException
-import org.scalatest.{FunSpec, Matchers}
+import org.scalatest.{ FunSpec, Matchers }
 import rx.exceptions.OnErrorNotImplementedException
 import rx.lang.scala.ImplicitFunctionConversions._
 import rx.lang.scala.Observable
@@ -19,7 +19,6 @@ class SingleSourceScenarioTest
 
   describe("A single source scenario") {
     it("should support a simple scenario") {
-
 
       TestScenario.singleSource[String, Int]()
         .given()
@@ -277,9 +276,9 @@ class SingleSourceScenarioTest
         .when()
         .theSubscriber().subscribes()
         .theSource().emits(2)
-        .check(s => s.eventCount().isEqualTo(1))
+        .checkSubscriber(s => s.eventCount().isEqualTo(1))
         .theSource().emits(3)
-        .check(s => s.eventCount().isEqualTo(2))
+        .checkSubscriber(s => s.eventCount().isEqualTo(2))
         .theSource().emits(4)
 
         .so()
@@ -299,8 +298,8 @@ class SingleSourceScenarioTest
 
       .when()
       .theActionIsPerformed(() => signal.set(true))
-      .check(signal.get() shouldBe true)
-      .check(signal.set(false))
+      .checkF(signal.get() shouldBe true)
+      .checkF(signal.set(false))
 
       .go()
 
@@ -348,7 +347,7 @@ class SingleSourceScenarioTest
     TestScenario.singleSource[String, String]()
       .when()
       .actionIsPerformed(s1.set(true))
-      .check(s1.get() shouldBe true)
+      .checkF(s1.get() shouldBe true)
 
       .go()
   }
@@ -358,7 +357,7 @@ class SingleSourceScenarioTest
     TestScenario.singleSource[String, String]()
       .when()
       .doAction(s1.set(true))
-      .check(s1.get() shouldBe true)
+      .checkF(s1.get() shouldBe true)
 
       .go()
   }
