@@ -23,17 +23,8 @@ public class BaseWhen<U, WHEN extends IWhen> implements IWhen<U, WHEN> {
     }
 
     @Override
-    public ISubscriber<U, WHEN> subscriber(int id) {
-        return subscriber(String.valueOf(id));
-    }
-
     public ISubscriber<U, WHEN> subscriber(String id) {
         return context.getOrCreateSubscriber(id);
-    }
-
-    @Override
-    public ISubscriber<U, WHEN> theSubscriber(String id) {
-        return subscriber(id);
     }
 
     @Override

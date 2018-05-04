@@ -25,16 +25,17 @@ class SingleSourceScenarioTest
         .theStreamUnderTest((source, _) => source.map(s => Integer.parseInt(s) + 1))
 
         .when()
-        .theSubscriber().subscribes()
-        .theSource().emits("1")
-        .theSource().emits("2")
-        .theSource().completes()
-
-        .so()
-        .theSubscriber()
-        .eventCount().isEqualTo(2)
-        .event(0).isEqualTo(2)
-        .event(1).isEqualTo(3)
+        .subscriber("1")
+      //        .subscribes()
+      //        .theSource().emits("1")
+      //        .theSource().emits("2")
+      //        .theSource().completes()
+      //
+      //        .so()
+      //        .theSubscriber()
+      //        .eventCount().isEqualTo(2)
+      //        .event(0).isEqualTo(2)
+      //        .event(1).isEqualTo(3)
     }
 
     it("should support multiple subscribers") {
@@ -312,8 +313,8 @@ class SingleSourceScenarioTest
       .theStreamUnderTest((source, _) => source)
 
       .when()
-      .theSubscriber("s1").subscribes()
-      .theSubscriber("s2").subscribes()
+      .subscriber("s1").subscribes()
+      .subscriber("s2").subscribes()
       .theSource().emits(2)
       .check("s1")(s => s.eventCount().isEqualTo(1))
       .check("s2")(s => s.eventCount().isEqualTo(1))

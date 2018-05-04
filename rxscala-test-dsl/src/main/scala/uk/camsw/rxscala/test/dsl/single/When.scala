@@ -4,7 +4,7 @@ import java.util.function.Consumer
 
 import uk.camsw.rxjava.test.dsl.KeyConstants
 import uk.camsw.rxjava.test.dsl.scenario.ExecutionContext
-import uk.camsw.rxjava.test.dsl.subscriber.SubscriberAssertions
+import uk.camsw.rxjava.test.dsl.subscriber.{ ISubscriber, SubscriberAssertions }
 import uk.camsw.rxjava.test.dsl.then.BaseThen
 import uk.camsw.rxjava.test.dsl.when.BaseWhen
 import uk.camsw.rxscala.test.dsl.TestScenario._
@@ -23,6 +23,10 @@ class When[T1, U](ctx: ExecutionContext[T1, T1, U, Given[T1, U], When[T1, U]]) e
   override def go() = so()
 
   def so() = super.then()
+
+  override def subscriber(id: String): ISubscriber[U, When[T1, U]] = super.subscriber(id)
+
+  override def theSubscriber(): ISubscriber[U, When[T1, U]] = super.theSubscriber()
 
   def doAction(f: => Unit): When[T1, U] = {
     execute(f)
