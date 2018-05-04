@@ -42,13 +42,25 @@ public class BaseWhen<U, WHEN extends IWhen> implements IWhen<U, WHEN> {
     }
 
     @Override
+    public WHEN sleepFor(long time, TemporalUnit unit) {
+        return theCurrentThreadSleepsFor(time, unit);
+    }
+
+    @Override
+    public WHEN sleepFor(Duration duration) {
+        return theCurrentThreadSleepsFor(duration);
+
+    }
+    @Override
     public WHEN theCurrentThreadSleepsFor(Duration duration) {
-        logger.info("Sleeping current thread: [{}]", duration);
-        try {
-            Thread.sleep(duration.toMillis());
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
+        context.addCommand(ctx -> {
+            logger.info("Sleeping current thread: [{}]", duration);
+            try {
+                Thread.sleep(duration.toMillis());
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+        });
         return context.getWhen();
     }
 

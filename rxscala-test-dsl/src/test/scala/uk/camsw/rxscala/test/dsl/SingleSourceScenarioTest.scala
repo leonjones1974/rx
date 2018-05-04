@@ -1,14 +1,14 @@
 package uk.camsw.rxscala.test.dsl
 
-
+import java.time
 import java.util.concurrent.atomic.AtomicBoolean
 
 import com.jayway.awaitility.core.ConditionTimeoutException
-import org.scalatest.{FunSpec, Matchers}
+import org.scalatest.{ FunSpec, Matchers }
 import rx.exceptions.OnErrorNotImplementedException
 import rx.lang.scala.ImplicitFunctionConversions._
+import rx.lang.scala.Observable
 import rx.lang.scala.schedulers.ComputationScheduler
-import rx.lang.scala.subjects.PublishSubject
 import uk.camsw.rxscala.test.dsl.TestScenario._
 
 import scala.concurrent.duration._
@@ -30,7 +30,7 @@ class SingleSourceScenarioTest
         .theSource().emits("2")
         .theSource().completes()
 
-        .then()
+        .so()
         .theSubscriber()
         .eventCount().isEqualTo(2)
         .event(0).isEqualTo(2)
@@ -51,7 +51,8 @@ class SingleSourceScenarioTest
         .theSource()
         .emits("2")
 
-        .then().subscriber("s1")
+        .so()
+        .subscriber("s1")
         .event(0).isEqualTo(2)
         .event(1).isEqualTo(3)
         .eventCount().isEqualTo(2)
@@ -72,7 +73,7 @@ class SingleSourceScenarioTest
         .subscriber("s1").unsubscribes()
         .theSource().emits("2")
 
-        .then()
+        .so()
         .subscriber("s1")
         .eventCount().isEqualTo(1)
     }
@@ -87,7 +88,7 @@ class SingleSourceScenarioTest
         .theSource().emits("1")
         .theSource().completes()
 
-        .then()
+        .so()
         .subscriber("s1")
         .isErrored.isFalse
         .completedCount().isEqualTo(1)
@@ -104,7 +105,7 @@ class SingleSourceScenarioTest
         .theSource().emits("1")
         .theSource().errors(new IllegalArgumentException("oh no"))
 
-        .then()
+        .so()
         .subscriber("s1")
         .isErrored.isTrue
         .errorClass().isAssignableFrom(classOf[IllegalArgumentException])
@@ -141,7 +142,7 @@ class SingleSourceScenarioTest
         .theSource().emits("2b")
         .theSource().completes()
 
-        .then()
+        .so()
         .subscriber("s1")
         .eventCount().isEqualTo(2)
         .event(0).isEqualTo(Seq("1a", "1b", "1c"))
@@ -160,7 +161,7 @@ class SingleSourceScenarioTest
         .theSource().emits(1)
         .theSource().completes()
 
-        .then()
+        .so()
         .subscriber("s1")
         .eventCount().isEqualTo(2)
         .renderedStream().isEqualTo("['a']-['B']-|")
@@ -180,7 +181,7 @@ class SingleSourceScenarioTest
         .theSource().emits(1)
         .theSource().errors(new RuntimeException("I'm broken"))
 
-        .then()
+        .so()
         .subscriber("s1")
         .renderedStream().isEqualTo("['a']-['B']-X[RuntimeException: I'm broken]")
         .isErrored.isTrue
@@ -199,7 +200,7 @@ class SingleSourceScenarioTest
         .theSource().emits("b")
         .subscriber("s1").waitsForEvents(2)
 
-        .then()
+        .so()
         .subscriber("s1")
         .renderedStream().isEqualTo("[a]-[b]")
         .eventCount().isEqualTo(2)
@@ -222,7 +223,7 @@ class SingleSourceScenarioTest
       }
     }
 
-    it ("should support custom actions") {
+    it("should support custom actions") {
       val s1 = new AtomicBoolean(false)
       TestScenario.singleSource[String, String]()
         .when()
@@ -232,5 +233,149 @@ class SingleSourceScenarioTest
 
       s1.get() shouldBe true
     }
+
+    it("should support all events match") {
+      TestScenario.singleSource[Int, Int]()
+        .given()
+        .theStreamUnderTest((source, _) => source)
+
+        .when()
+        .theSubscriber().subscribes()
+        .theSource().emits(2)
+        .theSource().emits(3)
+        .theSource().emits(4)
+
+        .so()
+        .theSubscriber()
+        .receivedOnlyEventsMatching((n: Int) => n >= 2 && n <= 4, "Event must be between 2 and 4 inclusive")
+    }
+
+    it("should support at least one event matches") {
+      TestScenario.singleSource[Int, Int]()
+        .given()
+        .theStreamUnderTest((source, _) => source)
+
+        .when()
+        .theSubscriber().subscribes()
+        .theSource().emits(2)
+        .theSource().emits(3)
+        .theSource().emits(4)
+
+        .so()
+        .theSubscriber()
+        .receivedAtLeastOneMatch((n: Int) => n == 2, "Events should contain 2")
+        .receivedAtLeastOneMatch((n: Int) => n == 3, "Events should contain 3")
+        .receivedAtLeastOneMatch((n: Int) => n == 4, "Events should contain 4")
+    }
+
+    it("should support inlined assertions using default subscriber") {
+      TestScenario.singleSource[Int, Int]()
+        .given()
+        .theStreamUnderTest((source, _) => source)
+
+        .when()
+        .theSubscriber().subscribes()
+        .theSource().emits(2)
+        .checkSubscriber(s => s.eventCount().isEqualTo(1))
+        .theSource().emits(3)
+        .checkSubscriber(s => s.eventCount().isEqualTo(2))
+        .theSource().emits(4)
+
+        .so()
+        .theSubscriber()
+        .receivedAtLeastOneMatch((n: Int) => n == 2, "Events should contain 2")
+        .receivedAtLeastOneMatch((n: Int) => n == 3, "Events should contain 3")
+        .receivedAtLeastOneMatch((n: Int) => n == 4, "Events should contain 4")
+    }
   }
+
+  it("should support inlined assertions without requiring subscriber") {
+    val signal: AtomicBoolean = new AtomicBoolean(false)
+
+    TestScenario.singleSource[Int, Int]()
+      .given()
+      .theStreamUnderTest((source, _) => source)
+
+      .when()
+      .theActionIsPerformed(() => signal.set(true))
+      .checkF(signal.get() shouldBe true)
+      .checkF(signal.set(false))
+
+      .go()
+
+    signal.get shouldBe false // Double check to get red/green test
+  }
+
+  it("should support inlined assertions using named subscriber") {
+    TestScenario.singleSource[Int, Int]()
+      .given()
+      .theStreamUnderTest((source, _) => source)
+
+      .when()
+      .theSubscriber("s1").subscribes()
+      .theSubscriber("s2").subscribes()
+      .theSource().emits(2)
+      .check("s1")(s => s.eventCount().isEqualTo(1))
+      .check("s2")(s => s.eventCount().isEqualTo(1))
+      .subscriber("s2").unsubscribes()
+      .theSource().emits(3)
+      .check("s1")(s => s.eventCount().isEqualTo(2))
+      .check("s2")(s => s.eventCount().isEqualTo(1))
+      .theSource().emits(4)
+
+      .so()
+      .theSubscriber("s1")
+      .receivedAtLeastOneMatch((n: Int) => n == 2, "Events should contain 2")
+      .receivedAtLeastOneMatch((n: Int) => n == 3, "Events should contain 3")
+      .receivedAtLeastOneMatch((n: Int) => n == 4, "Events should contain 4")
+  }
+
+  it("should support stream under test, passed by name") {
+    TestScenario.singleSource[Int, Int]()
+      .given()
+      .theStreamUnderTest(Observable.just(1, 2))
+
+      .when()
+      .theSubscriber().subscribes()
+
+      .so()
+      .theSubscribers().renderedStream().isEqualTo("[1]-[2]-|")
+  }
+
+  it("should support actions, passed by name") {
+    val s1 = new AtomicBoolean(false)
+    TestScenario.singleSource[String, String]()
+      .when()
+      .actionIsPerformed(s1.set(true))
+      .checkF(s1.get() shouldBe true)
+
+      .go()
+  }
+
+  it("should support actions (aliased), passed by name") {
+    val s1 = new AtomicBoolean(false)
+    TestScenario.singleSource[String, String]()
+      .when()
+      .doAction(s1.set(true))
+      .checkF(s1.get() shouldBe true)
+
+      .go()
+  }
+
+  ignore("should support sleep - manual test") {
+    TestScenario.singleSource[String, String]()
+      .given()
+      .theStreamUnderTest((source, _) => source.doOnUnsubscribe(println("Unsubscribed")))
+
+      .when()
+      .subscriber("s1").subscribes()
+      .doAction(println("Before sleep"))
+      .sleepFor(5 seconds)
+      .doAction(println("After sleep"))
+      .subscriber("s1").unsubscribes()
+
+      .go()
+
+  }
+
 }

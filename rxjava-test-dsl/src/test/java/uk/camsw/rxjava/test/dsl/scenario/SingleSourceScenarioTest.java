@@ -1,7 +1,9 @@
 package uk.camsw.rxjava.test.dsl.scenario;
 
+import com.google.common.util.concurrent.Uninterruptibles;
 import com.jayway.awaitility.core.ConditionTimeoutException;
 import org.junit.Test;
+import rx.Observable;
 import rx.exceptions.OnErrorNotImplementedException;
 import rx.schedulers.Schedulers;
 import rx.subjects.PublishSubject;
@@ -253,6 +255,57 @@ public class SingleSourceScenarioTest {
                 .eventCount().isEqualTo(2);
     }
 
+    @Test
+    public void asyncWaitForTerminal_Error() {
+        SingleSourceScenario<String, String> testScenario = TestScenario.singleSource();
+
+        Observable<String> sut = Observable.create(subscriber -> {
+            Schedulers.io().createWorker().schedule(() -> {
+                subscriber.onNext("a");
+                Uninterruptibles.sleepUninterruptibly(1, TimeUnit.SECONDS);
+                subscriber.onError(new RuntimeException("Ouch"));
+            });
+        });
+
+        testScenario
+                .given()
+                .theStreamUnderTest(() -> sut)
+                .errorsAreHandled()
+                .asyncTimeoutOf(Duration.ofSeconds(2))
+
+                .when()
+                .theSubscriber().subscribes()
+                .theSubscriber().waitsForTermination()
+
+                .then()
+                .theSubscriber()
+                .renderedStream().isEqualTo("[a]-X[RuntimeException: Ouch]");
+    }
+
+    @Test
+    public void asyncWaitForTerminal_Completion() {
+        SingleSourceScenario<String, String> testScenario = TestScenario.singleSource();
+        Observable<String> sut = Observable.just("a")
+                .observeOn(Schedulers.io())
+                .delay(1, TimeUnit.SECONDS);
+
+        testScenario
+                .given()
+                .errorsAreHandled()
+                .theStreamUnderTest(() -> sut)
+                .asyncTimeoutOf(Duration.ofSeconds(2))
+
+                .when()
+                .theSubscriber().subscribes()
+                .theSubscriber().waitsForTermination()
+
+                .then()
+                .theSubscriber()
+                .renderedStream().isEqualTo("[a]-|");
+    }
+
+
+
     @Test(expected = ConditionTimeoutException.class)
     public void asyncWithTimeout() {
         SingleSourceScenario<String, String> testScenario = TestScenario.singleSource();
@@ -284,6 +337,63 @@ public class SingleSourceScenarioTest {
                 .go();
 
         assertThat(s1.get()).isTrue();
+    }
+
+    @Test
+    public void allEventsMatch() {
+        SingleSourceScenario<Integer, Integer> testScenario = TestScenario.singleSource();
+
+        testScenario.given()
+                .theStreamUnderTest(source -> source)
+
+                .when()
+                .theSubscriber().subscribes()
+                .theSource().emits(2)
+                .theSource().emits(3)
+                .theSource().emits(4)
+
+                .then()
+                .theSubscriber().receivedOnlyEventsMatching(n -> n > 1 && n < 5, "Event must be between 2 and 4 inclusive");
+    }
+
+    @Test
+    public void atLeastOneEventMatches() {
+        SingleSourceScenario<Integer, Integer> testScenario = TestScenario.singleSource();
+
+        testScenario.given()
+                .theStreamUnderTest(source -> source)
+
+                .when()
+                .theSubscriber().subscribes()
+                .theSource().emits(2)
+                .theSource().emits(3)
+                .theSource().emits(4)
+
+                .then()
+                .theSubscriber()
+                .receivedAtLeastOneMatch(n -> n == 2, "Events should contain 2")
+                .receivedAtLeastOneMatch(n -> n == 3, "Events should contain 3")
+                .receivedAtLeastOneMatch(n -> n == 4, "Events should contain 4");
+    }
+
+    @Test
+    @org.junit.Ignore("Manual test")
+    public void sleep() {
+        SingleSourceScenario<String, String> testScenario = TestScenario.singleSource();
+
+        testScenario
+                .given()
+                .theStreamUnderTest(source -> source.doOnUnsubscribe(() -> System.out.println("Unsubscribed")))
+                .asyncTimeoutOf(Duration.ofMillis(500))
+
+                .when()
+                .subscriber("s1").subscribes()
+                .theActionIsPerformed(() -> System.out.println("Before sleep"))
+                .sleepFor(Duration.ofSeconds(4))
+                .theActionIsPerformed(() -> System.out.println("After sleep"))
+                .subscriber("s1").unsubscribes()
+
+                .go();
     }
 
 

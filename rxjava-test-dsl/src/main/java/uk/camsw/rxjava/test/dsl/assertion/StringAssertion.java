@@ -3,6 +3,8 @@ package uk.camsw.rxjava.test.dsl.assertion;
 import org.assertj.core.api.AbstractCharSequenceAssert;
 import uk.camsw.rxjava.test.dsl.then.IThen;
 
+import java.util.function.Predicate;
+
 public class StringAssertion<U> extends AbstractCharSequenceAssert<StringAssertion<U>, CharSequence> implements ISubscriberAssertions<U> {
 
     private final ISubscriberAssertions<U> subscriberAssertions;
@@ -50,5 +52,29 @@ public class StringAssertion<U> extends AbstractCharSequenceAssert<StringAsserti
     @Override
     public RenderedStreamAssertion<U> renderedStream() {
         return subscriberAssertions.renderedStream();
+    }
+
+    @Override
+    public ISubscriberAssertions<U> receivedOnlyEventsMatching(Predicate<U> p, String description) {
+        subscriberAssertions.receivedOnlyEventsMatching(p, description);
+        return this;
+    }
+
+    @Override
+    public ISubscriberAssertions<U> receivedAtLeastOneMatch(Predicate<U> p) {
+        subscriberAssertions.receivedAtLeastOneMatch(p);
+        return this;
+    }
+
+    @Override
+    public ISubscriberAssertions<U> receivedAtLeastOneMatch(Predicate<U> p, String description) {
+        subscriberAssertions.receivedAtLeastOneMatch(p, description);
+        return this;
+    }
+
+    @Override
+    public ISubscriberAssertions<U> receivedOnlyEventsMatching(Predicate<U> p) {
+        subscriberAssertions.receivedOnlyEventsMatching(p);
+        return this;
     }
 }

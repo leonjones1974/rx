@@ -6,8 +6,9 @@ import org.assertj.core.api.AbstractCharSequenceAssert;
 import uk.camsw.rxjava.test.dsl.then.IThen;
 
 import java.util.ArrayList;
+import java.util.function.Predicate;
 
-public class RenderedStreamAssertion<U> extends AbstractCharSequenceAssert<RenderedStreamAssertion<U>, CharSequence> implements ISubscriberAssertions<U>{
+public class RenderedStreamAssertion<U> extends AbstractCharSequenceAssert<RenderedStreamAssertion<U>, CharSequence> implements ISubscriberAssertions<U> {
 
     private final ISubscriberAssertions<U> subscriberAssertions;
 
@@ -56,11 +57,35 @@ public class RenderedStreamAssertion<U> extends AbstractCharSequenceAssert<Rende
         return subscriberAssertions.renderedStream();
     }
 
+    @Override
+    public ISubscriberAssertions<U> receivedOnlyEventsMatching(Predicate<U> p) {
+        subscriberAssertions.receivedOnlyEventsMatching(p);
+        return this;
+    }
+
+    @Override
+    public ISubscriberAssertions<U> receivedOnlyEventsMatching(Predicate<U> p, String description) {
+        subscriberAssertions.receivedOnlyEventsMatching(p, description);
+        return this;
+    }
+
+    @Override
+    public ISubscriberAssertions<U> receivedAtLeastOneMatch(Predicate<U> p) {
+        subscriberAssertions.receivedAtLeastOneMatch(p);
+        return this;
+    }
+
+    @Override
+    public ISubscriberAssertions<U> receivedAtLeastOneMatch(Predicate<U> p, String description) {
+        subscriberAssertions.receivedAtLeastOneMatch(p, description);
+        return this;
+    }
+
     public RenderedStreamAssertion<U> containsAllInAnyOrder(String expected) {
         ArrayList<String> actualItems = Lists.newArrayList(Splitter.on('-').split(actual));
         ArrayList<String> expectedItems = Lists.newArrayList(Splitter.on('-').split(expected));
         if (actualItems.size() == expectedItems.size()
-            && actualItems.containsAll(expectedItems)) return this;
+                && actualItems.containsAll(expectedItems)) return this;
 
         failWithMessage(actual + " does not contain all of " + expected);
         return this;

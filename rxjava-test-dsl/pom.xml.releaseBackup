@@ -5,21 +5,32 @@
 	<parent>
 		<groupId>uk.camsw</groupId>
 		<artifactId>rx</artifactId>
-		<version>5.0.1</version>
+		<version>6.0.0-SNAPSHOT</version>
 	</parent>
-	<artifactId>rxjava-kafka</artifactId>
+	<artifactId>rxjava-test-dsl</artifactId>
 
-	<name>rxjava-kafka</name>
+	<name>rxjava-test-dsl</name>
 
 	<dependencies>
 		<dependency>
-			<groupId>uk.camsw</groupId>
-			<artifactId>rxjava-test-kafka</artifactId>
-			<version>${project.version}</version>
+			<groupId>org.assertj</groupId>
+			<artifactId>assertj-core</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>io.reactivex</groupId>
 			<artifactId>rxjava</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.jayway.awaitility</groupId>
+			<artifactId>awaitility</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
 		</dependency>
 	</dependencies>
 
