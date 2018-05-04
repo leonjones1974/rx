@@ -12,7 +12,7 @@ public interface IWhen<U, WHEN extends IWhen> {
 
     ISubscriber<U, WHEN> subscriber(int id);
 
-    ISubscriber<U, WHEN> subscriber(String id);
+//    ISubscriber<U, WHEN> subscriber(String id);
 
     ISubscriber<U, WHEN> theSubscriber(String id);      // Alias
 
